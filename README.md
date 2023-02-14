@@ -1,2 +1,3 @@
-# flaskminimum
-Minimum setup for starting a flask app (https://flask.palletsprojects.com/en/2.2.x/tutorial/)
+# potterylog
+
+A web app for the documentation of the pottery process

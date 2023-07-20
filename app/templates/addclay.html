@@ -1,0 +1,60 @@
+{% extends 'layout.html' %}
+
+{% block main %}
+<h1>Add a new clay</h1>
+
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.brand.label }}
+        {{ form.brand(size=32) }}
+        {% for error in form.brand.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.color.label }}
+        {{ form.color(size=32) }}
+        {% for error in form.color.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.temp_min.label }}
+        {{ form.temp_min(size=10) }}
+        {% for error in form.temp_min.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.temp_max.label }}
+        {{ form.temp_max(size=10) }}
+        {% for error in form.temp_max.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.temp_unit.label }} : {{ form.temp_unit }}
+        {% for error in form.temp_unit.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.grog_percent.label }}
+        {{ form.grog_percent(size=10) }}
+        {% for error in form.grog_percent.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.grog_size_max.label }}
+        {{ form.grog_size_max(size=10) }}
+        {% for error in form.grog_size_max.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <p>
+        {{ form.submit }}
+    </p>
+</form>
+{% endblock %}

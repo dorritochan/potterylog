@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
-from app.models import User
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateTimeField, SelectField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, InputRequired
+from wtforms.widgets import Input
+from app.models import User, Clay
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -28,3 +29,27 @@ class RegistrationForm(FlaskForm):
         email = User.query.filter_by(email=email.data).first()
         if email is not None:
             raise ValidationError('Please use a different email address.')
+        
+
+class AddPotForm(FlaskForm):
+    vessel_type = StringField('Vessel type', validators=[DataRequired()])
+    clay_type = SelectField('Clay type', validators=[InputRequired()], coerce=int, choices=[])
+    author = StringField('Author', validators=[DataRequired()])
+    throw_date = DateTimeField('Throwing date and time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()], widget=Input(input_type='datetime-local'))
+    submit = SubmitField('Add pot')
+        
+    def __init__(self, *args, **kwargs):
+        super(AddPotForm, self).__init__(*args, **kwargs)
+        self.clay_type.choices = [(clay.id, clay.get_name()) for clay in Clay.query.all()]
+
+
+
+class AddClayForm(FlaskForm):
+    brand = StringField('Brand', validators=[DataRequired()])
+    color = StringField('Color')
+    temp_min = StringField('Minimum temperature')
+    temp_max = StringField('Maximum temperature')
+    temp_unit = SelectField('°', coerce=int, choices=[(1, 'C'), (2, 'F')])
+    grog_percent = StringField('Grog percentage %')
+    grog_size_max = StringField('Grog size mm')
+    submit = SubmitField('Add clay')

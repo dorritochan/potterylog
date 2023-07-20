@@ -2,4 +2,39 @@
 
 {% block main %}
 <h1>This is a pottery log</h1>
+
+<div>
+    <h2>List of pots</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Throwing time</th>
+                <th>Clay</th>
+                <th>Glazes</th>
+                <th>Bisque Program</th>
+                <th>Glaze Program</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pot in pots %}
+            <tr>
+                <td>{{ pot.id }}</td>
+                <td>{{ pot.vessel_type or ''}}</td>
+                <td>{{ pot.throw_date.strftime('%d.%m.%Y %H:%M') or ''}}</td>
+                <td>{{ pot.get_clay_info() or '' }}</td>
+                <td>{% for glaze in pot.get_glaze_info() %}
+                    <p>{{ glaze or '' }}</p><br>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div>
+        <a href="{{ url_for('add_pot') }}" class="button">Add a new pot</a>
+    </div>
+</div>
+
 {% endblock %}

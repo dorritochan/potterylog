@@ -1,0 +1,83 @@
+2023-07-18 14:51:58,027 ERROR: Exception on / [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+Traceback (most recent call last):
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 15, in index
+    return render_template('index.html', title='Pottery log', pots=pots)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/templating.py", line 147, in render_template
+    return _render(app, template, context)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/templating.py", line 130, in _render
+    rv = template.render(context)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/jinja2/environment.py", line 1301, in render
+    self.environment.handle_exception()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/jinja2/environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/templates/index.html", line 1, in top-level template code
+    {% extends 'layout.html' %}
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/templates/layout.html", line 56, in top-level template code
+    {% block main %}
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/templates/index.html", line 27, in block 'main'
+    <td>{% for glaze in pot.get_glaze_info() %}
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/jinja2/utils.py", line 83, in from_obj
+    if hasattr(obj, "jinja_pass_arg"):
+jinja2.exceptions.UndefinedError: 'app.models.Pot object' has no attribute 'get_glaze_info'
+2023-07-18 14:53:14,646 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 15:23:57,039 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 15:24:03,970 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 16:15:40,868 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 16:16:04,082 ERROR: Exception on /addpot [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+Traceback (most recent call last):
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 64, in add_pot
+    if current_user.is_authenticated and form.validate_on_submit():
+AttributeError: 'AddPotForm' object has no attribute 'validate_on_submit'
+2023-07-18 16:22:46,486 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 16:24:09,887 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 16:24:14,913 ERROR: Exception on /addpot [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+Traceback (most recent call last):
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 64, in add_pot
+    if current_user.is_authenticated and form.validate_on_submit():
+AttributeError: 'AddPotForm' object has no attribute 'validate_on_submit'
+2023-07-18 16:29:56,707 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 16:33:56,777 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 16:34:20,510 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 16:35:20,087 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 16:36:21,410 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 16:58:25,940 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 16:59:56,947 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 17:01:09,122 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 17:04:45,507 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 17:08:07,617 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 17:11:10,992 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 17:17:49,410 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 17:19:17,635 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 17:20:01,358 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 17:25:02,945 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]
+2023-07-18 17:47:57,512 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:57]

@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% block main %}
+<h1>Add a new pot</h1>
+
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <div>
+        <p>
+        {{ form.vessel_type.label }}
+        {{ form.vessel_type(size=32) }}
+        {% for error in form.vessel_type.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+        </p>
+    </div>
+    <div>
+        {{ form.clay_type.label }}: {{ form.clay_type() }}
+        {% for error in form.clay_type.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+        <a href="{{ url_for('add_clay') }}">Add a new clay</a>
+    </div>
+    <div>
+        {{ form.author.label }}
+        {{ form.author(size=32) }}
+        {% for error in form.author.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <p>
+        {{ form.throw_date.label }}
+        {{ form.throw_date }}
+        {% for error in form.throw_date.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.submit }}
+    </p>
+</form>
+{% endblock %}

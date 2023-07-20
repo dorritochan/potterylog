@@ -64,8 +64,12 @@ def add_pot():
     if current_user.is_authenticated and form.validate_on_submit():
         clay = Clay.query.filter_by(id=form.clay_type.data).first()
         if clay:
-            pot = Pot(vessel_type=form.vessel_type.data, clay_type=clay.id, author=form.author.data, \
-                throw_date=form.throw_date.data)
+            pot = Pot(vessel_type=form.vessel_type.data, clay_type=clay.id, author=form.author.data, 
+                    throw_date=form.throw_date.data, throw_weight=form.throw_weight.data, 
+                    throw_height=form.throw_height.data, throw_width=form.throw_width.data,
+                    throw_notes=form.throw_notes.data, trim_date=form.trim_date.data,
+                    trim_weight=form.trim_weight.data, trim_surface_treatment=form.trim_surface_treatment.data,
+                    trim_notes=form.trim_notes.data)
             db.session.add(pot)
             db.session.commit()
             flash('A new pot has been saved.')
@@ -79,7 +83,8 @@ def add_clay():
     form = AddClayForm()
     if current_user.is_authenticated and form.validate_on_submit():
         clay = Clay(brand=form.brand.data, color=form.color.data, temp_min=form.temp_min.data, 
-                    temp_max=form.temp_max.data, temp_unit=form.temp_unit.data, 
+                    temp_max=form.temp_max.data, 
+                    temp_unit=next(label for value, label in form.temp_unit.choices if value == form.temp_unit.data), 
                     grog_percent=form.grog_percent.data, grog_size_max=form.grog_size_max.data)
         db.session.add(clay)
         db.session.commit()

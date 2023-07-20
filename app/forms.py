@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateTimeField, SelectField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateTimeField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, InputRequired
 from wtforms.widgets import Input
 from app.models import User, Clay
@@ -36,6 +36,14 @@ class AddPotForm(FlaskForm):
     clay_type = SelectField('Clay type', validators=[InputRequired()], coerce=int, choices=[])
     author = StringField('Author', validators=[DataRequired()])
     throw_date = DateTimeField('Throwing date and time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()], widget=Input(input_type='datetime-local'))
+    throw_weight = StringField('Throwing weight in g')
+    throw_height = StringField('Throwing heights in cm')
+    throw_width = StringField('Throwing widths in cm')
+    throw_notes = TextAreaField('Throwing notes')
+    trim_date = DateTimeField('Trimming date and time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()], widget=Input(input_type='datetime-local'))
+    trim_weight = StringField('Trimmed weight in g')
+    trim_surface_treatment = StringField('Surface treatment')
+    trim_notes = TextAreaField('Trimming notes')
     submit = SubmitField('Add pot')
         
     def __init__(self, *args, **kwargs):

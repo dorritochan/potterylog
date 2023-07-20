@@ -159,7 +159,7 @@ class Clay(db.Model):
     pots = db.relationship('Pot', backref='made_with_clay', lazy='dynamic')
     
     def get_name(self):
-        return '{} {} {} {}'.format(self.brand, self.color, self.temp_max, self.grog_percent)
+        return '{} {} {}°{} {}%'.format(self.brand, self.color, self.temp_max, self.temp_unit, self.grog_percent)
 
     def __repr__(self):
         return '<Clay {}, {}, {}, {}>'.format(self.brand, self.color, self.temp_max, self.grog_percent)   

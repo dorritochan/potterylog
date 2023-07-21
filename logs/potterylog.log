@@ -1,13 +1,10 @@
-2023-07-20 02:33:28,125 ERROR: Exception on /addclay [POST] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+2023-07-21 23:03:43,409 ERROR: Exception on /addpot [POST] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1808, in _execute_context
-    context = constructor(
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/default.py", line 1261, in _init_compiled
-    l_param: List[Any] = [
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/default.py", line 1262, in <listcomp>
-    flattened_processors[key](compiled_params[key])
-  File "lib/sqlalchemy/cyextension/processors.pyx", line 21, in sqlalchemy.cyextension.processors.to_float
-ValueError: could not convert string to float: '0,1'
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/default.py", line 747, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.InterfaceError: Error binding parameter 1 - probably unsupported type.
 
 The above exception was the direct cause of the following exception:
 
@@ -22,7 +19,7 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 85, in add_clay
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 97, in add_pot
     db.session.commit()
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/scoping.py", line 538, in commit
     return self._proxied.commit()
@@ -60,25 +57,16 @@ Traceback (most recent call last):
     return connection._execute_clauseelement(
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
     ret = self._execute_context(
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1814, in _execute_context
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1842, in _execute_context
+    return self._exec_single_context(
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
     self._handle_dbapi_exception(
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 2325, in _handle_dbapi_exception
     raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1808, in _execute_context
-    context = constructor(
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/default.py", line 1261, in _init_compiled
-    l_param: List[Any] = [
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/default.py", line 1262, in <listcomp>
-    flattened_processors[key](compiled_params[key])
-  File "lib/sqlalchemy/cyextension/processors.pyx", line 21, in sqlalchemy.cyextension.processors.to_float
-sqlalchemy.exc.StatementError: (builtins.ValueError) could not convert string to float: '0,1'
-[SQL: INSERT INTO clay (brand, color, temp_min, temp_max, temp_unit, grog_percent, grog_size_max, grog_size_unit) VALUES (?, ?, ?, ?, ?, ?, ?, ?)]
-[parameters: [{'grog_size_max': '0,1', 'color': 'white', 'brand': 'Carl Jäger', 'temp_max': '1280', 'temp_min': '1220', 'grog_percent': '20', 'temp_unit': 1}]]
-2023-07-20 02:43:55,381 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-20 02:44:18,251 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-20 02:44:59,737 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-20 02:49:06,493 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-20 02:54:57,248 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-20 23:16:56,614 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-20 23:17:01,724 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-20 23:30:36,466 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/default.py", line 747, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.InterfaceError: <unprintable InterfaceError object>
+2023-07-21 23:05:09,822 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-07-21 23:07:25,415 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]

@@ -62,7 +62,7 @@ class Pot(db.Model):
     bisque_fire_start = db.Column(db.DateTime, index=True)
     bisque_fire_program_id = db.Column(db.Integer, db.ForeignKey('firing_program.id'), index=True)
     bisque_fired_with_program = db.relationship('FiringProgram', back_populates='bisque_pots', foreign_keys=[bisque_fire_program_id])
-    bisque_fire_kiln_id = db.Column(db.Integer, db.ForeignKey('kiln.id'), index=True)
+    bisque_fire_kiln_id = db.Column(db.Integer, db.ForeignKey('kiln.id'), index=True, default=1)
     bisque_fired_with_kiln = db.relationship('Kiln', back_populates='bisque_fired_pots', foreign_keys=[bisque_fire_kiln_id])
     bisque_fire_end = db.Column(db.DateTime)
     bisque_fire_open = db.Column(db.DateTime)
@@ -75,7 +75,7 @@ class Pot(db.Model):
     glaze_fire_start = db.Column(db.DateTime, index=True)
     glaze_fire_program_id = db.Column(db.Integer, db.ForeignKey('firing_program.id'), index=True)
     glaze_fired_with_program = db.relationship('FiringProgram', back_populates='glaze_pots', foreign_keys=[glaze_fire_program_id])
-    glaze_fire_kiln_id = db.Column(db.Integer, db.ForeignKey('kiln.id'), index=True)
+    glaze_fire_kiln_id = db.Column(db.Integer, db.ForeignKey('kiln.id'), index=True, default=1)
     glaze_fired_with_kiln = db.relationship('Kiln', back_populates='glaze_fired_pots', foreign_keys=[glaze_fire_kiln_id])
     glaze_fire_end = db.Column(db.DateTime, index=True)
     glaze_fire_open = db.Column(db.DateTime, index=True)
@@ -85,13 +85,13 @@ class Pot(db.Model):
         '''This is for displaying purposes for the UI'''
         glaze_info = []
         for glaze in self.used_glazes:
-            glaze_info.append(f'{glaze.brand} {glaze.color} {glaze.brand_id} max {glaze.temp_max}°{glaze.temp_unit}')
+            glaze_info.append(glaze.get_glaze_name())
         return glaze_info 
     
     def get_clay_info(self):
         clay = Clay.query.get(self.clay_type)
         if clay:
-            return '{} {} {}°{} {}%'.format(clay.brand, clay.color, clay.temp_max, clay.temp_unit, clay.grog_percent)
+            return '{} {} {}{} {}%'.format(clay.brand, clay.color, clay.temp_max, clay.temp_unit, clay.grog_percent)
         return self.clay_type
     
     def __repr__(self):
@@ -105,9 +105,12 @@ class Glaze(db.Model):
     color = db.Column(db.String(140))
     temp_min = db.Column(db.Integer)
     temp_max = db.Column(db.Integer)
-    temp_unit = db.Column(db.String(10), default='C')
+    temp_unit = db.Column(db.String(10), default='°C')
     brand_id = db.Column(db.Integer)
     glazed_pots = db.relationship('Pot', secondary=pot_glaze, back_populates='used_glazes', lazy='dynamic')
+    
+    def get_glaze_name(self):
+        return '{} {} {} {}{}'.format(self.brand, self.brand_id, self.color, self.temp_max, self.temp_unit)
     
     def __repr__(self):
         return '<Glaze {}, {}, {}>'.format(self.brand, self.color, self.temp_max)   
@@ -123,12 +126,13 @@ class FiringProgram(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # Bisque or glaze
     type = db.Column(db.String(20))
+    name = db.Column(db.String(100))
     associated_segments = db.relationship('FiringSegment', secondary=program_segment, back_populates='associated_programs', lazy='dynamic')
     bisque_pots = db.relationship('Pot', back_populates='bisque_fired_with_program', foreign_keys='[Pot.bisque_fire_program_id]', lazy='dynamic')
     glaze_pots = db.relationship('Pot', back_populates='glaze_fired_with_program', foreign_keys='[Pot.glaze_fire_program_id]', lazy='dynamic')
     
     def __repr__(self):
-        return '<Firing program {}, {}>'.format(self.type, self.firing_segments)  
+        return '<Firing program {}>'.format(self.type)  
     
     
 class FiringSegment(db.Model):
@@ -136,9 +140,9 @@ class FiringSegment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     temp_start = db.Column(db.Integer)
     temp_end = db.Column(db.Integer)
-    temp_unit = db.Column(db.String(10))
+    temp_unit = db.Column(db.String(10), default='°C')
     time_to_reach = db.Column(db.Integer)
-    time_to_reach_unit = db.Column(db.String(10))
+    time_to_reach_unit = db.Column(db.String(10), default='min')
     associated_programs = db.relationship('FiringProgram', secondary=program_segment, back_populates='associated_segments', lazy='dynamic')
     
     def __repr__(self):
@@ -152,14 +156,14 @@ class Clay(db.Model):
     color = db.Column(db.String(140))
     temp_min = db.Column(db.Integer)
     temp_max = db.Column(db.Integer)
-    temp_unit = db.Column(db.String(10), default='C')
+    temp_unit = db.Column(db.String(10), default='°C')
     grog_percent = db.Column(db.Integer)
     grog_size_max = db.Column(db.Float)
     grog_size_unit = db.Column(db.String(10), default='mm')
     pots = db.relationship('Pot', backref='made_with_clay', lazy='dynamic')
     
     def get_name(self):
-        return '{} {} {}°{} {}%'.format(self.brand, self.color, self.temp_max, self.temp_unit, self.grog_percent)
+        return '{} {} {}{} {}%'.format(self.brand, self.color, self.temp_max, self.temp_unit, self.grog_percent)
 
     def __repr__(self):
         return '<Clay {}, {}, {}, {}>'.format(self.brand, self.color, self.temp_max, self.grog_percent)   
@@ -175,9 +179,9 @@ class Kiln(db.Model):
     capacity = db.Column(db.Integer)
     capacity_unit = db.Column(db.String(10), default='L')
     temp_max = db.Column(db.Integer)
-    temp_unit = db.Column(db.String(10), default='C')
+    temp_unit = db.Column(db.String(10), default='°C')
     voltage = db.Column(db.String(20))
-    controller = db.Column(db.String(40))
+    controller = db.Column(db.String(200))
     bisque_fired_pots  = db.relationship('Pot', back_populates='bisque_fired_with_kiln', foreign_keys='[Pot.bisque_fire_kiln_id]', lazy='dynamic')
     glaze_fired_pots  = db.relationship('Pot', back_populates='glaze_fired_with_kiln', foreign_keys='[Pot.glaze_fire_kiln_id]', lazy='dynamic')
     

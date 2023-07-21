@@ -3,7 +3,7 @@ from app import app
 from app import db
 from app.forms import LoginForm, RegistrationForm, AddPotForm, AddClayForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Pot, Clay
+from app.models import User, Pot, Clay, FiringProgram, Kiln, Glaze
 from werkzeug.urls import url_parse
 from datetime import datetime
 
@@ -62,14 +62,35 @@ def logout():
 def add_pot():
     form = AddPotForm()
     if current_user.is_authenticated and form.validate_on_submit():
-        clay = Clay.query.filter_by(id=form.clay_type.data).first()
-        if clay:
-            pot = Pot(vessel_type=form.vessel_type.data, clay_type=clay.id, author=form.author.data, 
+        clay = Clay.query.get(form.clay_type.data)
+        bisque_fire_program_id = form.bisque_fired_with_program.data
+        bisque_program = FiringProgram.query.get(bisque_fire_program_id)
+        bisque_fire_kiln_id = form.bisque_fired_with_kiln.data
+        bisque_kiln = Kiln.query.get(bisque_fire_kiln_id)
+        used_glazes = [Glaze.query.get(id) for id in form.used_glazes.data]
+        glaze_fire_program_id = form.glaze_fired_with_program.data
+        glaze_program = FiringProgram.query.get(glaze_fire_program_id)
+        glaze_fire_kiln_id = form.glaze_fired_with_kiln.data
+        glaze_kiln = Kiln.query.get(glaze_fire_kiln_id)
+        if clay and bisque_program and bisque_kiln and glaze_program and glaze_kiln:
+            pot = Pot(vessel_type=form.vessel_type.data, made_with_clay = clay, author=form.author.data, 
                     throw_date=form.throw_date.data, throw_weight=form.throw_weight.data, 
                     throw_height=form.throw_height.data, throw_width=form.throw_width.data,
                     throw_notes=form.throw_notes.data, trim_date=form.trim_date.data,
                     trim_weight=form.trim_weight.data, trim_surface_treatment=form.trim_surface_treatment.data,
-                    trim_notes=form.trim_notes.data)
+                    trim_notes=form.trim_notes.data, bisque_fire_start=form.bisque_fire_start.data,
+                    bisque_fire_program_id=bisque_fire_program_id,
+                    bisque_fired_with_program=bisque_program, bisque_fire_kiln_id=bisque_fire_kiln_id,
+                    bisque_fired_with_kiln=bisque_kiln,
+                    bisque_fire_end=form.bisque_fire_end.data, bisque_fire_open=form.bisque_fire_open.data,
+                    bisque_fire_notes=form.bisque_fire_notes.data, 
+                    glaze_date=form.glaze_date.data, used_glazes = used_glazes, glaze_notes=form.glaze_notes.data,
+                    glaze_fire_start=form.glaze_fire_start.data,
+                    glaze_fire_program_id=glaze_fire_program_id, glaze_fire_kiln_id=glaze_fire_kiln_id,
+                    glaze_fired_with_kiln=glaze_kiln,
+                    glaze_fired_with_program=glaze_program, 
+                    glaze_fire_end=form.glaze_fire_end.data, glaze_fire_open=form.glaze_fire_open.data,
+                    glaze_fire_notes=form.glaze_fire_notes.data)
             db.session.add(pot)
             db.session.commit()
             flash('A new pot has been saved.')

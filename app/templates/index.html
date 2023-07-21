@@ -28,6 +28,8 @@
                     <p>{{ glaze or '' }}</p><br>
                     {% endfor %}
                 </td>
+                <td>{{ pot.bisque_fired_with_program.name or '' }}</td>
+                <td>{{ pot.glaze_fired_with_program.name or '' }}</td>
             </tr>
             {% endfor %}
         </tbody>

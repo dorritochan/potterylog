@@ -102,15 +102,17 @@ class Glaze(db.Model):
     __tablename__ = 'glaze'
     id = db.Column(db.Integer, primary_key=True)
     brand = db.Column(db.String(140), index=True)
+    name = db.Column(db.String(50))
     color = db.Column(db.String(140))
     temp_min = db.Column(db.Integer)
     temp_max = db.Column(db.Integer)
     temp_unit = db.Column(db.String(10), default='°C')
     brand_id = db.Column(db.Integer)
+    glaze_url = db.Column(db.String(200))
     glazed_pots = db.relationship('Pot', secondary=pot_glaze, back_populates='used_glazes', lazy='dynamic')
     
     def get_glaze_name(self):
-        return '{} {} {} {}{}'.format(self.brand, self.brand_id, self.color, self.temp_max, self.temp_unit)
+        return '{} {} {} {}{}'.format(self.brand, self.brand_id, self.name, self.temp_max, self.temp_unit)
     
     def __repr__(self):
         return '<Glaze {}, {}, {}>'.format(self.brand, self.color, self.temp_max)   

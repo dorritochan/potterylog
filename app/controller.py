@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app
 from app import db
-from app.forms import LoginForm, RegistrationForm, AddPotForm, AddClayForm
+from app.forms import LoginForm, RegistrationForm, AddPotForm, AddClayForm, AddGlazeForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Pot, Clay, FiringProgram, Kiln, Glaze
 from werkzeug.urls import url_parse
@@ -110,6 +110,29 @@ def add_clay():
         db.session.add(clay)
         db.session.commit()
         flash('A new clay has been added.')
-        return(redirect(url_for('index')))
+        return(redirect(url_for('add_pot')))
     return render_template('addclay.html', title='Add new clay', form=form)
+
+
+@app.route('/addglaze', methods=['GET', 'POST'])
+@login_required
+def add_glaze():
+    form = AddGlazeForm()
+    if current_user.is_authenticated and form.validate_on_submit():
+        glaze = Glaze(brand=form.brand.data, name=form.name.data, color=form.color.data, 
+                    temp_min=form.temp_min.data, temp_max=form.temp_max.data, 
+                    temp_unit=next(label for value, label in form.temp_unit.choices if value == form.temp_unit.data),
+                    brand_id=form.brand_id.data, glaze_url=form.glaze_url.data)
+        db.session.add(glaze)
+        db.session.commit()
+        flash('A new glaze has been added.')
+        return redirect(url_for('add_pot'))
+    return render_template('addglaze.html', title='Add new glaze', form=form)
+
+
+@app.route('/viewglazes')
+@login_required
+def view_glazes():
+    glazes = Glaze.query.all()
+    return render_template('viewglazes.html', title='List of glazes', glazes=glazes)
         

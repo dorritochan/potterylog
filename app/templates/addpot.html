@@ -5,6 +5,7 @@
 
 <form action="" method="post">
     {{ form.hidden_tag() }}
+    <h3>Throwing</h3>
     <div>
         {{ form.vessel_type.label }}
         {{ form.vessel_type(size=32) }}
@@ -61,6 +62,7 @@
             <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </div>
+    <h3>Trimming</h3>
     <div>
         {{ form.trim_date.label }}
         {{ form.trim_date }}
@@ -89,6 +91,7 @@
             <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </div>
+    <h3>Bisque firing</h3>
     <div>
         {{ form.bisque_fire_start.label }}
         {{ form.bisque_fire_start }}
@@ -129,6 +132,7 @@
             <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </div>
+    <h3>Glazing</h3>
     <div>
         {{ form.glaze_date.label }}
         {{ form.glaze_date }}
@@ -141,6 +145,7 @@
         {% for error in form.used_glazes.errors %}
             <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
+        <a href="{{ url_for('add_glaze') }}">Add a new glaze</a>
     </div>
     <div>
         {{ form.glaze_notes.label }}
@@ -149,6 +154,7 @@
             <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </div>
+    <h3>Glaze firing</h3>
     <div>
         {{ form.glaze_fire_start.label }}
         {{ form.glaze_fire_start }}

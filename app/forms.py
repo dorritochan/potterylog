@@ -1,8 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateTimeField, SelectField, TextAreaField, SelectMultipleField, widgets
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, InputRequired, Optional
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, InputRequired, Optional, URL
 from wtforms.widgets import Input
 from app.models import User, Clay, FiringProgram, Kiln, Glaze
+from datetime import datetime
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -34,8 +35,8 @@ class RegistrationForm(FlaskForm):
 class AddPotForm(FlaskForm):
     vessel_type = StringField('Vessel type', validators=[DataRequired()])
     clay_type = SelectField('Clay type', validators=[InputRequired()], choices=[])
-    author = StringField('Author', validators=[DataRequired()])
-    throw_date = DateTimeField('Throwing date and time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()], widget=Input(input_type='datetime-local'))
+    author = StringField('Author', validators=[DataRequired()], default='Dora')
+    throw_date = DateTimeField('Throwing date and time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()], widget=Input(input_type='datetime-local'), default=datetime.now)
     throw_weight = StringField('Throwing weight in g')
     throw_height = StringField('Throwing heights in cm')
     throw_width = StringField('Throwing widths in cm')
@@ -80,3 +81,17 @@ class AddClayForm(FlaskForm):
     grog_percent = StringField('Grog percentage %')
     grog_size_max = StringField('Grog size mm')
     submit = SubmitField('Add clay')
+    
+    
+class AddGlazeForm(FlaskForm):
+    brand = StringField('Brand name', validators=[DataRequired()])
+    name = StringField('Glaze name')
+    color = StringField('Color')
+    temp_min = StringField('Minimum temperature')
+    temp_max = StringField('Maximum temperature')
+    temp_unit = SelectField('Temperature unit', coerce=int, choices=[(1, '°C'), (2, '°F')])
+    brand_id = StringField('Brand ID')
+    glaze_url = StringField('Glaze URL', validators=[URL()])
+    submit = SubmitField('Add glaze')
+    
+    

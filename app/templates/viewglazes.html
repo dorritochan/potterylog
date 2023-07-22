@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block main %}
+<h1>List of glazes</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Brand</th>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Color</th>
+            <th>Min. temp.</th>
+            <th>Max. temp.</th>
+            <th>URL</th>
+        </tr>
+    </thead>
+    <body>
+        {% for glaze in glazes %}
+        <tr>
+            <td>{{ glaze.brand or '' }}</td>
+            <td>{{ glaze.brand_id or '' }}</td>
+            <td>{{ glaze.name or '' }}</td>
+            <td>{{ glaze.color or '' }}</td>
+            <td>{{ glaze.temp_min or '' }}</td>
+            <td>{{ glaze.temp_max or '' }}</td>
+            <td>
+                <a href="{{ glaze.glaze_url }}">{{ glaze.glaze_url or '' }}</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </body>
+</table>
+{% endblock %}

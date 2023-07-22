@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}
+
+{% block main %}
+<h1>Add a new glaze</h1>
+
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.brand.label }}
+        {{ form.brand(size=32) }}
+        {% for error in form.brand.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.brand_id.label }}
+        {{ form.brand_id(size=32) }}
+        {% for error in form.brand_id.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.name.label }}
+        {{ form.name(size=32) }}
+        {% for error in form.name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.glaze_url.label }}
+        {{ form.glaze_url(size=200) }}
+        {% for error in form.glaze_url.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.color.label }}
+        {{ form.color(size=32) }}
+        {% for error in form.color.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.temp_min.label }}
+        {{ form.temp_min(size=10) }}
+        {% for error in form.temp_min.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.temp_max.label }}
+        {{ form.temp_max(size=10) }}
+        {% for error in form.temp_max.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.temp_unit.label }} : {{ form.temp_unit }}
+        {% for error in form.temp_unit.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <p>
+        {{ form.submit }}
+    </p>
+</form>
+{% endblock %}

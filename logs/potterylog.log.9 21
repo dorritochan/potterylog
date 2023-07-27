@@ -1,0 +1,66 @@
+2023-07-21 11:22:42,449 ERROR: Exception on /addpot [POST] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+Traceback (most recent call last):
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 67, in add_pot
+    pot = Pot(vessel_type=form.vessel_type.data, clay_type=clay.id, author=form.author.data,
+  File "<string>", line 4, in __init__
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/state.py", line 576, in _initialize_instance
+    manager.dispatch.init_failure(self, args, kwargs)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/util/langhelpers.py", line 147, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/state.py", line 573, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/decl_base.py", line 2076, in _declarative_constructor
+    setattr(self, k, kwargs[k])
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/attributes.py", line 528, in __set__
+    self.impl.set(
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/attributes.py", line 1453, in set
+    value = self.fire_replace_event(state, dict_, value, old, initiator)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/attributes.py", line 1492, in fire_replace_event
+    value = fn(
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/attributes.py", line 2142, in emit_backref_from_scalar_set_event
+    instance_state(child),
+AttributeError: 'int' object has no attribute '_sa_instance_state'
+2023-07-21 11:24:14,265 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-07-21 11:24:30,298 ERROR: Exception on /addpot [POST] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+Traceback (most recent call last):
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 67, in add_pot
+    pot = Pot(vessel_type=form.vessel_type.data, clay_type=clay, author=form.author.data,
+  File "<string>", line 4, in __init__
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/state.py", line 576, in _initialize_instance
+    manager.dispatch.init_failure(self, args, kwargs)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/util/langhelpers.py", line 147, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/state.py", line 573, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/decl_base.py", line 2076, in _declarative_constructor
+    setattr(self, k, kwargs[k])
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/attributes.py", line 528, in __set__
+    self.impl.set(
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/attributes.py", line 1453, in set
+    value = self.fire_replace_event(state, dict_, value, old, initiator)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/attributes.py", line 1492, in fire_replace_event
+    value = fn(
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/attributes.py", line 2142, in emit_backref_from_scalar_set_event
+    instance_state(child),
+AttributeError: 'int' object has no attribute '_sa_instance_state'
+2023-07-21 11:27:09,179 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]

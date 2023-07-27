@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateTimeField, SelectField, TextAreaField, SelectMultipleField, widgets
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateTimeField, SelectField, TextAreaField, SelectMultipleField, widgets, FileField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, InputRequired, Optional, URL
+from flask_wtf.file import FileAllowed
 from wtforms.widgets import Input
 from app.models import User, Clay, FiringProgram, Kiln, Glaze
 from datetime import datetime
@@ -36,6 +37,7 @@ class AddPotForm(FlaskForm):
     vessel_type = StringField('Vessel type', validators=[DataRequired()])
     clay_type = SelectField('Clay type', validators=[InputRequired()], choices=[])
     author = StringField('Author', validators=[DataRequired()], default='Dora')
+    photo = FileField('Upload photos', validators=[FileAllowed(['jpg', 'jpeg', 'png', 'gif'])])
     throw_date = DateTimeField('Throwing date and time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()], widget=Input(input_type='datetime-local'), default=datetime.now)
     throw_weight = StringField('Throwing weight in g')
     throw_height = StringField('Throwing heights in cm')

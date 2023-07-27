@@ -1,22 +1,4 @@
-2023-07-21 22:42:12,714 ERROR: Exception on /addpot [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
-Traceback (most recent call last):
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 64, in add_pot
-    used_glazes = [Glaze.query.get(id) for id in form.used_glazes.data]
-TypeError: 'NoneType' object is not iterable
-2023-07-21 22:43:08,088 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 22:45:23,151 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 22:47:37,950 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 22:47:57,516 ERROR: Exception on /addpot [POST] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+2023-07-21 23:00:45,449 ERROR: Exception on /addpot [POST] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
     self.dialect.do_execute(
@@ -86,6 +68,5 @@ Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/default.py", line 747, in do_execute
     cursor.execute(statement, parameters)
 sqlalchemy.exc.InterfaceError: <unprintable InterfaceError object>
-2023-07-21 22:49:21,700 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 22:50:14,627 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 22:50:59,289 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-07-21 23:01:22,415 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-07-21 23:02:37,499 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]

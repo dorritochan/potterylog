@@ -1,4 +1,4 @@
-2023-07-21 23:02:49,618 ERROR: Exception on /addpot [POST] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+2023-07-21 11:56:33,926 ERROR: Exception on /addpot [POST] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
     self.dialect.do_execute(
@@ -19,7 +19,7 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 97, in add_pot
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 80, in add_pot
     db.session.commit()
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/scoping.py", line 538, in commit
     return self._proxied.commit()
@@ -68,4 +68,4 @@ Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/default.py", line 747, in do_execute
     cursor.execute(statement, parameters)
 sqlalchemy.exc.InterfaceError: <unprintable InterfaceError object>
-2023-07-21 23:03:20,591 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-07-21 11:59:52,026 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]

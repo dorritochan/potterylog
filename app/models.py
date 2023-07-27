@@ -44,6 +44,7 @@ class Pot(db.Model):
     vessel_type = db.Column(db.String(50))
     clay_type = db.Column(db.Integer, db.ForeignKey('clay.id'), index=True)
     author = db.Column(db.String(30), index=True)
+    photo_filename = db.Column(db.String(255))
     # Throwing
     throw_date = db.Column(db.DateTime, index=True, default=lambda: germany_timezone.localize(datetime.now()))
     throw_weight = db.Column(db.Integer, index=True)
@@ -80,13 +81,6 @@ class Pot(db.Model):
     glaze_fire_end = db.Column(db.DateTime, index=True)
     glaze_fire_open = db.Column(db.DateTime, index=True)
     glaze_fire_notes = db.Column(db.Text)
-    
-    def get_glaze_info(self):
-        '''This is for displaying purposes for the UI'''
-        glaze_info = []
-        for glaze in self.used_glazes:
-            glaze_info.append(glaze.get_glaze_name())
-        return glaze_info 
     
     def get_clay_info(self):
         clay = Clay.query.get(self.clay_type)

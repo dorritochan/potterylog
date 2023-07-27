@@ -1,4 +1,4 @@
-2023-07-21 12:04:36,380 ERROR: Exception on /addpot [POST] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+2023-07-21 22:59:35,419 ERROR: Exception on /addpot [POST] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
     self.dialect.do_execute(
@@ -19,7 +19,7 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 84, in add_pot
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 99, in add_pot
     db.session.commit()
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/scoping.py", line 538, in commit
     return self._proxied.commit()
@@ -68,28 +68,5 @@ Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/default.py", line 747, in do_execute
     cursor.execute(statement, parameters)
 sqlalchemy.exc.InterfaceError: <unprintable InterfaceError object>
-2023-07-21 12:04:51,261 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:05:50,119 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:06:55,649 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:17:48,574 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:27:24,305 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:28:35,760 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:33:42,551 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:33:44,318 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:33:58,715 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:41:03,913 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:43:01,009 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:43:30,240 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:44:27,567 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:46:39,157 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:46:40,790 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 12:52:34,576 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 13:08:29,288 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 13:39:25,880 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 13:41:56,356 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 13:41:57,933 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 13:43:01,191 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 13:44:12,737 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 13:47:10,695 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 22:40:51,434 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-07-21 22:42:08,188 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-07-21 23:00:09,013 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-07-21 23:00:24,526 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]

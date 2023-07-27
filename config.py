@@ -11,3 +11,5 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     FLASK_DEBUG = True
+    
+    UPLOAD_FOLDER = os.path.join(basedir, 'app', 'photos')

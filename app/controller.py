@@ -5,7 +5,9 @@ from app.forms import LoginForm, RegistrationForm, AddPotForm, AddClayForm, AddG
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Pot, Clay, FiringProgram, Kiln, Glaze
 from werkzeug.urls import url_parse
+from werkzeug.utils import secure_filename
 from datetime import datetime
+import os
 
 @app.route('/')
 @app.route('/home')
@@ -91,6 +93,12 @@ def add_pot():
                     glaze_fired_with_program=glaze_program, 
                     glaze_fire_end=form.glaze_fire_end.data, glaze_fire_open=form.glaze_fire_open.data,
                     glaze_fire_notes=form.glaze_fire_notes.data)
+            file = form.photo.data
+            if file:
+                filename = secure_filename(file.filename)
+                photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(photo_path)
+                pot.photo_filename = filename
             db.session.add(pot)
             db.session.commit()
             flash('A new pot has been saved.')
@@ -126,7 +134,7 @@ def add_glaze():
         db.session.add(glaze)
         db.session.commit()
         flash('A new glaze has been added.')
-        return redirect(url_for('add_pot'))
+        return redirect(url_for('index'))
     return render_template('addglaze.html', title='Add new glaze', form=form)
 
 
@@ -136,3 +144,11 @@ def view_glazes():
     glazes = Glaze.query.all()
     return render_template('viewglazes.html', title='List of glazes', glazes=glazes)
         
+
+@app.route('/showglaze/<int:glaze_id>')
+@login_required
+def show_glaze(glaze_id):
+    glaze = Glaze.query.get(glaze_id)
+    if glaze:
+        return render_template('showglaze.html', title='Glaze {}'.format(glaze.get_glaze_name()), glaze=glaze)
+    return render_template('404.html')

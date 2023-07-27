@@ -1,11 +1,10 @@
 {% extends 'layout.html' %}
 
 {% block main %}
-<h1>List of glazes</h1>
+<h1>Glaze {{ glaze.get_glaze_name() }}</h1>
 <table>
     <thead>
         <tr>
-            <th>Pots</th>
             <th>Brand</th>
             <th>ID</th>
             <th>Name</th>
@@ -16,9 +15,7 @@
         </tr>
     </thead>
     <body>
-        {% for glaze in glazes %}
         <tr>
-            <td><a href="{{ url_for('show_glaze', glaze_id=glaze.id) }}">View</a></td>
             <td>{{ glaze.brand or '' }}</td>
             <td>{{ glaze.brand_id or '' }}</td>
             <td>{{ glaze.name or '' }}</td>
@@ -29,8 +26,10 @@
                 <a href="{{ glaze.glaze_url }}">{{ glaze.glaze_url or '' }}</a>
             </td>
         </tr>
-        {% endfor %}
     </body>
 </table>
-<a href="{{ url_for('add_glaze') }}">Add a new glaze</a>
+<h3>Pots used with this glaze</h3>
+{% for pot in glaze.glazed_pots %}
+<p>{{ pot.id }}</p>
+{% endfor %}
 {% endblock %}

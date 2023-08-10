@@ -21,9 +21,14 @@
         <tbody>
             {% for pot in pots %}
             <tr>
+                <td>
+                    <a href="{{ url_for('edit_pot', pot_id=pot.id) }}">View details</a>
+                </td>
                 <td>{{ pot.id }}</td>
-                <td>    
-                    <img src="{{ url_for('static', filename='photos/' + pot.photo_filename) }}" alt="{{ pot.id }} Photo">
+                <td>
+                    {% if pot.photo_filename %}    
+                    <img src="{{ url_for('static', filename='photos/' + pot.photo_filename) }}" alt="{{ pot.get_pot_name() }} Photo" class="img-small">
+                    {% endif %}
                 </td>
                 <td>{{ pot.vessel_type or ''}}</td>
                 <td>{{ pot.throw_date.strftime('%d.%m.%Y %H:%M') or ''}}</td>

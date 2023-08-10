@@ -12,4 +12,6 @@ class Config(object):
     
     FLASK_DEBUG = True
     
-    UPLOAD_FOLDER = os.path.join(basedir, 'app', 'photos')
+    UPLOAD_FOLDER = os.path.join(basedir, 'app', 'static', 'photos')
+    
+    ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'gif', 'png'}

@@ -1,0 +1,240 @@
+{% extends 'layout.html' %}
+
+{% block main %}
+<h1>{{ title }}
+</h1>
+
+<form action="" method="post" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <h3>Throwing</h3>
+    <div>
+        {{ form.vessel_type.label }}
+        {{ form.vessel_type(size=32) }}
+        {% for error in form.vessel_type.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.made_with_clay.label }}
+        <select id="made_with_clay" name="made_with_clay" required>
+            {% for value, label in form.made_with_clay.choices %}
+                <option value="{{ value }}" {% if value == form.made_with_clay.data %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        {% for error in form.made_with_clay.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+        <a href="{{ url_for('add_clay') }}">Add a new clay</a>
+    </div>
+    <div>
+        {{ form.author.label }}
+        {{ form.author(size=32) }}
+        {% for error in form.author.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        <p>Upload a file</p>
+        <p><input type="file" name="file"></p>
+        {% if form.photo.data%}
+        <div class="card" style="width: 12rem;">
+            <img src="{{form.photo.data}}" class="card-img-top" alt="{{ form.photo.data }}">
+            <div class="card-body">
+                <p class="card-text">{{form.photo.data}}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div>
+        {{ form.throw_date.label }}
+        {{ form.throw_date }}
+        {% for error in form.throw_date.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.throw_weight.label }}
+        {{ form.throw_weight }}
+        {% for error in form.throw_weight.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.throw_height.label }}
+        {{ form.throw_height }}
+        {% for error in form.throw_height.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.throw_width.label }}
+        {{ form.throw_width }}
+        {% for error in form.throw_width.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.throw_notes.label }}
+        {{ form.throw_notes }}
+        {% for error in form.throw_notes.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <h3>Trimming</h3>
+    <div>
+        {{ form.trim_date.label }}
+        {{ form.trim_date }}
+        {% for error in form.trim_date.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.trim_weight.label }}
+        {{ form.trim_weight }}
+        {% for error in form.trim_weight.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.trim_surface_treatment.label }}
+        {{ form.trim_surface_treatment }}
+        {% for error in form.trim_surface_treatment.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.trim_notes.label }}
+        {{ form.trim_notes }}
+        {% for error in form.trim_notes.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <h3>Bisque firing</h3>
+    <div>
+        {{ form.bisque_fire_start.label }}
+        {{ form.bisque_fire_start }}
+        {% for error in form.bisque_fire_start.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.bisque_fire_program_id.label }}
+        <select id="bisque_fire_program_id" name="bisque_fire_program_id" required>
+            {% for value, label in form.bisque_fire_program_id.choices %}
+                <option value="{{ value }}" {% if value == form.bisque_fire_program_id.data %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        {% for error in form.bisque_fire_program_id.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.bisque_fire_kiln_id.label }}
+        <select id="bisque_fire_kiln_id" name="bisque_fire_kiln_id" required>
+            {% for value, label in form.bisque_fire_kiln_id.choices %}
+                <option value="{{ value }}" {% if value == form.bisque_fire_kiln_id.data %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        {% for error in form.bisque_fire_kiln_id.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.bisque_fire_end.label }}
+        {{ form.bisque_fire_end }}
+        {% for error in form.bisque_fire_end.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.bisque_fire_open.label }}
+        {{ form.bisque_fire_open }}
+        {% for error in form.bisque_fire_open.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.bisque_fire_notes.label }}
+        {{ form.bisque_fire_notes }}
+        {% for error in form.bisque_fire_notes.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <h3>Glazing</h3>
+    <div>
+        {{ form.glaze_date.label }}
+        {{ form.glaze_date }}
+        {% for error in form.glaze_date.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.used_glazes.label }}: {{ form.used_glazes }}
+        {% for error in form.used_glazes.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+        <a href="{{ url_for('add_glaze') }}">Add a new glaze</a>
+    </div>
+    <div>
+        {{ form.glaze_notes.label }}
+        {{ form.glaze_notes }}
+        {% for error in form.glaze_notes.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <h3>Glaze firing</h3>
+    <div>
+        {{ form.glaze_fire_start.label }}
+        {{ form.glaze_fire_start }}
+        {% for error in form.glaze_fire_start.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.glaze_fire_program_id.label }}
+        <select id="glaze_fire_program_id" name="glaze_fire_program_id" required>
+            {% for value, label in form.glaze_fire_program_id.choices %}
+                <option value="{{ value }}" {% if value == form.glaze_fire_program_id.data %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        {% for error in form.glaze_fire_program_id.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.glaze_fire_kiln_id.label }}
+        <select id="glaze_fire_kiln_id" name="glaze_fire_kiln_id" required>
+            {% for value, label in form.glaze_fire_kiln_id.choices %}
+                <option value="{{ value }}" {% if value == form.glaze_fire_kiln_id.data %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        {% for error in form.glaze_fire_kiln_id.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.glaze_fire_end.label }}
+        {{ form.glaze_fire_end }}
+        {% for error in form.glaze_fire_end.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.glaze_fire_open.label }}
+        {{ form.glaze_fire_open }}
+        {% for error in form.glaze_fire_open.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.glaze_fire_notes.label }}
+        {{ form.glaze_fire_notes }}
+        {% for error in form.glaze_fire_notes.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.submit }}
+    </div>
+</form>
+{% endblock %}

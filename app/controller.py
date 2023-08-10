@@ -1,13 +1,15 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app
 from app import db
-from app.forms import LoginForm, RegistrationForm, AddPotForm, AddClayForm, AddGlazeForm
+from app.forms import LoginForm, RegistrationForm, AddPotForm,  AddClayForm, AddGlazeForm
+from wtforms import SubmitField
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Pot, Clay, FiringProgram, Kiln, Glaze
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import os
+from app.utils import allowed_file, get_pot_fields, POT_EXCLUDED_FIELDS, safe_query, set_select_field_choices
 
 @app.route('/')
 @app.route('/home')
@@ -59,52 +61,94 @@ def logout():
     return redirect(url_for('index'))
 
 
+def fetch_pot(form, pot=None):
+    POT_FIELDS = get_pot_fields(form)
+    data = {field: getattr(form, field).data for field in POT_FIELDS}
+    additional_data = {'made_with_clay': safe_query(Clay, form.made_with_clay.data), 
+                    'bisque_fired_with_program': safe_query(FiringProgram, data['bisque_fire_program_id']),
+                    'bisque_fired_with_kiln': safe_query(Kiln, data['bisque_fire_kiln_id']),
+                    'used_glazes': [safe_query(Glaze, id) for id in form.used_glazes.data],
+                    'glaze_fired_with_program': safe_query(FiringProgram, data['glaze_fire_program_id']),
+                    'glaze_fired_with_kiln': safe_query(Kiln, data['glaze_fire_kiln_id'])}
+    data.update(additional_data)
+    if data['made_with_clay']:
+        if pot is None:
+            pot = Pot(**data)
+        else:
+            # Update the existing Pot object with the new data
+            for key, value in data.items():
+                setattr(pot, key, value)
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(photo_path)
+            pot.photo_filename = filename
+            
+    return pot
+
 @app.route('/addpot', methods=['GET', 'POST'])
 @login_required
 def add_pot():
     form = AddPotForm()
-    if current_user.is_authenticated and form.validate_on_submit():
-        clay = Clay.query.get(form.clay_type.data)
-        bisque_fire_program_id = form.bisque_fired_with_program.data
-        bisque_program = FiringProgram.query.get(bisque_fire_program_id)
-        bisque_fire_kiln_id = form.bisque_fired_with_kiln.data
-        bisque_kiln = Kiln.query.get(bisque_fire_kiln_id)
-        used_glazes = [Glaze.query.get(id) for id in form.used_glazes.data]
-        glaze_fire_program_id = form.glaze_fired_with_program.data
-        glaze_program = FiringProgram.query.get(glaze_fire_program_id)
-        glaze_fire_kiln_id = form.glaze_fired_with_kiln.data
-        glaze_kiln = Kiln.query.get(glaze_fire_kiln_id)
-        if clay and bisque_program and bisque_kiln and glaze_program and glaze_kiln:
-            pot = Pot(vessel_type=form.vessel_type.data, made_with_clay = clay, author=form.author.data, 
-                    throw_date=form.throw_date.data, throw_weight=form.throw_weight.data, 
-                    throw_height=form.throw_height.data, throw_width=form.throw_width.data,
-                    throw_notes=form.throw_notes.data, trim_date=form.trim_date.data,
-                    trim_weight=form.trim_weight.data, trim_surface_treatment=form.trim_surface_treatment.data,
-                    trim_notes=form.trim_notes.data, bisque_fire_start=form.bisque_fire_start.data,
-                    bisque_fire_program_id=bisque_fire_program_id,
-                    bisque_fired_with_program=bisque_program, bisque_fire_kiln_id=bisque_fire_kiln_id,
-                    bisque_fired_with_kiln=bisque_kiln,
-                    bisque_fire_end=form.bisque_fire_end.data, bisque_fire_open=form.bisque_fire_open.data,
-                    bisque_fire_notes=form.bisque_fire_notes.data, 
-                    glaze_date=form.glaze_date.data, used_glazes = used_glazes, glaze_notes=form.glaze_notes.data,
-                    glaze_fire_start=form.glaze_fire_start.data,
-                    glaze_fire_program_id=glaze_fire_program_id, glaze_fire_kiln_id=glaze_fire_kiln_id,
-                    glaze_fired_with_kiln=glaze_kiln,
-                    glaze_fired_with_program=glaze_program, 
-                    glaze_fire_end=form.glaze_fire_end.data, glaze_fire_open=form.glaze_fire_open.data,
-                    glaze_fire_notes=form.glaze_fire_notes.data)
-            file = form.photo.data
-            if file:
-                filename = secure_filename(file.filename)
-                photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                file.save(photo_path)
-                pot.photo_filename = filename
-            db.session.add(pot)
-            db.session.commit()
-            flash('A new pot has been saved.')
-            return redirect(url_for('index'))
-    return render_template('addpot.html', title='Add new pot', form=form)
+    
+    # Set the choices for the select fields
+    set_select_field_choices(form)
+    
+    # Set the label for the submit button
+    form.submit.label.text = 'Add pot'
+    
+    # POST
+    if request.method == 'POST' and current_user.is_authenticated and form.validate_on_submit():
+        pot = fetch_pot(form)
+        db.session.add(pot)
+        db.session.commit()
+        flash('A new pot has been saved.')
+        return redirect(url_for('index'))
+    # GET
+    return render_template('pot.html', title='Add a new pot', form=form)
 
+
+@app.route('/editpot/<int:pot_id>', methods=['GET', 'POST'])
+@login_required
+def edit_pot(pot_id):
+    # Fetch the existing pot from the database
+    pot = Pot.query.get_or_404(pot_id)
+    
+    # Populate the form with the existing pot data
+    form = AddPotForm(obj=pot)
+    
+    # Prepopulate select fields
+    set_select_field_choices(form)
+    
+    # Set the label for the submit button
+    form.submit.label.text = 'Update pot'
+    
+    # POST
+    if request.method == 'POST' and current_user.is_authenticated and form.validate_on_submit():
+        print('Form validated')
+        pot = fetch_pot(form, pot)
+        db.session.commit()
+        flash('Pot successfully updated.')
+        return redirect(url_for('index'))
+    
+    # GET
+    # Show the correct choices for select fields
+    form.made_with_clay.data = pot.made_with_clay.id
+    form.bisque_fire_program_id.data = pot.bisque_fired_with_program.id
+    form.bisque_fire_kiln_id.data = pot.bisque_fired_with_kiln.id
+    form.used_glazes.data = [glaze.id for glaze in pot.used_glazes]
+    form.glaze_fire_program_id.data = pot.glaze_fired_with_program.id
+    form.glaze_fire_kiln_id.data = pot.glaze_fired_with_kiln.id
+    
+    # Photo prepopulation
+    if pot.photo_filename is not None:
+        form.photo.process_data(url_for('static', filename='photos/' + pot.photo_filename))
+    
+    return render_template('pot.html', title='Edit pot', form=form)
 
 @app.route('/addclay', methods=['GET', 'POST'])
 @login_required

@@ -35,9 +35,9 @@ class RegistrationForm(FlaskForm):
 
 class AddPotForm(FlaskForm):
     vessel_type = StringField('Vessel type', validators=[DataRequired()])
-    clay_type = SelectField('Clay type', validators=[InputRequired()], choices=[])
+    made_with_clay = SelectField('Clay type', validators=[InputRequired()], choices=[], coerce=int)
     author = StringField('Author', validators=[DataRequired()], default='Dora')
-    photo = FileField('Upload photos', validators=[FileAllowed(['jpg', 'jpeg', 'png', 'gif'])])
+    photo = FileField('Upload photos', validators=[FileAllowed(['jpg', 'jpeg', 'png', 'gif', 'heic', 'heif'])])
     throw_date = DateTimeField('Throwing date and time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()], widget=Input(input_type='datetime-local'), default=datetime.now)
     throw_weight = StringField('Throwing weight in g')
     throw_height = StringField('Throwing heights in cm')
@@ -48,8 +48,8 @@ class AddPotForm(FlaskForm):
     trim_surface_treatment = StringField('Surface treatment')
     trim_notes = TextAreaField('Trimming notes')
     bisque_fire_start = DateTimeField('Bisque firing started at', format='%Y-%m-%dT%H:%M', widget=Input(input_type='datetime-local'), validators=[Optional()])
-    bisque_fired_with_program = SelectField('Bisque firing program', choices=[])
-    bisque_fired_with_kiln = SelectField('Bisque fired with kiln', choices=[])
+    bisque_fire_program_id = SelectField('Bisque firing program', choices=[])
+    bisque_fire_kiln_id = SelectField('Bisque fired with kiln', choices=[])
     bisque_fire_end = DateTimeField('Bisque firing ended at', format='%Y-%m-%dT%H:%M', widget=Input(input_type='datetime-local'), validators=[Optional()])
     bisque_fire_open = DateTimeField('Kiln opened at', format='%Y-%m-%dT%H:%M', widget=Input(input_type='datetime-local'), validators=[Optional()])
     bisque_fire_notes = TextAreaField('Bisque firing notes')
@@ -57,23 +57,46 @@ class AddPotForm(FlaskForm):
     used_glazes = SelectMultipleField('Used glazes', choices=[], widget=widgets.ListWidget(prefix_label=False), option_widget=widgets.CheckboxInput(), coerce=int)
     glaze_notes = TextAreaField('Glazing notes')
     glaze_fire_start = DateTimeField('Glaze firing started at', format='%Y-%m-%dT%H:%M', widget=Input(input_type='datetime-local'), validators=[Optional()])
-    glaze_fired_with_program = SelectField('Glaze firing program', choices=[])
-    glaze_fired_with_kiln = SelectField('Glaze fired with kiln', choices=[])
+    glaze_fire_program_id = SelectField('Glaze firing program', choices=[])
+    glaze_fire_kiln_id = SelectField('Glaze fired with kiln', choices=[])
     glaze_fire_end = DateTimeField('Glaze firing ended at', format='%Y-%m-%dT%H:%M', widget=Input(input_type='datetime-local'), validators=[Optional()])
     glaze_fire_open = DateTimeField('Kiln opened at', format='%Y-%m-%dT%H:%M', widget=Input(input_type='datetime-local'), validators=[Optional()])
     glaze_fire_notes = TextAreaField('Glaze firing notes')
-    submit = SubmitField('Add pot')
+    submit = SubmitField()
+    
+    def validate_made_with_clay(self, made_with_clay):
+        '''Check if the made_with_clay exists in the database'''
+        clay = Clay.query.get(made_with_clay.data)
+        if clay is None:
+            raise ValidationError('There is no such clay with ID {}'.format(made_with_clay))
         
-    def __init__(self, *args, **kwargs):
-        super(AddPotForm, self).__init__(*args, **kwargs)
-        self.clay_type.choices = [(clay.id, clay.get_name()) for clay in Clay.query.all()]
-        self.bisque_fired_with_program.choices = [(program.id, program.name) for program in FiringProgram.query.filter_by(type='Bisque')]
-        self.bisque_fired_with_kiln.choices = [(kiln.id, kiln.name) for kiln in Kiln.query.all()]
-        self.used_glazes.choices = [(glaze.id, glaze.get_glaze_name()) for glaze in Glaze.query.all()]
-        self.glaze_fired_with_program.choices = [(program.id, program.name) for program in FiringProgram.query.filter_by(type='Glaze')]
-        self.glaze_fired_with_kiln.choices = [(kiln.id, kiln.name) for kiln in Kiln.query.all()]
-
-
+    def validate_bisque_fire_program_id(self, bisque_fire_program_id):
+        '''Check if bisque_fire_program_id exists in the database'''
+        if FiringProgram.query.get(bisque_fire_program_id.data) is None:
+            raise ValidationError('There is no firing program with ID {}'.format(bisque_fire_program_id))
+        
+    def validate_bisque_fire_kiln_id(self, bisque_fire_kiln_id):
+        '''Check if bisque_fire_kiln_id exists in the database'''
+        if Kiln.query.get(bisque_fire_kiln_id.data) is None:
+            raise ValidationError('There is not kiln with ID {}'.format(bisque_fire_kiln_id))
+        
+    def validate_used_glazes(self, used_glazes):
+        '''Check if used_glazes exist in the database'''
+        for glaze in used_glazes:
+            if Glaze.query.get(glaze.data) is None:
+                raise ValidationError('There is no glaze with ID {}'.format(glaze))
+        
+    def validate_glaze_fire_program_id(self, glaze_fire_program_id):
+        '''Check if glaze_fire_program_id exists in the database'''
+        if FiringProgram.query.get(glaze_fire_program_id.data) is None:
+            raise ValidationError('There is no firing program with ID {}'.format(glaze_fire_program_id))
+        
+    def validate_glaze_fire_kiln_id(self, glaze_fire_kiln_id):
+        '''Check if glaze_fire_kiln_id exists in the database'''
+        if Kiln.query.get(glaze_fire_kiln_id.data) is None:
+            raise ValidationError('There is not kiln with ID {}'.format(glaze_fire_kiln_id))
+        
+    
 class AddClayForm(FlaskForm):
     brand = StringField('Brand', validators=[DataRequired()])
     color = StringField('Color')

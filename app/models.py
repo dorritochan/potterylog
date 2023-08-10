@@ -88,6 +88,9 @@ class Pot(db.Model):
             return '{} {} {}{} {}%'.format(clay.brand, clay.color, clay.temp_max, clay.temp_unit, clay.grog_percent)
         return self.clay_type
     
+    def get_pot_name(self):
+        return 'Pot {} {} {}'.format(self.id, self.vessel_type, self.throw_date)
+    
     def __repr__(self):
         return '<Pot {}, {}, {}>'.format(self.throw_date, self.vessel_type, self.clay_type)
     

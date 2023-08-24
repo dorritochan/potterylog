@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+{% block main %}
+<h1>List of clays</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Pots</th>
+            <th>Brand</th>
+            <th>Color</th>
+            <th>Min. temp.</th>
+            <th>Max. temp.</th>
+            <th>Grog %</th>
+            <th>Grog size</th>
+        </tr>
+    </thead>
+    <body>
+        {% for clay in clays %}
+        <tr>
+            <td><a href="{{ url_for('show_clay', clay_id=clay.id) }}">View pots</a></td>
+            <td>{{ clay.brand or '' }}</td>
+            <td>{{ clay.color or '' }}</td>
+            <td>{{ clay.temp_min ~ clay.temp_unit or '' }}</td>
+            <td>{{ clay.temp_max ~ clay.temp_unit or '' }}</td>
+            <td>{{ clay.grog_percent or '' }}</td>
+            <td>{{ clay.grog_size_max ~ clay.grog_size_unit or '' }}</td>
+        </tr>
+        {% endfor %}
+    </body>
+</table>
+<a href="{{ url_for('add_clay') }}">Add a new clay</a>
+{% endblock %}

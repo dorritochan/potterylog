@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block main %}
+<h1>Clay {{ clay.get_clay_name() }}</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Brand</th>
+            <th>Color</th>
+            <th>Min. temp.</th>
+            <th>Max. temp.</th>
+            <th>Grog %</th>
+            <th>Grog size</th>
+        </tr>
+    </thead>
+    <body>
+        <tr>
+            <td>{{ clay.brand or '' }}</td>
+            <td>{{ clay.color or '' }}</td>
+            <td>{{ clay.temp_min ~ clay.temp_unit or '' }}</td>
+            <td>{{ clay.temp_max ~ clay.temp_unit or '' }}</td>
+            <td>{{ clay.grog_percent or '' }}</td>
+            <td>{{ clay.grog_size_max ~ clay.grog_size_unit or '' }}</td>
+        </tr>
+    </body>
+</table>
+<h3>Pots used with this clay</h3>
+{% for pot in clay.pots %}
+    <a href="{{ url_for('edit_pot', pot_id=pot.id) }}">
+        {{ pot.id }}
+    </a>
+{% endfor %}
+{% endblock %}

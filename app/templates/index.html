@@ -8,6 +8,7 @@
     <table>
         <thead>
             <tr>
+                <th>View pot</th>
                 <th>ID</th>
                 <th>Photo</th>
                 <th>Type</th>
@@ -26,15 +27,22 @@
                 </td>
                 <td>{{ pot.id }}</td>
                 <td>
-                    {% if pot.photo_filename %}    
-                    <img src="{{ url_for('static', filename='photos/' + pot.photo_filename) }}" alt="{{ pot.get_pot_name() }} Photo" class="img-small">
+                    <!-- Display the uploaded photos -->
+                    {% if pot.primary_image %}
+                        <img src="{{ url_for('static', filename='photos/' + pot.primary_image) }}" alt="Selected Photo" style="max-width: 300px; display: block;">
                     {% endif %}
+                    
                 </td>
                 <td>{{ pot.vessel_type or ''}}</td>
                 <td>{{ pot.throw_date.strftime('%d.%m.%Y %H:%M') or ''}}</td>
-                <td>{{ pot.get_clay_info() or '' }}</td>
-                <td>{% for glaze in pot.used_glazes %}
-                    <a href="{{ url_for('show_glaze', glaze_id=glaze.id) }}">{{ glaze.get_glaze_name() or '' }}</a><br>
+                <td>
+                    {% if pot.made_with_clay %}
+                        <a href="{{ url_for('show_clay', clay_id=pot.made_with_clay.id) }}">{{ pot.made_with_clay.get_clay_name() or '' }}</a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% for glaze in pot.used_glazes %}
+                    <a href="{{ url_for('show_glaze', glaze_id=glaze.glaze_id) }}">{{ glaze.glaze.get_glaze_name() or '' }}</a> x{{ glaze.number_of_layers or '1' }}<br>
                     {% endfor %}
                 </td>
                 <td>{{ pot.bisque_fired_with_program.name or '' }}</td>

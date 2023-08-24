@@ -18,7 +18,7 @@
     <body>
         {% for glaze in glazes %}
         <tr>
-            <td><a href="{{ url_for('show_glaze', glaze_id=glaze.id) }}">View</a></td>
+            <td><a href="{{ url_for('show_glaze', glaze_id=glaze.id) }}">View pots</a></td>
             <td>{{ glaze.brand or '' }}</td>
             <td>{{ glaze.brand_id or '' }}</td>
             <td>{{ glaze.name or '' }}</td>
@@ -26,7 +26,7 @@
             <td>{{ glaze.temp_min ~ glaze.temp_unit or '' }}</td>
             <td>{{ glaze.temp_max ~ glaze.temp_unit or '' }}</td>
             <td>
-                <a href="{{ glaze.glaze_url }}">{{ glaze.glaze_url or '' }}</a>
+                <a href="{{ glaze.glaze_url }}" target="_blank">{{ glaze.glaze_url or '' }}</a>
             </td>
         </tr>
         {% endfor %}

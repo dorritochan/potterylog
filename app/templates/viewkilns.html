@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+{% block main %}
+<h1>List of kilns</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Brand</th>
+            <th>Type</th>
+            <th>Capacity</th>
+            <th>Max. temp.</th>
+            <th>Voltage</th>
+            <th>Controller</th>
+        </tr>
+    </thead>
+    <body>
+        {% for kiln in kilns %}
+        <tr>
+            <td>{{ kiln.name or '' }}</td>
+            <td>{{ kiln.brand or '' }}</td>
+            <td>{{ kiln.type or '' }}</td>
+            <td>{{ kiln.capacity ~ kiln.capacity_unit or '' }}</td>
+            <td>{{ kiln.temp_max ~ kiln.temp_unit or '' }}</td>
+            <td>{{ kiln.voltage or '' }}</td>
+            <td>{{ kiln.controller or '' }}</td>
+        </tr>
+        {% endfor %}
+    </body>
+</table>
+<a href="{{ url_for('add_kiln') }}">Add a new kiln</a>
+{% endblock %}

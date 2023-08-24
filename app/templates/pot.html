@@ -34,15 +34,19 @@
         {% endfor %}
     </div>
     <div>
-        <p>Upload a file</p>
-        <p><input type="file" name="file"></p>
-        {% if form.photo.data%}
-        <div class="card" style="width: 12rem;">
-            <img src="{{form.photo.data}}" class="card-img-top" alt="{{ form.photo.data }}">
-            <div class="card-body">
-                <p class="card-text">{{form.photo.data}}</p>
+        <!-- Upload new photos -->
+        <p>Upload new photos:</p>
+        <input type="file" name="photos" multiple>
+
+        {% if form.photos.data%}
+            {% for photo in form.photos.data %}
+            <div class="card" style="width: 12rem;">
+                <img src="{{photo}}" class="card-img-top" alt="{{ photo }}">
+                <div class="card-body">
+                    <p class="card-text">{{photo}}</p>
+                </div>
             </div>
-        </div>
+            {% endfor %}
         {% endif %}
     </div>
     <div>
@@ -169,10 +173,22 @@
         {% endfor %}
     </div>
     <div>
-        {{ form.used_glazes.label }}: {{ form.used_glazes }}
+        <div id="glaze-fields">
+            <div hidden id="glaze-count" data-variable="{{ form.used_glazes.data | length | tojson }}"></div>
+            {% set index = 0 %}
+            {% for glaze_form in form.used_glazes %}
+                {{ glaze_form.csrf_token }}
+                <div id="glaze-field-{{ index }}">
+                    {{ glaze_form.glaze.label }}: {{ glaze_form.glaze }}
+                    {{ glaze_form.number_of_layers.label }}: {{ glaze_form.number_of_layers }}
+                </div>
+                {% set index = index + 1 %}
+            {% endfor %}
+        </div>
         {% for error in form.used_glazes.errors %}
-            <span style="color: red;">[{{ error }}]</span>
+        <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
+        <button id="add-glaze-layer" type="button">Add Glaze Layer</button>
         <a href="{{ url_for('add_glaze') }}">Add a new glaze</a>
     </div>
     <div>

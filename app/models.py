@@ -32,10 +32,16 @@ def load_user(id):
 
     
 # Intermediary table for many-to-many relationship between pot and glaze
-pot_glaze = db.Table('pot_glaze',
-    db.Column('pot_id', db.Integer, db.ForeignKey('pot.id')),
-    db.Column('glaze_id', db.Integer, db.ForeignKey('glaze.id'))
-)  
+class PotGlaze(db.Model):
+    __tablename__ = 'pot_glaze'
+    
+    pot_id = db.Column(db.Integer, db.ForeignKey('pot.id'), primary_key=True)
+    glaze_id = db.Column(db.Integer, db.ForeignKey('glaze.id'), primary_key=True)
+    number_of_layers = db.Column(db.Integer)
+    display_order = db.Column(db.Integer)
+    
+    pot = db.relationship('Pot', back_populates='used_glazes')
+    glaze = db.relationship('Glaze', back_populates='glazed_pots')
     
 class Pot(db.Model):
     __tablename__ = 'pot'
@@ -44,7 +50,8 @@ class Pot(db.Model):
     vessel_type = db.Column(db.String(50))
     clay_type = db.Column(db.Integer, db.ForeignKey('clay.id'), index=True)
     author = db.Column(db.String(30), index=True)
-    photo_filename = db.Column(db.String(255))
+    images = db.relationship('Image', back_populates='pot', cascade='all, delete-orphan')
+    primary_image = db.Column(db.String(255))
     # Throwing
     throw_date = db.Column(db.DateTime, index=True, default=lambda: germany_timezone.localize(datetime.now()))
     throw_weight = db.Column(db.Integer, index=True)
@@ -70,7 +77,7 @@ class Pot(db.Model):
     bisque_fire_notes = db.Column(db.Text)
     # Glazing
     glaze_date = db.Column(db.DateTime, index=True)
-    used_glazes = db.relationship('Glaze', secondary=pot_glaze, back_populates='glazed_pots', lazy='dynamic')
+    used_glazes = db.relationship('PotGlaze', back_populates='pot', lazy='dynamic')
     glaze_notes = db.Column(db.Text)
     # Glaze firing
     glaze_fire_start = db.Column(db.DateTime, index=True)
@@ -82,18 +89,18 @@ class Pot(db.Model):
     glaze_fire_open = db.Column(db.DateTime, index=True)
     glaze_fire_notes = db.Column(db.Text)
     
-    def get_clay_info(self):
-        clay = Clay.query.get(self.clay_type)
-        if clay:
-            return '{} {} {}{} {}%'.format(clay.brand, clay.color, clay.temp_max, clay.temp_unit, clay.grog_percent)
-        return self.clay_type
-    
     def get_pot_name(self):
         return 'Pot {} {} {}'.format(self.id, self.vessel_type, self.throw_date)
     
     def __repr__(self):
         return '<Pot {}, {}, {}>'.format(self.throw_date, self.vessel_type, self.clay_type)
-    
+
+
+class Image(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(255), nullable=False)
+    pot_id = db.Column(db.Integer, db.ForeignKey('pot.id'), nullable=False)
+    pot = db.relationship('Pot', back_populates='images')
     
 class Glaze(db.Model):
     __tablename__ = 'glaze'
@@ -106,7 +113,7 @@ class Glaze(db.Model):
     temp_unit = db.Column(db.String(10), default='°C')
     brand_id = db.Column(db.Integer)
     glaze_url = db.Column(db.String(200))
-    glazed_pots = db.relationship('Pot', secondary=pot_glaze, back_populates='used_glazes', lazy='dynamic')
+    glazed_pots = db.relationship('PotGlaze', back_populates='glaze', lazy='dynamic')
     
     def get_glaze_name(self):
         return '{} {} {} {}{}'.format(self.brand, self.brand_id, self.name, self.temp_max, self.temp_unit)
@@ -161,8 +168,8 @@ class Clay(db.Model):
     grog_size_unit = db.Column(db.String(10), default='mm')
     pots = db.relationship('Pot', backref='made_with_clay', lazy='dynamic')
     
-    def get_name(self):
-        return '{} {} {}{} {}%'.format(self.brand, self.color, self.temp_max, self.temp_unit, self.grog_percent)
+    def get_clay_name(self):
+        return '{} {} {}{} {}% {}{}'.format(self.brand, self.color, self.temp_max, self.temp_unit, self.grog_percent, self.grog_size_max, self.grog_size_unit)
 
     def __repr__(self):
         return '<Clay {}, {}, {}, {}>'.format(self.brand, self.color, self.temp_max, self.grog_percent)   

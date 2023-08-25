@@ -29,4 +29,41 @@
     </body>
 </table>
 <a href="{{ url_for('add_kiln') }}">Add a new kiln</a>
+
+<h1>List of firing programs</h1>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Segments</th>
+            <th>Total firing time</th>
+        </tr>
+    </thead>
+    <body>
+        {% for program in firing_programs %}
+        <tr>
+            <td>{{ program.id or '' }}</td>
+            <td>{{ program.name or '' }}</td>
+            <td>
+                {% for segment in program.associated_segments %}
+                    {% if segment.temp_start == segment.temp_end %}
+                        Hold {{ segment.temp_start ~ segment.temp_unit or '' }}:
+                    {% else %}
+                        {{ segment.temp_start ~ segment.temp_unit or '' }} -
+                        {{ segment.temp_end ~ segment.temp_unit or '' }}:
+                        {% endif %}
+                    {% if segment.time_to_reach %}
+                        {{ segment.time_to_reach ~ segment.time_to_reach_unit or '' }}
+                    {% endif %}
+                    <br>
+                {% endfor %}
+            </td>
+            <td>Min. {{ program_time[program.id] }}</td>
+        </tr>
+        {% endfor %}
+    </body>
+</table>
+<a href="{{ url_for('add_firing_program') }}">Add a new firing program</a>
+
 {% endblock %}

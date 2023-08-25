@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from app import app
 from app import db
-from app.forms import LoginForm, RegistrationForm, AddPotForm,  AddClayForm, AddGlazeForm, GlazeLayerForm, AddKilnForm
+from app.forms import LoginForm, RegistrationForm, AddPotForm,  AddClayForm, AddGlazeForm, GlazeLayerForm, AddKilnForm, AddFiringProgram, FiringSegmentForm
 from wtforms import SubmitField
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Pot, Clay, FiringProgram, Kiln, Glaze, Image, PotGlaze
@@ -9,7 +9,7 @@ from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import os
-from app.utils import allowed_file, get_pot_fields, POT_EXCLUDED_FIELDS, safe_query, set_select_field_choices
+from app.utils import allowed_file, get_pot_fields, POT_EXCLUDED_FIELDS, safe_query, set_select_field_choices, prepopulate_select
 
 @app.route('/')
 @app.route('/home')
@@ -113,8 +113,6 @@ def add_pot():
     
     # Set the label for the submit button
     form.submit.label.text = 'Add pot'
-    print('form.used_glazes.data')
-    print(form.used_glazes.data)
     
     # POST
     if request.method == 'POST' and current_user.is_authenticated and form.validate_on_submit():
@@ -151,20 +149,23 @@ def edit_pot(pot_id):
         return redirect(url_for('index'))
     
     # GET
-    # Show the correct choices for select fields
-    form.made_with_clay.data = pot.made_with_clay.id
-    form.bisque_fire_program_id.data = pot.bisque_fired_with_program.id
-    form.bisque_fire_kiln_id.data = pot.bisque_fired_with_kiln.id
-    form.used_glazes.data = [glaze.id for glaze in pot.used_glazes]
-    form.glaze_fire_program_id.data = pot.glaze_fired_with_program.id
-    form.glaze_fire_kiln_id.data = pot.glaze_fired_with_kiln.id
+
+    # Show the correct selected choices for select fields from the database
+    form.made_with_clay.data = prepopulate_select(pot.made_with_clay)
+    form.bisque_fire_program_id.data = prepopulate_select(pot.bisque_fired_with_program)
+    form.bisque_fire_kiln_id.data = prepopulate_select(pot.bisque_fired_with_kiln)
+    for glaze_index, glaze in enumerate(pot.used_glazes):
+        form_glaze = form.used_glazes.entries[glaze_index]
+        form_glaze.glaze.data = glaze.glaze_id
+    form.glaze_fire_program_id.data = prepopulate_select(pot.glaze_fired_with_program)
+    form.glaze_fire_kiln_id.data = prepopulate_select(pot.glaze_fired_with_kiln)
     
     # Photo prepopulation
     if pot.images:
         image_urls = [url_for('static', filename='photos/' + image.filename) for image in pot.images]
         form.photos.process_data(image_urls)
     
-    return render_template('pot.html', title='Edit pot', form=form)
+    return render_template('pot.html', title='Edit pot', form=form, pot_id=pot_id)
 
 '''AJAX route for adding new glaze layer(s)'''
 @app.route('/get_glaze_field/<int:index>')
@@ -249,7 +250,14 @@ def show_clay(clay_id):
 @login_required
 def view_kilns():
     kilns = Kiln.query.all()
-    return render_template('viewkilns.html', title='List of kilns', kilns=kilns)
+    firing_programs = FiringProgram.query.all()
+    program_time = {}
+    for program in firing_programs:
+        associated_segments = program.associated_segments.all()
+        total_time = sum(segment.time_to_reach for segment in associated_segments if segment.time_to_reach)
+        hours, minutes = divmod(total_time, 60)
+        program_time[program.id] = '{}h {}min'.format(hours, minutes)
+    return render_template('viewkilns.html', title='List of kilns', kilns=kilns, firing_programs=firing_programs, program_time=program_time)
         
         
 @app.route('/addkiln', methods=['GET', 'POST'])
@@ -264,5 +272,23 @@ def add_kiln():
         db.session.add(kiln)
         db.session.commit()
         flash('A new kiln has been added.')
-        return(redirect(url_for('index')))
+        return redirect(url_for('index'))
     return render_template('addkiln.html', title='Add new kiln', form=form)
+
+
+@app.route('/addfiringprogram', methods=['GET', 'POST'])
+@login_required
+def add_firing_program():
+    form = AddFiringProgram()
+    
+    if current_user.is_authenticated and form.validate_on_submit():
+        return redirect(url_for('view_kilns'))
+    return render_template('addfiringprogram.html', form=form)
+
+
+'''AJAX route for adding new firing segment(s))'''
+@app.route('/get_segment/<int:index>')
+@login_required
+def get_segment(index):
+    segment = FiringSegmentForm(prefix=f'firing_segments-{index}')
+    return render_template('firing_segment.html', segment=segment, segment_index=index)

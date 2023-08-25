@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block main %}
+<h1>Add a new firing program</h1>
+
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <div id="firing-segments">
+        <div hidden id="segment-count" data-variable="{{ form.firing_segments.data | length | tojson }}"></div>
+        {% for segment in form.firing_segments %}
+            {% set segment_index=loop.index0 %}
+            {{ segment.csrf_token }}
+            <div id="firing-segment-{{ segment_index }}">
+                {{ segment.temp_start.label }} {{ segment.temp_start }}
+                {{ segment.temp_end.label }} {{ segment.temp_end }}
+                {{ segment.temp_unit.label }}: {{ segment.temp_unit }}
+                {{ segment.time_to_reach.label }}: {{ segment.time_to_reach }}
+            </div>
+        {% endfor %}
+    </div>
+    {% for error in form.firing_segments.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+    <button id="add-segment" type="button">Add Another Segment</button>
+    <p>
+        {{ form.submit }}
+    </p>
+</form>
+{% endblock %}

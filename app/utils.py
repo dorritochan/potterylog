@@ -30,3 +30,10 @@ def set_select_field_choices(form):
         glaze_form.glaze.choices = [('-1', '-')] + [(glaze.id, glaze.get_glaze_name()) for glaze in Glaze.query.all()]
     form.glaze_fire_program_id.choices = [('-1', '-')] + [(program.id, program.name) for program in FiringProgram.query.filter_by(type='Glaze')]
     form.glaze_fire_kiln_id.choices = [('-1', '-')] + [(kiln.id, kiln.name) for kiln in Kiln.query.all()]
+    
+
+def prepopulate_select(pot_select_field):
+    if pot_select_field:
+        return pot_select_field.id
+    else:
+        return -1

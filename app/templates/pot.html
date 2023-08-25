@@ -1,8 +1,10 @@
 {% extends 'layout.html' %}
 
 {% block main %}
-<h1>{{ title }}
-</h1>
+<h1>{{ title }}</h1>
+{% if title=='Edit pot' %}
+<p>ID {{ pot_id }}</p>
+{% endif %}
 
 <form action="" method="post" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
@@ -175,14 +177,13 @@
     <div>
         <div id="glaze-fields">
             <div hidden id="glaze-count" data-variable="{{ form.used_glazes.data | length | tojson }}"></div>
-            {% set index = 0 %}
             {% for glaze_form in form.used_glazes %}
+                {% set index=loop.index0 %}
                 {{ glaze_form.csrf_token }}
                 <div id="glaze-field-{{ index }}">
                     {{ glaze_form.glaze.label }}: {{ glaze_form.glaze }}
                     {{ glaze_form.number_of_layers.label }}: {{ glaze_form.number_of_layers }}
                 </div>
-                {% set index = index + 1 %}
             {% endfor %}
         </div>
         {% for error in form.used_glazes.errors %}

@@ -8,7 +8,6 @@ from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy.exc import DatabaseError
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
-from wtforms import SubmitField
 
 # Local application imports
 from app import app, db
@@ -21,9 +20,10 @@ from app.models import (
     ProgramSegment, FiringSegment, FiringProgram
 )
 from app.utils import (
-    allowed_file, get_pot_fields, POT_EXCLUDED_FIELDS, safe_query,
-    set_select_field_choices, prepopulate_select, 
-    extract_glaze_data, extract_clay_data, extract_kiln_data, 
+    allowed_file, 
+    set_select_field_choices, safe_query, 
+    populate_select_field_data, get_field_id_or_default, 
+    extract_pot_data, extract_glaze_data, extract_clay_data, extract_kiln_data, 
     program_firing_time
 )
 
@@ -182,55 +182,84 @@ def logout():
     return redirect(url_for('index'))
 
 
-'''Create a Pot object from the form data.
-If there is a pot as a given argument, update the existing pot with new data.'''
 def fetch_pot(form, pot=None):
-    POT_FIELDS = get_pot_fields(form)
-    data = {field: getattr(form, field).data for field in POT_FIELDS}
-    additional_data = {'made_with_clay': safe_query(Clay, form.made_with_clay.data), 
-                    'bisque_fired_with_program': safe_query(FiringProgram, data['bisque_fire_program_id']),
-                    'bisque_fired_with_kiln': safe_query(Kiln, data['bisque_fire_kiln_id']),
-                    'glaze_fired_with_program': safe_query(FiringProgram, data['glaze_fire_program_id']),
-                    'glaze_fired_with_kiln': safe_query(Kiln, data['glaze_fire_kiln_id'])}
-    data.update(additional_data)
+    """
+    Create or update a Pot object based on form data.
+    
+    If a 'pot' argument is given, this function will update the existing pot object with
+    new data from the form. Otherwise, it will create a new Pot object from the form data.
+    
+    Args:
+        form (Form): The form containing data to create/update the pot.
+        pot (Pot, optional): The Pot object to update. Defaults to None, indicating a new Pot object should be created.
+    
+    Returns:
+        Pot: The created or updated Pot object.
+    """
+    
+    # Extract form data
+    data = extract_pot_data(form)
+
+    # Only proceed if vessel type is provided
     if data['vessel_type']:
+        
+        # Create a new Pot object if none is provided, otherwise update the existing one
         if pot is None:
             pot = Pot(**data)
         else:
             # Update the existing Pot object with the new data
             for key, value in data.items():
                 setattr(pot, key, value)
-        # Save the used glaze with the number of layers
-        number_of_glazes = len(form.used_glazes.data)
-        for glaze_layer_index in range(number_of_glazes):
-            glaze_layer = form.used_glazes.data[glaze_layer_index]
+                
+        # Process and save glazes associated with the pot
+        for glaze_layer_index, glaze_layer in enumerate(form.used_glazes.data):
             glaze = safe_query(Glaze, glaze_layer['glaze'])
             if glaze and glaze_layer['number_of_layers'] > 0:
-                pot_glaze = PotGlaze(pot=pot, glaze=glaze, number_of_layers=glaze_layer['number_of_layers'], display_order=glaze_layer_index + 1)
+                pot_glaze = PotGlaze(
+                    pot=pot, 
+                    glaze=glaze, 
+                    number_of_layers=glaze_layer['number_of_layers'], 
+                    display_order=glaze_layer_index + 1
+                    )
+                
                 db.session.add(pot_glaze)
-        # Save the images
+                
+        # Process and save images associated with the pot
         for photo in form.photos.data:
             if photo and allowed_file(photo.filename):
                 filename = secure_filename(photo.filename)
                 photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                
                 image = Image(filename=filename, pot=pot)
                 db.session.add(image)
+                
+                # Set the primary image for the pot
                 pot.primary_image = filename        
+                
     return pot
 
 
-'''Filling out the AddPotForm and add a new pot to the database'''
 @app.route('/addpot', methods=['GET', 'POST'])
 @login_required
 def add_pot():
     """
-    Add a new pot.
-    
-    
+    Handle the creation of a new pot.
+
+    The function presents a form for adding a new pot, validates the submitted data, and
+    saves the new pot to the database if the form submission is valid.
+
+    * If the request method is GET: the function renders the form to add a new pot.
+    * If the request method is POST and the form validates: 
+        - Extracts the pot data from the form.
+        - Creates a new pot instance and adds it to the database.
+        - Provides feedback to the user upon successful addition.
+        - Redirects the user back to the 'index' page.
 
     Returns:
-        _type_: _description_
+        render_template: Renders the 'pot.html' template with the form for adding a new pot
+            or redirects to the 'index' page after successful addition.
     """
+    
     form = AddPotForm()
     
     # Set the choices for the select fields
@@ -242,12 +271,17 @@ def add_pot():
     # ===================
     # POST method: Add a new pot
     # ===================
+    # Validate the form
     if form.validate_on_submit():
+        
+        # Extract the form data and create a new Pot instance
         pot = fetch_pot(form)
         
         # Add the pot to the database
         db.session.add(pot)
         db.session.commit()
+        
+        # Show a message upon success
         flash('A new pot has been saved.')
         
         # Redirect to the 'index' page
@@ -265,44 +299,50 @@ def edit_pot(pot_id):
     # Fetch the existing pot from the database
     pot = Pot.query.get_or_404(pot_id)
     
-    # Populate the form with the existing pot data
+    # Pre-populate the form with the existing pot data
     form = AddPotForm(obj=pot)
     
-    # Prepopulate select fields
+    # Set the choices for the select fields
     set_select_field_choices(form)
     
     # Set the label for the submit button
     form.submit.label.text = 'Update pot'
     
-    # POST
+    # ===================
+    # POST method: Update pot
+    # ===================
+    # Validate the form data
     if form.validate_on_submit():
-        print('Form validated')
+        
+        # Extract the form data and update the pot
         pot = fetch_pot(form, pot)
+        
+        # Update the database 
         db.session.commit()
+        
+        # Show message upon success
         flash('Pot successfully updated.')
+        
+        # Redirection to the 'index' page
         return redirect(url_for('index'))
     
-    # GET
+    # ===================
+    # GET method: Render the pot form with prepopulated data
+    # ===================
 
     # Show the correct selected choices for select fields from the database
-    form.made_with_clay.data = prepopulate_select(pot.made_with_clay)
-    form.bisque_fire_program_id.data = prepopulate_select(pot.bisque_fired_with_program)
-    form.bisque_fire_kiln_id.data = prepopulate_select(pot.bisque_fired_with_kiln)
-    for glaze_index, glaze in enumerate(pot.used_glazes):
-        form_glaze = form.used_glazes.entries[glaze_index]
-        form_glaze.glaze.data = glaze.glaze_id
-    form.glaze_fire_program_id.data = prepopulate_select(pot.glaze_fired_with_program)
-    form.glaze_fire_kiln_id.data = prepopulate_select(pot.glaze_fired_with_kiln)
-    
-    # Photo prepopulation
+    populate_select_field_data(form, pot)
+
+    # Pre-populate the form with the related images
     if pot.images:
         image_urls = [url_for('static', filename='photos/' + image.filename) for image in pot.images]
         form.photos.process_data(image_urls)
     
+    # Render the 'pot.html' with pre-populated form data
     return render_template('pot.html', title='Edit pot', form=form, pot_id=pot_id)
 
 
-@app.route('/get_glaze_field/<int:index>')
+@app.route('/get_glaze_field/<int:layer_index>')
 @login_required
 def get_glaze_field(layer_index):
     """
@@ -519,8 +559,11 @@ def add_firing_program():
     # Validation of the form data
     if form.validate_on_submit():
         
+        # Retrieve the type of the firing program: 'Glaze' or 'Bisque'
+        type = next(label for value, label in form.type.choices if value == form.type.data)
+        
         # Create new firing program instance
-        firing_program = FiringProgram(type=form.type.data)
+        firing_program = FiringProgram(type=type)
         
         for segment_index, segment in enumerate(form.firing_segments.data):
             
@@ -545,7 +588,6 @@ def add_firing_program():
             
             # Define the name of the firing program
             if segment_index == len(form.firing_segments.data) - 1:
-                type = next(label for value, label in form.type.choices if value == form.type.data)
                 firing_program.name = '{} {} hold {}'.format(type, segment['temp_end'], segment['time_to_reach'])
         
         # Add the firing program to the database

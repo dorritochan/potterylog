@@ -69,19 +69,19 @@ class AddPotForm(FlaskForm):
     
     def validate_made_with_clay(self, made_with_clay):
         '''Check if the made_with_clay exists in the database'''
-        if made_with_clay.data != -1:
+        if made_with_clay.data > 0:
             if Clay.query.get(made_with_clay.data) is None:
                 raise ValidationError('There is no such clay with ID {}'.format(made_with_clay.data))
         
     def validate_bisque_fire_program_id(self, bisque_fire_program_id):
         '''Check if bisque_fire_program_id exists in the database'''
-        if bisque_fire_program_id.data != -1:
+        if bisque_fire_program_id.data > 0:
             if FiringProgram.query.get(bisque_fire_program_id.data) is None:
                 raise ValidationError('There is no firing program with ID {}'.format(bisque_fire_program_id.data))
         
     def validate_bisque_fire_kiln_id(self, bisque_fire_kiln_id):
         '''Check if bisque_fire_kiln_id exists in the database'''
-        if bisque_fire_kiln_id.data != -1:
+        if bisque_fire_kiln_id.data > 0:
             if Kiln.query.get(bisque_fire_kiln_id.data) is None:
                 raise ValidationError('There is not kiln with ID {}'.format(bisque_fire_kiln_id.data))
         
@@ -89,19 +89,19 @@ class AddPotForm(FlaskForm):
         '''Check if used_glazes exist in the database'''
         for glaze in used_glazes:
             glaze_id = glaze.data.get('glaze')
-            if glaze_id != -1:
+            if glaze_id > 0:
                 if Glaze.query.get(glaze_id) is None:
                     raise ValidationError('There is no glaze with ID {}'.format(glaze_id))
         
     def validate_glaze_fire_program_id(self, glaze_fire_program_id):
         '''Check if glaze_fire_program_id exists in the database'''
-        if glaze_fire_program_id.data != -1:
+        if glaze_fire_program_id.data > 0:
             if FiringProgram.query.get(glaze_fire_program_id.data) is None:
                 raise ValidationError('There is no firing program with ID {}'.format(glaze_fire_program_id.data))
         
     def validate_glaze_fire_kiln_id(self, glaze_fire_kiln_id):
         '''Check if glaze_fire_kiln_id exists in the database'''
-        if glaze_fire_kiln_id.data != -1:
+        if glaze_fire_kiln_id.data > 0:
             if Kiln.query.get(glaze_fire_kiln_id.data) is None:
                 raise ValidationError('There is not kiln with ID {}'.format(glaze_fire_kiln_id.data))
         

@@ -1,44 +1,134 @@
-# Utility functions and constants
+# Utility functions
+
 from app import app
 from app.models import Clay, FiringProgram, Kiln, Glaze
 
-'''The allowed filenames for the upload of photos'''
+
+
 def allowed_file(filename):
+    """
+    Check if the provided file has an allowed extension.
+
+    The function determines the validity of a file's extension by 
+    checking it against a predefined list of allowed extensions 
+    (stored in app.config['ALLOWED_EXTENSIONS']).
+
+    Args:
+        filename (str): Name of the file including its extension.
+
+    Returns:
+        bool: True if the file extension is allowed, False otherwise.
+    """
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 
-POT_EXCLUDED_FIELDS = ['made_with_clay', 'photos', 'used_glazes', 'submit', 'csrf_token']
-'''Save the form.<field_name>.data to <field_name>, exclude POT_EXCLUDED_FIELDS'''
-def get_pot_fields(form):
-    def include_field(field_name):
-        return field_name not in POT_EXCLUDED_FIELDS
-
-    return [field_name for field_name, _ in form._fields.items() if include_field(field_name)]
-
-'''Args: model from app.model, id of a certain model item
-This function returns the model row with id id if the id is not None. 
-Otherwise return None.'''
-def safe_query(model, id):
-    return model.query.get(id) if id and id is not '-1' else None
-
-
 def set_select_field_choices(form):
-    form.made_with_clay.choices = [('-1', '-')] + [(clay.id, clay.get_clay_name()) for clay in Clay.query.all()]
-    form.bisque_fire_program_id.choices = [('-1', '-')] + [(program.id, program.name) for program in FiringProgram.query.filter_by(type='Bisque')]
-    form.bisque_fire_kiln_id.choices = [('-1', '-')] + [(kiln.id, kiln.name) for kiln in Kiln.query.all()]
+    """
+    Setting the choices for the select fields on the 'pot' page.
+
+    This function retrieves database objects and shows them as choices
+    in respective select fields of the given form. In addition, the first 
+    choice is set to (0, '-') for no value chosen.
+    
+    Args:
+        form (FlaskForm): An AddPotForm with all its fields.
+    """
+    form.made_with_clay.choices = [(0, '-')] + [(clay.id, clay.get_clay_name()) for clay in Clay.query.all()]
+    form.bisque_fire_program_id.choices = [(0, '-')] + [(program.id, program.name) for program in FiringProgram.query.filter_by(type='Bisque')]
+    form.bisque_fire_kiln_id.choices = [(0, '-')] + [(kiln.id, kiln.name) for kiln in Kiln.query.all()]
     for glaze_form in form.used_glazes:
-        glaze_form.glaze.choices = [('-1', '-')] + [(glaze.id, glaze.get_glaze_name()) for glaze in Glaze.query.all()]
-    form.glaze_fire_program_id.choices = [('-1', '-')] + [(program.id, program.name) for program in FiringProgram.query.filter_by(type='Glaze')]
-    form.glaze_fire_kiln_id.choices = [('-1', '-')] + [(kiln.id, kiln.name) for kiln in Kiln.query.all()]
+        glaze_form.glaze.choices = [(0, '-')] + [(glaze.id, glaze.get_glaze_name()) for glaze in Glaze.query.all()]
+    form.glaze_fire_program_id.choices = [(0, '-')] + [(program.id, program.name) for program in FiringProgram.query.filter_by(type='Glaze')]
+    form.glaze_fire_kiln_id.choices = [(0, '-')] + [(kiln.id, kiln.name) for kiln in Kiln.query.all()]
     
 
-def prepopulate_select(pot_select_field):
-    if pot_select_field:
-        return pot_select_field.id
-    else:
-        return -1
+def get_field_id_or_default(pot_select_field):
+    """Return the id of the given field or 0 if it's None."""
+    return pot_select_field.id if pot_select_field else 0
+
+
+def populate_select_field_data(form, pot):
+    """Fill in the form data with the values from a given pot."""
+    fields_mapping = {
+        'made_with_clay': pot.made_with_clay,
+        'bisque_fire_program_id': pot.bisque_fired_with_program,
+        'bisque_fire_kiln_id': pot.bisque_fired_with_kiln,
+        'glaze_fire_program_id': pot.glaze_fired_with_program,
+        'glaze_fire_kiln_id': pot.glaze_fired_with_kiln
+    }
+
+    for form_field, pot_field in fields_mapping.items():
+        form_field_obj = getattr(form, form_field)
+        form_field_obj.data = get_field_id_or_default(pot_field)
+    
+    # Populate glazes
+    form_glazes = [glaze.glaze_id for glaze in pot.used_glazes]
+    for form_glaze, glaze_id in zip(form.used_glazes.entries, form_glazes):
+        form_glaze.glaze.data = glaze_id
+    
+
+
+def safe_query(model, id):
+    """
+    Retrieve an instance of the given model by its ID, if it exists.
+
+    Given a model and an ID, this function attempts to retrieve the corresponding
+    instance from the database. If the provided ID is None or 0 or the instance is not found, 
+    the function returns None instead of the instance.
+
+    Args:
+        model (db.Model): The database model to query from.
+        id (int or str): The ID of the instance to retrieve.
+
+    Returns:
+        db.Model or None: The instance with the given ID if it exists; None otherwise.
+    """
+    return model.query.get(id) if id else None
     
     
+def extract_pot_data(form):
+    """Extracts data from the AddPotForm form to create a new Pot."""
+    
+    # Standard pot fields
+    pot_form_fields = [
+        'author',
+        'vessel_type',
+        'throw_date',
+        'throw_weight',
+        'throw_height',
+        'throw_width',
+        'throw_notes',
+        'trim_date',
+        'trim_weight',
+        'trim_surface_treatment',
+        'trim_notes',
+        'bisque_fire_start',
+        'bisque_fire_program_id',
+        'bisque_fire_kiln_id',
+        'bisque_fire_end',
+        'bisque_fire_open',
+        'bisque_fire_notes',
+        'glaze_date',
+        'glaze_notes',
+        'glaze_fire_start',
+        'glaze_fire_program_id',
+        'glaze_fire_kiln_id',
+        'glaze_fire_end',
+        'glaze_fire_open',
+        'glaze_fire_notes'
+    ]
+    
+    # Standard fields extraction
+    data = {field: getattr(form, field).data for field in pot_form_fields}
+
+    # Special field extraction (since it doesn't directly map to a model field)
+    data['made_with_clay'] = safe_query(Clay, form.made_with_clay.data) 
+    data['bisque_fired_with_program'] = safe_query(FiringProgram, data['bisque_fire_program_id'])
+    data['bisque_fired_with_kiln'] = safe_query(Kiln, data['bisque_fire_kiln_id'])
+    data['glaze_fired_with_program'] = safe_query(FiringProgram, data['glaze_fire_program_id'])
+    data['glaze_fired_with_kiln'] = safe_query(Kiln, data['glaze_fire_kiln_id'])
+    
+    return data
     
 
 def extract_glaze_data(form):

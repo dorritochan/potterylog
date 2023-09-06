@@ -16,7 +16,7 @@ $(document).ready(function() {
                     
                     // Fetch the glaze choices and set them for the newly added field
                     $.get('/get_glaze_choices', function(choicesData) {
-                        var firstOption = [[-1, '-']];
+                        var firstOption = [[0, '-']];
                         var choices = firstOption.concat(choicesData);
                         $('#glaze-field-' + glazeCount + ' select[name$="glaze"]').html(getOptionsHtml(choices));
                         glazeCount++;

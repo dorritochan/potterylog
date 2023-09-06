@@ -20,8 +20,8 @@
             <td>{{ kiln.name or '' }}</td>
             <td>{{ kiln.brand or '' }}</td>
             <td>{{ kiln.type or '' }}</td>
-            <td>{{ kiln.capacity ~ kiln.capacity_unit or '' }}</td>
-            <td>{{ kiln.temp_max ~ kiln.temp_unit or '' }}</td>
+            <td>{{ kiln.capacity ~ 'L' or '' }}</td>
+            <td>{{ kiln.temp_max ~ '°C' or '' }}</td>
             <td>{{ kiln.voltage or '' }}</td>
             <td>{{ kiln.controller or '' }}</td>
         </tr>
@@ -46,20 +46,20 @@
             <td>{{ program.id or '' }}</td>
             <td>{{ program.name or '' }}</td>
             <td>
-                {% for segment in program.associated_segments %}
-                    {% if segment.temp_start == segment.temp_end %}
-                        Hold {{ segment.temp_start ~ segment.temp_unit or '' }}:
+                {% for segment in program.ordered_segments %}
+                    {% if segment.segment.temp_start == segment.segment.temp_end %}
+                        Hold {{ segment.segment.temp_start ~ '°C' or '' }}:
                     {% else %}
-                        {{ segment.temp_start ~ segment.temp_unit or '' }} -
-                        {{ segment.temp_end ~ segment.temp_unit or '' }}:
+                        {{ segment.segment.temp_start ~ '°C' or '' }} -
+                        {{ segment.segment.temp_end ~ '°C' or '' }}:
                         {% endif %}
-                    {% if segment.time_to_reach %}
-                        {{ segment.time_to_reach ~ segment.time_to_reach_unit or '' }}
+                    {% if segment.segment.time_to_reach %}
+                        {{ segment.segment.time_to_reach ~ 'min' or '' }}
                     {% endif %}
                     <br>
                 {% endfor %}
             </td>
-            <td>Min. {{ program_time[program.id] }}</td>
+            <td>Min. {{ total_firing_time[program.id] }}</td>
         </tr>
         {% endfor %}
     </body>

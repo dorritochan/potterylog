@@ -77,7 +77,7 @@ class Pot(db.Model):
     bisque_fire_notes = db.Column(db.Text)
     # Glazing
     glaze_date = db.Column(db.DateTime, index=True)
-    used_glazes = db.relationship('PotGlaze', back_populates='pot', lazy='dynamic')
+    used_glazes = db.relationship('PotGlaze', back_populates='pot', lazy='dynamic', cascade='all')
     glaze_notes = db.Column(db.Text)
     # Glaze firing
     glaze_fire_start = db.Column(db.DateTime, index=True)
@@ -122,23 +122,29 @@ class Glaze(db.Model):
         return '<Glaze {}, {}, {}>'.format(self.brand, self.color, self.temp_max)   
     
 # Intermediary table for many-to-many relationship between firing segment and firing program
-program_segment = db.Table('program_segment',
-    db.Column('firing_program_id', db.Integer, db.ForeignKey('firing_program.id')),
-    db.Column('firing_segment_id', db.Integer, db.ForeignKey('firing_segment.id'))
-)   
+class ProgramSegment(db.Model):
+    __tablename__ = 'program_segment'
+    
+    program_id = db.Column(db.Integer, db.ForeignKey('firing_program.id'), primary_key=True)
+    segment_id = db.Column(db.Integer, db.ForeignKey('firing_segment.id'), primary_key=True)
+    segment_order = db.Column(db.Integer)
+    
+    program = db.relationship('FiringProgram', back_populates='associated_segments')
+    segment = db.relationship('FiringSegment', back_populates='associated_programs')
+    
     
 class FiringProgram(db.Model):
     __tablename__ = 'firing_program'
     id = db.Column(db.Integer, primary_key=True)
-    # Bisque or glaze
+    # Bisque or Glaze
     type = db.Column(db.String(20))
     name = db.Column(db.String(100))
-    associated_segments = db.relationship('FiringSegment', secondary=program_segment, back_populates='associated_programs', lazy='dynamic')
+    associated_segments = db.relationship('ProgramSegment', back_populates='program', lazy='dynamic', cascade='all')
     bisque_pots = db.relationship('Pot', back_populates='bisque_fired_with_program', foreign_keys='[Pot.bisque_fire_program_id]', lazy='dynamic')
     glaze_pots = db.relationship('Pot', back_populates='glaze_fired_with_program', foreign_keys='[Pot.glaze_fire_program_id]', lazy='dynamic')
     
     def __repr__(self):
-        return '<Firing program {}>'.format(self.type)  
+        return '<Firing program {}>'.format(self.name)  
     
     
 class FiringSegment(db.Model):
@@ -146,10 +152,8 @@ class FiringSegment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     temp_start = db.Column(db.Integer)
     temp_end = db.Column(db.Integer)
-    temp_unit = db.Column(db.String(10), default='°C')
     time_to_reach = db.Column(db.Integer)
-    time_to_reach_unit = db.Column(db.String(10), default='min')
-    associated_programs = db.relationship('FiringProgram', secondary=program_segment, back_populates='associated_segments', lazy='dynamic')
+    associated_programs = db.relationship('ProgramSegment', back_populates='segment', lazy='dynamic', cascade='all')
     
     def __repr__(self):
         return '<Firing segment {}, {}, {}>'.format(self.temp_start, self.temp_end, self.time_to_reach)  
@@ -162,14 +166,12 @@ class Clay(db.Model):
     color = db.Column(db.String(140))
     temp_min = db.Column(db.Integer)
     temp_max = db.Column(db.Integer)
-    temp_unit = db.Column(db.String(10), default='°C')
     grog_percent = db.Column(db.Integer)
     grog_size_max = db.Column(db.Float)
-    grog_size_unit = db.Column(db.String(10), default='mm')
     pots = db.relationship('Pot', backref='made_with_clay', lazy='dynamic')
     
     def get_clay_name(self):
-        return '{} {} {}{} {}% {}{}'.format(self.brand, self.color, self.temp_max, self.temp_unit, self.grog_percent, self.grog_size_max, self.grog_size_unit)
+        return '{} {} {}°C {}% {}mm'.format(self.brand, self.color, self.temp_max, self.grog_percent, self.grog_size_max)
 
     def __repr__(self):
         return '<Clay {}, {}, {}, {}>'.format(self.brand, self.color, self.temp_max, self.grog_percent)   
@@ -183,9 +185,7 @@ class Kiln(db.Model):
     # Electric or gas
     type = db.Column(db.String(20))
     capacity = db.Column(db.Integer)
-    capacity_unit = db.Column(db.String(10), default='L')
     temp_max = db.Column(db.Integer)
-    temp_unit = db.Column(db.String(10), default='°C')
     voltage = db.Column(db.String(20))
     controller = db.Column(db.String(200))
     bisque_fired_pots  = db.relationship('Pot', back_populates='bisque_fired_with_kiln', foreign_keys='[Pot.bisque_fire_kiln_id]', lazy='dynamic')

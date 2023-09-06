@@ -135,7 +135,6 @@ class AddKilnForm(FlaskForm):
     type = SelectField('Type', coerce=int, choices=[(1, 'Electric'), (2, 'Gas')])
     capacity = IntegerField('Capacity')
     temp_max = StringField('Maximum temperature')
-    temp_unit = SelectField('Temperature unit', coerce=int, choices=[(1, '°C'), (2, '°F')])
     voltage = StringField('Voltage kW')
     controller = StringField('Controller')
     submit = SubmitField('Add kiln')
@@ -144,10 +143,10 @@ class AddKilnForm(FlaskForm):
 class FiringSegmentForm(FlaskForm):
     temp_start = IntegerField('Start temperature', validators=[DataRequired()])
     temp_end = IntegerField('End temperature', validators=[DataRequired()])
-    temp_unit = SelectField('Temperature unit', coerce=int, choices=[(1, '°C'), (2, '°F')])
-    time_to_reach = IntegerField('Time to reach in min')
+    time_to_reach = IntegerField('Time to reach')
     
     
 class AddFiringProgram(FlaskForm):
+    type = SelectField('Type', coerce=int, choices=[(1, 'Bisque'), (2, 'Glaze')])
     firing_segments = FieldList(FormField(FiringSegmentForm), min_entries=1)
     submit = SubmitField('Add program')

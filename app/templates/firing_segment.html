@@ -1,7 +1,6 @@
 {{ segment.csrf_token }}
 <div id="firing-segment-{{ segment_index }}">
-    {{ segment.temp_start.label }} {{ segment.temp_start }}
-    {{ segment.temp_end.label }} {{ segment.temp_end }}
-    {{ segment.temp_unit.label }}: {{ segment.temp_unit }}
-    {{ segment.time_to_reach.label }}: {{ segment.time_to_reach }}
+    {{ segment.temp_start.label }} {{ segment.temp_start }} °C
+    {{ segment.temp_end.label }} {{ segment.temp_end }} °C
+    {{ segment.time_to_reach.label }}: {{ segment.time_to_reach }} min
 </div>

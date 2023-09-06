@@ -41,7 +41,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% for glaze in pot.used_glazes %}
+                    {% for glaze in pot.ordered_glaze_layers %}
                     <a href="{{ url_for('show_glaze', glaze_id=glaze.glaze_id) }}">{{ glaze.glaze.get_glaze_name() or '' }}</a> x{{ glaze.number_of_layers or '1' }}<br>
                     {% endfor %}
                 </td>

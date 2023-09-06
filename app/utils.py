@@ -37,3 +37,93 @@ def prepopulate_select(pot_select_field):
         return pot_select_field.id
     else:
         return -1
+    
+    
+    
+
+def extract_glaze_data(form):
+    """Extracts data from the AddGlazeForm form to create a new Glaze."""
+    # Standard fields extraction
+    data = {
+        'brand': form.brand.data,
+        'name': form.name.data,
+        'color': form.color.data,
+        'temp_min': form.temp_min.data,
+        'temp_max': form.temp_max.data,
+        'brand_id': form.brand_id.data,
+        'glaze_url': form.glaze_url.data
+    }
+
+    # Special field extraction (since it doesn't directly map to a model field)
+    data['temp_unit'] = next(label for value, label in form.temp_unit.choices if value == form.temp_unit.data)
+
+    return data
+
+
+def extract_clay_data(form):
+    """Extracts data from the AddClayForm form to create a new Clay."""
+    # Standard fields extraction
+    data = {
+        'brand': form.brand.data,
+        'color': form.color.data,
+        'temp_min': form.temp_min.data,
+        'temp_max': form.temp_max.data,
+        'grog_percent': form.grog_percent.data,
+        'grog_size_max': form.grog_size_max.data
+    }
+
+    # Special field extraction (since it doesn't directly map to a model field)
+    data['temp_unit'] = next(label for value, label in form.temp_unit.choices if value == form.temp_unit.data)
+
+    return data
+
+
+def extract_kiln_data(form):
+    """Extracts data from the AddKilnForm form to create a new Kiln."""
+    # Standard fields extraction
+    data = {
+        'name': form.name.data,
+        'brand': form.brand.data,
+        'capacity': form.capacity.data,
+        'temp_max': form.temp_max.data,
+        'voltage': form.voltage.data,
+        'controller': form.controller.data
+    }
+
+    # Special field extraction (since it doesn't directly map to a model field)
+    data['type'] = next(label for value, label in form.type.choices if value == form.type.data)
+    data['temp_unit'] = next(label for value, label in form.temp_unit.choices if value == form.temp_unit.data)
+
+    return data
+
+
+def program_firing_time(firing_program):
+    """
+    Compute the total firing time for one firing program.
+
+    This helper function takes a FiringProgram instance as an argument 
+    and computes the total firing time for it. The firing time of the
+    segments of the program are summed up and using divmod splitted into
+    hours and minutes for better readability.
+    
+    Args:
+        firing_program (FiringProgram): A FiringProgram instance.
+        
+    Returns:
+        dict: A dictionary containing the keys 'hours' and 'minutes' and
+        their respective computed value for the given firing program.
+    """
+    
+    # Retrieve the firing segments of the program
+    segments = firing_program.associated_segments
+    
+    # Compute the sum of the firing times of the segments (in minutes)
+    minutes_sum = sum(segment.segment.time_to_reach for segment in segments)
+    
+    # Split the sum into hours and minutes
+    hours, minutes = divmod(minutes_sum, 60)
+    
+    if hours > 0:
+        return '{}h {}min'.format(hours, minutes)
+    else:
+        return '{}min'.format(minutes)

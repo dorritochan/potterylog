@@ -54,16 +54,13 @@ class Pot(db.Model):
     primary_image = db.Column(db.String(255))
     # Throwing
     throw_date = db.Column(db.DateTime, index=True, default=lambda: germany_timezone.localize(datetime.now()))
-    throw_weight = db.Column(db.Integer, index=True)
-    throw_weight_unit = db.Column(db.String(10), default='g')
-    throw_height = db.Column(db.String(140))
-    throw_width = db.Column(db.String(140))
-    throw_dimensions_unit = db.Column(db.String(10), default='cm')
+    throw_weight = db.Column(db.Integer, index=True) # in g
+    throw_height = db.Column(db.String(140)) # in cm
+    throw_width = db.Column(db.String(140)) # in cm
     throw_notes = db.Column(db.Text)
     # Trimming
     trim_date = db.Column(db.DateTime, index=True)
-    trim_weight = db.Column(db.Integer, index=True)
-    trim_weight_unit = db.Column(db.String(10))
+    trim_weight = db.Column(db.Integer, index=True) # in g
     trim_surface_treatment = db.Column(db.String(140), index=True)
     trim_notes = db.Column(db.Text)
     # Bisque firing
@@ -106,20 +103,27 @@ class Glaze(db.Model):
     __tablename__ = 'glaze'
     id = db.Column(db.Integer, primary_key=True)
     brand = db.Column(db.String(140), index=True)
-    name = db.Column(db.String(50))
+    name = db.Column(db.String(50), unique=True)
+    brand_id = db.Column(db.Integer, unique=True)
     color = db.Column(db.String(140))
-    temp_min = db.Column(db.Integer)
-    temp_max = db.Column(db.Integer)
-    temp_unit = db.Column(db.String(10), default='°C')
-    brand_id = db.Column(db.Integer)
+    temp_min = db.Column(db.Integer) # in °C
+    temp_max = db.Column(db.Integer) # in °C
+    cone = db.Column(db.String(5))
     glaze_url = db.Column(db.String(200))
     glazed_pots = db.relationship('PotGlaze', back_populates='glaze', lazy='dynamic')
     
     def get_glaze_name(self):
-        return '{} {} {} {}{}'.format(self.brand, self.brand_id, self.name, self.temp_max, self.temp_unit)
+        if self.temp_max:
+            temp = str(self.temp_max) + '°C'
+        elif self.cone:
+            temp = 'Cone ' + str(self.cone)
+        else:
+            temp= ''    
+        return '{} {} {} {}'.format(self.brand, self.brand_id, self.name, temp)
     
     def __repr__(self):
         return '<Glaze {}, {}, {}>'.format(self.brand, self.color, self.temp_max)   
+    
     
 # Intermediary table for many-to-many relationship between firing segment and firing program
 class ProgramSegment(db.Model):
@@ -136,8 +140,7 @@ class ProgramSegment(db.Model):
 class FiringProgram(db.Model):
     __tablename__ = 'firing_program'
     id = db.Column(db.Integer, primary_key=True)
-    # Bisque or Glaze
-    type = db.Column(db.String(20))
+    type = db.Column(db.String(20)) # Bisque or Glaze
     name = db.Column(db.String(100))
     associated_segments = db.relationship('ProgramSegment', back_populates='program', lazy='dynamic', cascade='all')
     bisque_pots = db.relationship('Pot', back_populates='bisque_fired_with_program', foreign_keys='[Pot.bisque_fire_program_id]', lazy='dynamic')
@@ -150,9 +153,9 @@ class FiringProgram(db.Model):
 class FiringSegment(db.Model):
     __tablename__ = 'firing_segment'
     id = db.Column(db.Integer, primary_key=True)
-    temp_start = db.Column(db.Integer)
-    temp_end = db.Column(db.Integer)
-    time_to_reach = db.Column(db.Integer)
+    temp_start = db.Column(db.Integer) # in °C
+    temp_end = db.Column(db.Integer) # in °C
+    time_to_reach = db.Column(db.Integer) # in min
     associated_programs = db.relationship('ProgramSegment', back_populates='segment', lazy='dynamic', cascade='all')
     
     def __repr__(self):
@@ -164,10 +167,10 @@ class Clay(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     brand = db.Column(db.String(140), index=True)
     color = db.Column(db.String(140))
-    temp_min = db.Column(db.Integer)
-    temp_max = db.Column(db.Integer)
-    grog_percent = db.Column(db.Integer)
-    grog_size_max = db.Column(db.Float)
+    temp_min = db.Column(db.Integer) # in °C
+    temp_max = db.Column(db.Integer) # in °C
+    grog_percent = db.Column(db.Integer) # in %
+    grog_size_max = db.Column(db.Float) # in mm
     pots = db.relationship('Pot', backref='made_with_clay', lazy='dynamic')
     
     def get_clay_name(self):
@@ -182,11 +185,10 @@ class Kiln(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(140), index=True)
     brand = db.Column(db.String(140), index=True)
-    # Electric or gas
-    type = db.Column(db.String(20))
-    capacity = db.Column(db.Integer)
-    temp_max = db.Column(db.Integer)
-    voltage = db.Column(db.String(20))
+    type = db.Column(db.String(20)) # Electric or Gas
+    capacity = db.Column(db.Integer) # in L
+    temp_max = db.Column(db.Integer) # in °C
+    voltage = db.Column(db.Float(20)) # in kW
     controller = db.Column(db.String(200))
     bisque_fired_pots  = db.relationship('Pot', back_populates='bisque_fired_with_kiln', foreign_keys='[Pot.bisque_fire_kiln_id]', lazy='dynamic')
     glaze_fired_pots  = db.relationship('Pot', back_populates='glaze_fired_with_kiln', foreign_keys='[Pot.glaze_fire_kiln_id]', lazy='dynamic')

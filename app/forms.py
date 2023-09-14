@@ -1,10 +1,17 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateTimeField, SelectField, TextAreaField, SelectMultipleField, widgets, MultipleFileField, IntegerField, FormField, FieldList
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, InputRequired, Optional, URL
 from flask_wtf.file import FileAllowed
+from wtforms import (
+    StringField, PasswordField, BooleanField, SubmitField, DateTimeField, 
+    SelectField, TextAreaField, SelectMultipleField, widgets, MultipleFileField, 
+    IntegerField, FormField, FieldList, FloatField
+)
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, InputRequired, Optional, URL
 from wtforms.widgets import Input
-from app.models import User, Clay, FiringProgram, Kiln, Glaze
+
 from datetime import datetime
+
+from app.models import User, Clay, FiringProgram, Kiln, Glaze
+from app.utils import normalize_string
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -38,16 +45,16 @@ class GlazeLayerForm(FlaskForm):
 
 class AddPotForm(FlaskForm):
     vessel_type = StringField('Vessel type', validators=[DataRequired()])
-    made_with_clay = SelectField('Clay type', validators=[InputRequired()], choices=[], coerce=int)
+    made_with_clay = SelectField('Clay', validators=[InputRequired()], choices=[], coerce=int)
     author = StringField('Author', validators=[DataRequired()], default='Dora')
     photos = MultipleFileField('Upload photos', validators=[FileAllowed(['jpg', 'jpeg', 'png', 'gif', 'heic', 'heif'])])
     throw_date = DateTimeField('Throwing date and time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()], widget=Input(input_type='datetime-local'), default=datetime.now)
-    throw_weight = StringField('Throwing weight in g')
-    throw_height = StringField('Throwing heights in cm')
-    throw_width = StringField('Throwing widths in cm')
+    throw_weight = StringField('Throwing weight') 
+    throw_height = StringField('Throwing heights')
+    throw_width = StringField('Throwing widths')
     throw_notes = TextAreaField('Throwing notes')
     trim_date = DateTimeField('Trimming date and time', format='%Y-%m-%dT%H:%M', widget=Input(input_type='datetime-local'), validators=[Optional()])
-    trim_weight = StringField('Trimmed weight in g')
+    trim_weight = StringField('Trimmed weight')
     trim_surface_treatment = StringField('Surface treatment')
     trim_notes = TextAreaField('Trimming notes')
     bisque_fire_start = DateTimeField('Bisque firing started at', format='%Y-%m-%dT%H:%M', widget=Input(input_type='datetime-local'), validators=[Optional()])
@@ -109,41 +116,90 @@ class AddPotForm(FlaskForm):
 class AddClayForm(FlaskForm):
     brand = StringField('Brand', validators=[DataRequired()])
     color = StringField('Color')
-    temp_min = StringField('Minimum temperature')
-    temp_max = StringField('Maximum temperature')
-    temp_unit = SelectField('°', coerce=int, choices=[(1, 'C'), (2, 'F')])
-    grog_percent = StringField('Grog percentage %')
-    grog_size_max = StringField('Grog size mm')
+    temp_min = IntegerField('Minimum temperature') # in °C
+    temp_max = IntegerField('Maximum temperature') # in °C
+    grog_percent = IntegerField('Grog percentage %')
+    grog_size_max = FloatField('Grog size mm')
     submit = SubmitField('Add clay')
     
+    def validate_grog_size_max(self, grog_size_max):
+        '''Check if the clay already exists in the database'''
+        
+        normalized_brand = normalize_string(self.brand.data)
+        normalized_color = normalize_string(self.color.data)
+
+        clay = Clay.query.filter(
+            Clay.brand.ilike(normalized_brand),
+            Clay.color.ilike(normalized_color),
+            Clay.grog_percent == self.grog_percent.data,
+            Clay.grog_size_max == grog_size_max.data
+            ).first()
+        if clay:
+            raise ValidationError('This clay already exists.')
     
 class AddGlazeForm(FlaskForm):
     brand = StringField('Brand name', validators=[DataRequired()])
-    name = StringField('Glaze name')
-    color = StringField('Color')
-    temp_min = StringField('Minimum temperature')
-    temp_max = StringField('Maximum temperature')
-    temp_unit = SelectField('Temperature unit', coerce=int, choices=[(1, '°C'), (2, '°F')])
+    name = StringField('Glaze name', validators=[DataRequired()])
     brand_id = StringField('Brand ID')
-    glaze_url = StringField('Glaze URL', validators=[URL()])
+    color = StringField('Color')
+    temp_min = IntegerField('Minimum temperature °C')
+    temp_max = IntegerField('Maximum temperature °C')
+    cone = SelectField('Cone', choices=[], coerce=int)
+    glaze_url = StringField('Glaze URL', validators=[Optional(), URL()])
     submit = SubmitField('Add glaze')
     
+    def validate_name(self, name):
+        '''Check if the glaze already exists in the database'''
+        
+        normalized_brand = normalize_string(self.brand.data)
+        normalized_name = normalize_string(name.data)
+        glaze = Glaze.query.filter(
+            Glaze.brand.ilike(normalized_brand),
+            Glaze.name.ilike(normalized_name)
+            ).first()
+        if glaze:
+            raise ValidationError('This glaze already exists.')
+    
+    def validate_brand_id(self, brand_id):
+        '''Check if the glaze already exists in the database'''
+        
+        normalized_brand = normalize_string(self.brand.data)
+        normalized_brand_id = normalize_string(brand_id.data)
+        if brand_id:
+            glaze = Glaze.query.filter(
+                Glaze.brand.ilike(normalized_brand),
+                Glaze.brand_id.ilike(normalized_brand_id)
+                ).first()
+            if glaze:
+                raise ValidationError('This glaze already exists.')
+    
+    def __init__(self, *args, **kwargs):
+        super(AddGlazeForm, self).__init__(*args, **kwargs)
+        
+        cones = [
+            '019', '018', '017', '016', '015', '014', '013', '012', '011',
+            '010', '09', '08', '07', '06', '05', '04', '03', '02', '01',
+            '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
+            ]
+        self.cone.choices = [(index + 1, cone) for index, cone in enumerate(cones)]
+        
+        self.cone.choices.insert(0, (0, ''))
     
 class AddKilnForm(FlaskForm):
     name = StringField('Kiln name')
     brand = StringField('Brand name', validators=[DataRequired()])
     type = SelectField('Type', coerce=int, choices=[(1, 'Electric'), (2, 'Gas')])
-    capacity = IntegerField('Capacity')
-    temp_max = StringField('Maximum temperature')
-    voltage = StringField('Voltage kW')
+    capacity = IntegerField('Capacity') # in L
+    temp_max = IntegerField('Maximum temperature') # in °C
+    voltage = FloatField('Voltage kW') # in kW
     controller = StringField('Controller')
     submit = SubmitField('Add kiln')
     
 
 class FiringSegmentForm(FlaskForm):
-    temp_start = IntegerField('Start temperature', validators=[DataRequired()])
-    temp_end = IntegerField('End temperature', validators=[DataRequired()])
-    time_to_reach = IntegerField('Time to reach')
+    temp_start = IntegerField('Start temperature', validators=[DataRequired()]) # in °C
+    temp_end = IntegerField('End temperature', validators=[DataRequired()]) # in °C
+    time_to_reach = IntegerField('Time to reach') # in minutes
     
     
 class AddFiringProgram(FlaskForm):

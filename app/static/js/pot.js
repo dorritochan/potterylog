@@ -49,6 +49,57 @@ $(document).ready(function() {
             });
         });
     }
+
+
+    $('#btn-add-glaze').click(function(event) {
+        event.preventDefault(); // Prevent the form from reloading the page
+        event.stopPropagation();
+
+        $.ajax({
+            url: "/addglaze",
+            type: "POST",
+            data: $('#form-add-glaze').serialize(),
+            success: function(response) {
+                if (response.success) {
+                    // Close the modal and update the pot info, if necessary
+                    $('#modal-add-glaze').modal('hide');
+                    var shouldReload = $('#add-new-glaze').data('reload-page');
+                    if (shouldReload) {
+                        location.reload();
+                    } else {
+                        // update the list of glazes without a page reload
+                        $.get('/get_glaze_choices', function(choicesData) {
+                            var firstOption = [[0, '-']];
+                            var choices = firstOption.concat(choicesData);
+                            
+                            var lastGlazeLayerId = $('[id^="glaze-field-"]').last().attr('id');
+                            var glazeLayerCount = parseInt(lastGlazeLayerId.split('-').pop(), 10);
+                            console.log(glazeLayerCount);
+                            for (let index = 0; index <= glazeLayerCount; index++) {
+                                $('#glaze-field-' + index + ' select[name$="glaze"]').html(getOptionsHtml(choices));
+                            }
+                        });
+                    }
+                } else {
+                    $('#modal-add-glaze').modal('show');
+                    // Clear previous errors
+                    $(".form-error").remove();
+
+                    // Loop through the errors and display them
+                    $.each(response.errors, function(field, errors) {
+                        // For each error of a field, create an error span
+                        $.each(errors, function(_, error) {
+                            var errorSpan = $("<span>").addClass("form-error").css("color", "red").text("[" + error + "]");
+                            // Append errorSpan next to the respective input field
+                            $("#form-add-glaze").find('[name="' + field + '"]').after(errorSpan);
+                        });
+                    });
+                }
+            }
+        });
+    });
+    
+
 });
 
 
@@ -58,4 +109,16 @@ function getOptionsHtml(choices) {
         optionsHtml += '<option value="' + choices[i][0] + '">' + choices[i][1] + '</option>';
     }
     return optionsHtml;
+}
+
+function updateGlazeList() {
+    $.ajax({
+        url: "/get_updated_glaze_list",
+        type: "GET",
+        success: function(data) {
+            // Assuming 'data' contains the updated list of glazes
+            // Update the DOM with the new list
+            $("#glaze-list").html(data);
+        }
+    });
 }

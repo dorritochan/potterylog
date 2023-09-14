@@ -2,7 +2,7 @@
 
 {% block main %}
 <h1>List of kilns</h1>
-<table>
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Name</th>
@@ -20,9 +20,9 @@
             <td>{{ kiln.name or '' }}</td>
             <td>{{ kiln.brand or '' }}</td>
             <td>{{ kiln.type or '' }}</td>
-            <td>{{ kiln.capacity ~ 'L' or '' }}</td>
-            <td>{{ kiln.temp_max ~ '°C' or '' }}</td>
-            <td>{{ kiln.voltage or '' }}</td>
+            <td>{{ kiln.capacity ~ 'L' if kiln.capacity else '' }}</td>
+            <td>{{ kiln.temp_max ~ '°C' if kiln.temp_max else '' }}</td>
+            <td>{{ kiln.voltage ~ 'kW' if kiln.voltage else '' }}</td>
             <td>{{ kiln.controller or '' }}</td>
         </tr>
         {% endfor %}
@@ -52,7 +52,7 @@
                     {% else %}
                         {{ segment.segment.temp_start ~ '°C' or '' }} -
                         {{ segment.segment.temp_end ~ '°C' or '' }}:
-                        {% endif %}
+                    {% endif %}
                     {% if segment.segment.time_to_reach %}
                         {{ segment.segment.time_to_reach ~ 'min' or '' }}
                     {% endif %}

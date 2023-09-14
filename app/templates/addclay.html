@@ -21,34 +21,28 @@
     </div>
     <div>
         {{ form.temp_min.label }}
-        {{ form.temp_min(size=10) }}
+        {{ form.temp_min(size=10) }} °C
         {% for error in form.temp_min.errors %}
             <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </div>
     <div>
         {{ form.temp_max.label }}
-        {{ form.temp_max(size=10) }}
+        {{ form.temp_max(size=10) }} °C
         {% for error in form.temp_max.errors %}
             <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </div>
     <div>
-        {{ form.temp_unit.label }} : {{ form.temp_unit }}
-        {% for error in form.temp_unit.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </div>
-    <div>
         {{ form.grog_percent.label }}
-        {{ form.grog_percent(size=10) }}
+        {{ form.grog_percent(size=10) }} %
         {% for error in form.grog_percent.errors %}
             <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </div>
     <div>
         {{ form.grog_size_max.label }}
-        {{ form.grog_size_max(size=10) }}
+        {{ form.grog_size_max(size=10) }} mm
         {% for error in form.grog_size_max.errors %}
             <span style="color: red;">[{{ error }}]</span>
         {% endfor %}

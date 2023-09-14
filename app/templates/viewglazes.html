@@ -1,8 +1,14 @@
 {% extends 'layout.html' %}
+{% include 'addglaze.html' %}
 
 {% block main %}
 <h1>List of glazes</h1>
-<table>
+
+<div class="float-right">
+    <button id="add-new-glaze" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-glaze" data-reload-page="true">Add a new glaze</button>
+</div>
+
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Pots</th>
@@ -12,6 +18,7 @@
             <th>Color</th>
             <th>Min. temp.</th>
             <th>Max. temp.</th>
+            <th>Cone</th>
             <th>URL</th>
         </tr>
     </thead>
@@ -23,8 +30,9 @@
             <td>{{ glaze.brand_id or '' }}</td>
             <td>{{ glaze.name or '' }}</td>
             <td>{{ glaze.color or '' }}</td>
-            <td>{{ glaze.temp_min ~ glaze.temp_unit or '' }}</td>
-            <td>{{ glaze.temp_max ~ glaze.temp_unit or '' }}</td>
+            <td>{{ glaze.temp_min ~ '°C' if glaze.temp_min else '' }}</td>
+            <td>{{ glaze.temp_max ~ '°C' if glaze.temp_max else '' }}</td>
+            <td>{{ glaze.cone or '' }}</td>
             <td>
                 <a href="{{ glaze.glaze_url }}" target="_blank">{{ glaze.glaze_url or '' }}</a>
             </td>
@@ -32,5 +40,5 @@
         {% endfor %}
     </body>
 </table>
-<a href="{{ url_for('add_glaze') }}">Add a new glaze</a>
+
 {% endblock %}

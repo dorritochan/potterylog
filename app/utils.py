@@ -3,6 +3,8 @@
 from app import app
 from app.models import Clay, FiringProgram, Kiln, Glaze
 
+import re
+
 
 
 def allowed_file(filename):
@@ -66,7 +68,6 @@ def populate_select_field_data(form, pot):
     for form_glaze, glaze_id in zip(form.used_glazes.entries, form_glazes):
         form_glaze.glaze.data = glaze_id
     
-
 
 def safe_query(model, id):
     """
@@ -143,9 +144,9 @@ def extract_glaze_data(form):
         'brand_id': form.brand_id.data,
         'glaze_url': form.glaze_url.data
     }
-
+    
     # Special field extraction (since it doesn't directly map to a model field)
-    data['temp_unit'] = next(label for value, label in form.temp_unit.choices if value == form.temp_unit.data)
+    data['cone'] = next(label for value, label in form.cone.choices if value == form.cone.data)
 
     return data
 
@@ -161,9 +162,6 @@ def extract_clay_data(form):
         'grog_percent': form.grog_percent.data,
         'grog_size_max': form.grog_size_max.data
     }
-
-    # Special field extraction (since it doesn't directly map to a model field)
-    data['temp_unit'] = next(label for value, label in form.temp_unit.choices if value == form.temp_unit.data)
 
     return data
 
@@ -182,7 +180,6 @@ def extract_kiln_data(form):
 
     # Special field extraction (since it doesn't directly map to a model field)
     data['type'] = next(label for value, label in form.type.choices if value == form.type.data)
-    data['temp_unit'] = next(label for value, label in form.temp_unit.choices if value == form.temp_unit.data)
 
     return data
 
@@ -217,3 +214,9 @@ def program_firing_time(firing_program):
         return '{}h {}min'.format(hours, minutes)
     else:
         return '{}min'.format(minutes)
+    
+    
+def normalize_string(s):
+    """Converts the string to lowercase, trims white spaces and replaces multiple spaces with a single space."""
+    s = s.lower().strip()
+    return re.sub(' +', ' ', s)

@@ -2,7 +2,7 @@
 
 {% block main %}
 <h1>Glaze {{ glaze.get_glaze_name() }}</h1>
-<table>
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Brand</th>
@@ -11,6 +11,7 @@
             <th>Color</th>
             <th>Min. temp.</th>
             <th>Max. temp.</th>
+            <th>Cone</th>
             <th>URL</th>
         </tr>
     </thead>
@@ -20,8 +21,9 @@
             <td>{{ glaze.brand_id or '' }}</td>
             <td>{{ glaze.name or '' }}</td>
             <td>{{ glaze.color or '' }}</td>
-            <td>{{ glaze.temp_min ~ glaze.temp_unit or '' }}</td>
-            <td>{{ glaze.temp_max ~ glaze.temp_unit or '' }}</td>
+            <td>{{ glaze.temp_min ~ '°C' if glaze.temp_min else '' }}</td>
+            <td>{{ glaze.temp_max ~ '°C' if glaze.temp_max else '' }}</td>
+            <td>{{ glaze.cone or '' }}</td>
             <td>
                 <a href="{{ glaze.glaze_url }}" target="_blank">{{ glaze.glaze_url or '' }}</a>
             </td>

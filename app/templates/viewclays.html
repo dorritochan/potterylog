@@ -2,7 +2,7 @@
 
 {% block main %}
 <h1>List of clays</h1>
-<table>
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Pots</th>
@@ -10,7 +10,7 @@
             <th>Color</th>
             <th>Min. temp.</th>
             <th>Max. temp.</th>
-            <th>Grog %</th>
+            <th>Grog percentage</th>
             <th>Grog size</th>
         </tr>
     </thead>
@@ -20,10 +20,10 @@
             <td><a href="{{ url_for('show_clay', clay_id=clay.id) }}">View pots</a></td>
             <td>{{ clay.brand or '' }}</td>
             <td>{{ clay.color or '' }}</td>
-            <td>{{ clay.temp_min ~ clay.temp_unit or '' }}</td>
-            <td>{{ clay.temp_max ~ clay.temp_unit or '' }}</td>
-            <td>{{ clay.grog_percent or '' }}</td>
-            <td>{{ clay.grog_size_max ~ clay.grog_size_unit or '' }}</td>
+            <td>{{ clay.temp_min ~ '°C' if clay.temp_min else '' }}</td>
+            <td>{{ clay.temp_max ~ '°C' if clay.temp_max else '' }}</td>
+            <td>{{ clay.grog_percent ~ '%' if clay.grog_percent else '' }}</td>
+            <td>{{ clay.grog_size_max ~ 'mm' if clay.grog_size_max else '' }}</td>
         </tr>
         {% endfor %}
     </body>

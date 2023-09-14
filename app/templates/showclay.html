@@ -17,10 +17,10 @@
         <tr>
             <td>{{ clay.brand or '' }}</td>
             <td>{{ clay.color or '' }}</td>
-            <td>{{ clay.temp_min ~ clay.temp_unit or '' }}</td>
-            <td>{{ clay.temp_max ~ clay.temp_unit or '' }}</td>
-            <td>{{ clay.grog_percent or '' }}</td>
-            <td>{{ clay.grog_size_max ~ clay.grog_size_unit or '' }}</td>
+            <td>{{ clay.temp_min ~ '°C' if clay.temp_min else '' }}</td>
+            <td>{{ clay.temp_max ~ '°C' if clay.temp_max else '' }}</td>
+            <td>{{ clay.grog_percent ~ '%' if clay.grog_percent else '' }}</td>
+            <td>{{ clay.grog_size_max ~ 'mm' if clay.grog_size_max else '' }}</td>
         </tr>
     </body>
 </table>

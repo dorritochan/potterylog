@@ -1,67 +1,78 @@
-{% extends 'layout.html' %}
-
-{% block main %}
-<h1>Add a new glaze</h1>
-
-<form action="" method="post">
-    {{ form.hidden_tag() }}
-    <div>
-        {{ form.brand.label }}
-        {{ form.brand(size=32) }}
-        {% for error in form.brand.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
+<!-- Modal -->
+<div class="modal fade" id="modal-add-glaze" tabindex="-1" role="dialog" aria-labelledby="modal-add-glaze-title" aria-hidden="true">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="modal-add-glaze-title">Add a new glaze</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+        
+        <form method="post" id="form-add-glaze">
+            {{ glaze_form.hidden_tag() }}
+            <div class="form-group">
+                {{ glaze_form.brand.label }}
+                {{ glaze_form.brand(class_="form-control") }}
+                {% for error in glaze_form.brand.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ glaze_form.brand_id.label }}
+                {{ glaze_form.brand_id(class_="form-control", autocomplete_="off") }}
+                {% for error in glaze_form.brand_id.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ glaze_form.name.label }}
+                {{ glaze_form.name(class_="form-control", autocomplete_="off") }}
+                {% for error in glaze_form.name.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ glaze_form.glaze_url.label }}
+                {{ glaze_form.glaze_url(class_="form-control", autocomplete_="off") }}
+                {% for error in glaze_form.glaze_url.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ glaze_form.color.label }}
+                {{ glaze_form.color(class_="form-control", autocomplete_="off") }}
+                {% for error in glaze_form.color.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ glaze_form.temp_min.label }}
+                {{ glaze_form.temp_min(class_="form-control", autocomplete_="off") }}
+                {% for error in glaze_form.temp_min.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ glaze_form.temp_max.label }}
+                {{ glaze_form.temp_max(class_="form-control", autocomplete_="off")}}
+                {% for error in glaze_form.temp_max.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ glaze_form.cone.label }}: {{ glaze_form.cone(class_="form-control") }}
+                {% for error in glaze_form.cone.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="modal-footer">
+                {{ glaze_form.submit(class_="btn btn-primary", id="btn-add-glaze", form_="form-add-glaze") }}
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </form>
+        </div>
     </div>
-    <div>
-        {{ form.brand_id.label }}
-        {{ form.brand_id(size=32) }}
-        {% for error in form.brand_id.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </div>
-    <div>
-        {{ form.name.label }}
-        {{ form.name(size=32) }}
-        {% for error in form.name.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </div>
-    <div>
-        {{ form.glaze_url.label }}
-        {{ form.glaze_url(size=200) }}
-        {% for error in form.glaze_url.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </div>
-    <div>
-        {{ form.color.label }}
-        {{ form.color(size=32) }}
-        {% for error in form.color.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </div>
-    <div>
-        {{ form.temp_min.label }}
-        {{ form.temp_min(size=10) }}
-        {% for error in form.temp_min.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </div>
-    <div>
-        {{ form.temp_max.label }}
-        {{ form.temp_max(size=10) }}
-        {% for error in form.temp_max.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </div>
-    <div>
-        {{ form.temp_unit.label }} : {{ form.temp_unit }}
-        {% for error in form.temp_unit.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </div>
-    <p>
-        {{ form.submit }}
-    </p>
-</form>
-{% endblock %}
+</div>
+</div>

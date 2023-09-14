@@ -268,6 +268,9 @@ def add_pot():
     # Set the label for the submit button
     form.submit.label.text = 'Add pot'
     
+    # The form for adding a new glaze in a modal
+    glaze_form = AddGlazeForm()
+    
     # ===================
     # POST method: Add a new pot
     # ===================
@@ -290,7 +293,7 @@ def add_pot():
     # ===================
     # GET method: Render the pot form
     # ===================
-    return render_template('pot.html', title='Add a new pot', form=form)
+    return render_template('pot.html', title='Add a new pot', form=form, glaze_form=glaze_form)
 
 
 @app.route('/editpot/<int:pot_id>', methods=['GET', 'POST'])
@@ -307,6 +310,9 @@ def edit_pot(pot_id):
     
     # Set the label for the submit button
     form.submit.label.text = 'Update pot'
+    
+    # The form for adding a new glaze in a modal
+    glaze_form = AddGlazeForm()
     
     # ===================
     # POST method: Update pot
@@ -339,7 +345,7 @@ def edit_pot(pot_id):
         form.photos.process_data(image_urls)
     
     # Render the 'pot.html' with pre-populated form data
-    return render_template('pot.html', title='Edit pot', form=form, pot_id=pot_id)
+    return render_template('pot.html', title='Edit pot', form=form, pot_id=pot_id, glaze_form=glaze_form)
 
 
 @app.route('/get_glaze_field/<int:layer_index>')
@@ -415,9 +421,9 @@ def add_item_to_db(form, model_class, extraction_function, redirect_url, flash_m
         - Exception: If there is en error extracting the form data
         - DatabaseError: If there's any issue while adding the item to the database. 
     """
+    
     # Validate the form data
     if form.validate_on_submit():
-        
         try:
             # Get the extraction function from 'utils.py' and extract the form data
             item_data = extraction_function(form)
@@ -463,19 +469,46 @@ def add_glaze():
         - Redirection to 'index' page: After successfully adding a new glaze.
         - HTML template: Renders the add glaze form for GET requests or if form validation fails.
     """
-    form = AddGlazeForm()
     
-    # ===================
-    # POST method: Add a glaze
-    # ===================
-    response = add_item_to_db(form, Glaze, extract_glaze_data, 'index', 'A new glaze has been added.')
-    if response:
-        return response
-
-    # ===================
-    # GET method: Render the template for adding a glaze
-    # ===================
-    return render_template('addglaze.html', title='Add a new glaze', form=form)
+    glaze_form = AddGlazeForm()
+    
+    # Validate the form data
+    if glaze_form.validate_on_submit():
+        try:
+            # Get the extraction function from 'utils.py' and extract the form data
+            item_data = extract_glaze_data(glaze_form)
+        except Exception as e:
+            # Log the exception for debugging
+            app.logger.error(f"Error extracting form data: {e}")
+            flash('An error occurred while processing the form. Please try again.')
+            return jsonify(success=False, error="Error while extracting the form data")
+        
+        # Create a new model instance based on the form data
+        item = Glaze(**item_data)
+        
+        try:
+            # Add the model instance to the database
+            db.session.add(item)
+            db.session.commit()
+        except DatabaseError:
+            # Rollback the session in case of an error
+            db.session.rollback()
+            # Log the error for debugging
+            app.logger.error("Error committing to the database.")
+            flash('An error occurred while saving to the database. Please try again later.')
+            return jsonify(success=False, error="Database error")
+        
+        # Show the success message
+        flash('The glaze has been saved.')
+        
+        # Return success JSON message
+        return jsonify(success=True)
+    
+    response_data = {
+        'success': False,
+        'errors': glaze_form.errors
+    }
+    return jsonify(response_data)
 
 
 @app.route('/addclay', methods=['GET', 'POST'])
@@ -645,7 +678,11 @@ def view_glazes():
         HTML template: Renders the list of all glazes.
     """
     glazes = Glaze.query.all()
-    return render_template('viewglazes.html', title='List of glazes', glazes=glazes)
+    
+    # A glaze form for the modal
+    glaze_form = AddGlazeForm()
+    
+    return render_template('viewglazes.html', title='List of glazes', glazes=glazes, glaze_form=glaze_form)
 
 
 @app.route('/showglaze/<int:glaze_id>')

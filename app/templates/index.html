@@ -1,11 +1,13 @@
 {% extends 'layout.html' %}
 
 {% block main %}
-<h1>This is a pottery log</h1>
+<h1>Pots</h1>
+<div class="float-right">
+    <a href="{{ url_for('add_pot') }}" class="btn btn-primary" type="button">Add a new pot</a>
+</div>
 
 <div>
-    <h2>List of pots</h2>
-    <table>
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>View pot</th>
@@ -51,9 +53,6 @@
             {% endfor %}
         </tbody>
     </table>
-    <div>
-        <a href="{{ url_for('add_pot') }}" class="button">Add a new pot</a>
-    </div>
 </div>
 
 {% endblock %}

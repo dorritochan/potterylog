@@ -1,34 +1,48 @@
-{% extends 'layout.html' %}
 
-{% block main %}
-<h1>Add a new firing program</h1>
-
-<form action="" method="post">
-    {{ form.hidden_tag() }}
-    <div>
-        {{ form.type.label }}: {{ form.type }}
-        {% for error in form.type.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-        {% endfor %}
-    </div>
-    <div id="firing-segments">
-        <div hidden id="segment-count" data-variable="{{ form.firing_segments.data | length | tojson }}"></div>
-        {% for segment in form.firing_segments %}
-            {% set segment_index=loop.index0 %}
-            {{ segment.csrf_token }}
-            <div id="firing-segment-{{ segment_index }}">
-                {{ segment.temp_start.label }} {{ segment.temp_start }} °C
-                {{ segment.temp_end.label }} {{ segment.temp_end }} °C
-                {{ segment.time_to_reach.label }}: {{ segment.time_to_reach }} min 
+<!-- Modal -->
+<div class="modal fade" id="modal-add-firing-program" tabindex="-1" role="dialog" aria-labelledby="modal-add-firing_program-title" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-add-firing-program-title">Add a new firing program</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-        {% endfor %}
+            <div class="modal-body">
+
+
+                <form action="" method="post" id="form-add-firing-program">
+                    {{ program_form.hidden_tag() }}
+                    <div class="form-group">
+                        {{ program_form.type.label }} {{ program_form.type(class_="form-control") }}
+                        {% for error in program_form.type.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <div id="firing-segments" class="form-group">
+                        <div hidden id="segment-count" data-variable="{{ program_form.firing_segments.data | length | tojson }}"></div>
+                        {% for segment in program_form.firing_segments %}
+                            {% set segment_index=loop.index0 %}
+                            {{ segment.csrf_token }}
+                            <h5 class="text-secondary pt-3">Segment {{ segment_index + 1 }}</h5>
+                            <div id="firing-segment-{{ segment_index }}">
+                                {{ segment.temp_start.label }} {{ segment.temp_start(class_="form-control", autocomplete_="off") }}
+                                {{ segment.temp_end.label }} {{ segment.temp_end(class_="form-control", autocomplete_="off") }}
+                                {{ segment.time_to_reach.label }} {{ segment.time_to_reach(class_="form-control", autocomplete_="off") }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% for error in program_form.firing_segments.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                    <button id="add-segment" type="button" class="btn btn-secondary">Add Another Segment</button>
+                    <div class="modal-footer">
+                        {{ program_form.submit(class_="btn btn-primary", id="btn-add-firing-program", form_="form-add-firing-program") }}
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    {% for error in form.firing_segments.errors %}
-        <span style="color: red;">[{{ error }}]</span>
-    {% endfor %}
-    <button id="add-segment" type="button">Add Another Segment</button>
-    <p>
-        {{ form.submit }}
-    </p>
-</form>
-{% endblock %}
+</div>

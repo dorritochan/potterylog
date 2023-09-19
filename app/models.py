@@ -113,13 +113,14 @@ class Glaze(db.Model):
     glazed_pots = db.relationship('PotGlaze', back_populates='glaze', lazy='dynamic')
     
     def get_glaze_name(self):
-        if self.temp_max:
-            temp = str(self.temp_max) + '°C'
-        elif self.cone:
-            temp = 'Cone ' + str(self.cone)
-        else:
-            temp= ''    
-        return '{} {} {} {}'.format(self.brand, self.brand_id, self.name, temp)
+        
+        brand = self.brand or ''
+        brand_id = self.brand_id or ''
+        name = self.name or ''
+        temp_max = str(self.temp_max) + '°C' if self.temp_max else ''
+        cone = str(self.cone) + 'c' if self.cone else ''
+
+        return '{} {} {} {} {}'.format(brand, brand_id, name, temp_max, cone)
     
     def __repr__(self):
         return '<Glaze {}, {}, {}>'.format(self.brand, self.color, self.temp_max)   
@@ -166,6 +167,7 @@ class Clay(db.Model):
     __tablename__ = 'clay'
     id = db.Column(db.Integer, primary_key=True)
     brand = db.Column(db.String(140), index=True)
+    name_id = db.Column(db.String(140), index=True)
     color = db.Column(db.String(140))
     temp_min = db.Column(db.Integer) # in °C
     temp_max = db.Column(db.Integer) # in °C
@@ -174,10 +176,16 @@ class Clay(db.Model):
     pots = db.relationship('Pot', backref='made_with_clay', lazy='dynamic')
     
     def get_clay_name(self):
-        return '{} {} {}°C {}% {}mm'.format(self.brand, self.color, self.temp_max, self.grog_percent, self.grog_size_max)
+        
+        brand = self.brand or ''
+        name_id = self.name_id or ''
+        color = self.color or ''
+        temp_max = str(self.temp_max) + '°C' if self.temp_max else ''
+        
+        return '{} {} {} {}'.format(brand, name_id, color, temp_max)
 
     def __repr__(self):
-        return '<Clay {}, {}, {}, {}>'.format(self.brand, self.color, self.temp_max, self.grog_percent)   
+        return '<Clay {}, {}, {}, {}>'.format(self.brand, self.name_id, self.temp_max, self.grog_percent)   
 
 
 class Kiln(db.Model):
@@ -195,3 +203,14 @@ class Kiln(db.Model):
     
     def __repr__(self):
         return '<Kiln {}>'.format(self.name)
+    
+    
+class Link(db.Model):
+    __tablename__ = 'link'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), index=True)
+    url = db.Column(db.String)
+    description = db.Column(db.String)
+    
+    def __repr__(self):
+        return 'Link {}'.format(self.name)

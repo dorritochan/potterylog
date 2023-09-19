@@ -1,0 +1,44 @@
+<!-- Modal -->
+<div class="modal fade" id="modal-add-link" tabindex="-1" role="dialog" aria-labelledby="modal-add-link-title" aria-hidden="true">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="modal-add-link-title">Add a new link</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+        
+        <form method="post" id="form-add-link">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.title.label }}
+                {{ form.title(class_="form-control", autocomplete_="off") }}
+                {% for error in form.title.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.url.label }}
+                {{ form.url(class_="form-control", autocomplete_="off") }}
+                {% for error in form.url.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.description.label }}
+                {{ form.description(class_="form-control", autocomplete_="off") }}
+                {% for error in form.description.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="modal-footer">
+                {{ form.submit(class_="btn btn-primary", id="btn-add-link", form_="form-add-link") }}
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+</div>

@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+{% include 'addlink.html' %}
+
+{% block main %}
+<h1>Useful links</h1>
+
+<div class="float-right">
+    <button id="add-new-link" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-link">Add a new link</button>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>URL</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for link in links %}
+            <tr>
+                <td>{{ link.title or ''}}</td>
+                <td>
+                    <a href="{{ link.url }}" target="_blank">{{ link.url or '' }}</a>
+                </td>
+                <td>{{ link.description or '' }}</td>
+                <td>
+                    <button type="button" class="btn btn-outline-danger" id="btn-delete-link-{{ link.id }}">Delete</button>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -13,17 +13,19 @@ from werkzeug.utils import secure_filename
 from app import app, db
 from app.forms import (
     LoginForm, RegistrationForm, AddPotForm, AddClayForm, AddGlazeForm,
-    GlazeLayerForm, AddKilnForm, AddFiringProgram, FiringSegmentForm
+    GlazeLayerForm, AddKilnForm, AddFiringProgramForm, FiringSegmentForm,
+    AddLinkForm
 )
 from app.models import (
     User, Pot, Clay, FiringProgram, Kiln, Glaze, Image, PotGlaze, 
-    ProgramSegment, FiringSegment, FiringProgram
+    ProgramSegment, FiringSegment, FiringProgram, Link
 )
 from app.utils import (
     allowed_file, 
     set_select_field_choices, safe_query, 
     populate_select_field_data, get_field_id_or_default, 
     extract_pot_data, extract_glaze_data, extract_clay_data, extract_kiln_data, 
+    extract_firing_segment_data, extract_link_data,
     program_firing_time
 )
 
@@ -268,8 +270,9 @@ def add_pot():
     # Set the label for the submit button
     form.submit.label.text = 'Add pot'
     
-    # The form for adding a new glaze in a modal
+    # Forms for the glaze and clay modals
     glaze_form = AddGlazeForm()
+    clay_form = AddClayForm()
     
     # ===================
     # POST method: Add a new pot
@@ -293,7 +296,7 @@ def add_pot():
     # ===================
     # GET method: Render the pot form
     # ===================
-    return render_template('pot.html', title='Add a new pot', form=form, glaze_form=glaze_form)
+    return render_template('pot.html', title='Add a new pot', form=form, glaze_form=glaze_form, clay_form=clay_form)
 
 
 @app.route('/editpot/<int:pot_id>', methods=['GET', 'POST'])
@@ -311,8 +314,9 @@ def edit_pot(pot_id):
     # Set the label for the submit button
     form.submit.label.text = 'Update pot'
     
-    # The form for adding a new glaze in a modal
+    # Forms the glaze and clay modals
     glaze_form = AddGlazeForm()
+    clay_form = AddClayForm()
     
     # ===================
     # POST method: Update pot
@@ -345,7 +349,7 @@ def edit_pot(pot_id):
         form.photos.process_data(image_urls)
     
     # Render the 'pot.html' with pre-populated form data
-    return render_template('pot.html', title='Edit pot', form=form, pot_id=pot_id, glaze_form=glaze_form)
+    return render_template('pot.html', title='Edit pot', form=form, pot_id=pot_id, glaze_form=glaze_form, clay_form=clay_form)
 
 
 @app.route('/get_glaze_field/<int:layer_index>')
@@ -391,31 +395,29 @@ def get_glaze_choices():
         an ID and the associated glaze name.
     """
     # Query all glaze choices and transform them into tuples of (id, name)
-    glaze_choices = [(glaze.id, glaze.get_glaze_name()) for glaze in Glaze.query.all()]
+    glaze_choices = [(glaze.id, glaze.get_glaze_name()) for glaze in Glaze.query.order_by(Glaze.brand, Glaze.brand_id).all()]
     
     # Return the glaze choices as a JSON response
     return jsonify(glaze_choices)
 
 
-def add_item_to_db(form, model_class, extraction_function, redirect_url, flash_message):
+def add_item_to_db(form, model_class, extraction_function, flash_message):
     """
     Validate the form, extract data, create an instance of a model, and add it to the database.
 
     This function consolidates the common steps of validating a form, extracting data from it, 
     creating an instance of a database model, saving it to the database, flashing a message, 
-    and redirecting to a specified URL.
+    and returning a respective JSON message to the frontend.
 
     Args:
         form (FlaskForm): An instance of a form class (e.g. AddGlazeForm, AddClayForm) to be validated.
         model_class (db.Model): The class of the database model to be instantiated (e.g., Glaze, Clay).
         extraction_function (Callable[[FlaskForm], Dict[str, Any]]): A function that takes the form 
             as an argument and returns a dictionary of data extracted from the form.
-        redirect_url (str): The endpoint string for `url_for` to which the user will be redirected 
-            after the item has been successfully added.
         flash_message (str): The message to be flashed to the user upon successful addition.
 
     Returns:
-        redirect: A redirection to the specified URL if form validation is successful.
+        jsonify: A JSON format message, that contains the success status and/or error messages.
 
     Raises:
         - Exception: If there is en error extracting the form data
@@ -431,7 +433,7 @@ def add_item_to_db(form, model_class, extraction_function, redirect_url, flash_m
             # Log the exception for debugging
             app.logger.error(f"Error extracting form data: {e}")
             flash('An error occurred while processing the form. Please try again.')
-            return redirect(url_for(redirect_url))
+            return jsonify(success=False, error="Error while extracting the form data")
         
         # Create a new model instance based on the form data
         item = model_class(**item_data)
@@ -446,170 +448,148 @@ def add_item_to_db(form, model_class, extraction_function, redirect_url, flash_m
             # Log the error for debugging
             app.logger.error("Error committing to the database.")
             flash('An error occurred while saving to the database. Please try again later.')
-            return redirect(url_for(redirect_url))
+            return jsonify(success=False, error="Database error")
         
         # Show the success message
         flash(flash_message)
         
-        # Redirect to the respective page
-        return redirect(url_for(redirect_url))
+        # Return the JSON success message
+        return jsonify(success=True)
+    
+    response_data = {
+        'success': False,
+        'errors': form.errors
+    }
+    return jsonify(response_data)
 
 
-@app.route('/addglaze', methods=['GET', 'POST'])
+@app.route('/addlink', methods=['POST'])
+@login_required
+def add_link():
+    
+    form = AddLinkForm()
+    
+    response = add_item_to_db(form, Link, extract_link_data, 'A new link has been saved.')
+    return response
+
+
+@app.route('/addglaze', methods=['POST'])
 @login_required
 def add_glaze():
     """
     Add a new glaze to the database.
     
-    This route handles both GET and POST requests. 
-    For a GET request, this function renders the form for adding a new glaze.
-    For a POST request, after successful form validation, it saves a new glaze to the database.
+    The functions handles only POST requests.
+    After successful form validation, it saves a new glaze to the database and returns a success
+    message in JSON format. On failed validation, the form errors are jsonified and sent to the frontend.
 
-    Returns:
-        - Redirection to 'index' page: After successfully adding a new glaze.
-        - HTML template: Renders the add glaze form for GET requests or if form validation fails.
     """
     
-    glaze_form = AddGlazeForm()
+    form = AddGlazeForm()
     
-    # Validate the form data
-    if glaze_form.validate_on_submit():
+    response = add_item_to_db(form, Glaze, extract_glaze_data, 'A new glaze has been saved.')
+    return response
+
+
+@app.route('/get_clay_choices')
+@login_required
+def get_clay_choices():
+    """
+    Retrieve available clays and return them in JSON format.
+    
+    This function provides the list of available clays as JSON data. It's primarily 
+    used to populate the clay choices in the select field of dynamically handled pages.
+    The AJAX requests, initiated from the pot.js file when on 'editpot' or 'addpot' pages, 
+    trigger this function to fetch the updated select field choices after a user adds a 
+    new clay type.
+
+    Returns:
+        JSON: List of tuples representing clay choices, where each tuple contains 
+        an ID and the associated clay name.
+    """
+    # Query all clay choices and transform them into tuples of (id, name)
+    clay_choices = [(clay.id, clay.get_clay_name()) for clay in Clay.query.order_by(Clay.brand, Clay.name_id).all()]
+    
+    # Return the clay choices as a JSON response
+    return jsonify(clay_choices)
+
+
+@app.route('/addclay', methods=['POST'])
+@login_required
+def add_clay():
+    """
+    Add a new clay to the database.
+    
+    This route handles POST requests. 
+    After successful form validation, it saves a new clay to the database.
+    On a failed validation, the form errors are jsonified and sent to the frontend.
+
+    """
+    form = AddClayForm()
+    
+    response = add_item_to_db(form, Clay, extract_clay_data, 'A new clay has been saved.')
+    return response
+
+
+@app.route('/addkiln', methods=['POST'])
+@login_required
+def add_kiln():
+    """
+    Add a new kiln to the database.
+    
+    This route handles POST requests. 
+    After successful form validation, it saves a new kiln to the database.
+    On a failed validation, the form errors are jsonified and sent to the frontend.
+
+    """
+    form = AddKilnForm()
+    
+    response = add_item_to_db(form, Kiln, extract_kiln_data, 'A new kiln has been saved.')
+    return response
+
+
+@app.route('/addfiringprogram', methods=['POST'])
+@login_required
+def add_firing_program():
+    """
+    Add a new firing program to the database.
+    
+    This route handles POST requests. 
+    After successful form validation, it saves a new firing program to the database.
+    On a failed validation, the form errors are jsonified and sent to the frontend.
+    """
+    
+    form = AddFiringProgramForm()
+    
+    if form.validate_on_submit():
+        
         try:
-            # Get the extraction function from 'utils.py' and extract the form data
-            item_data = extract_glaze_data(glaze_form)
+            # Extract the form data
+            type = next(label for value, label in form.type.choices if value == form.type.data)
         except Exception as e:
             # Log the exception for debugging
             app.logger.error(f"Error extracting form data: {e}")
             flash('An error occurred while processing the form. Please try again.')
             return jsonify(success=False, error="Error while extracting the form data")
         
-        # Create a new model instance based on the form data
-        item = Glaze(**item_data)
-        
-        try:
-            # Add the model instance to the database
-            db.session.add(item)
-            db.session.commit()
-        except DatabaseError:
-            # Rollback the session in case of an error
-            db.session.rollback()
-            # Log the error for debugging
-            app.logger.error("Error committing to the database.")
-            flash('An error occurred while saving to the database. Please try again later.')
-            return jsonify(success=False, error="Database error")
-        
-        # Show the success message
-        flash('The glaze has been saved.')
-        
-        # Return success JSON message
-        return jsonify(success=True)
-    
-    response_data = {
-        'success': False,
-        'errors': glaze_form.errors
-    }
-    return jsonify(response_data)
-
-
-@app.route('/addclay', methods=['GET', 'POST'])
-@login_required
-def add_clay():
-    """
-    Add a new clay to the database.
-    
-    This route handles both GET and POST requests. 
-    For a GET request, this function renders the form for adding a new clay.
-    For a POST request, after successful form validation, it saves a new clay to the database.
-
-    Returns:
-        - Redirection to 'index' page: After successfully adding a new clay.
-        - HTML template: Renders the add clay form for GET requests or if form validation fails.
-    """
-    form = AddClayForm()
-    
-    # ===================
-    # POST method: Add a clay
-    # ===================
-    response = add_item_to_db(form, Clay, extract_clay_data, 'index', 'A new clay has been added.')
-    if response:
-        return response
-    
-    # ===================
-    # GET method: Render the template for adding a clay
-    # ===================
-    return render_template('addclay.html', title='Add a new clay', form=form)
-
-
-@app.route('/addkiln', methods=['GET', 'POST'])
-@login_required
-def add_kiln():
-    """
-    Add a new kiln to the database.
-    
-    This route handles both GET and POST requests. 
-    For a GET request, this function renders the form for adding a new kiln.
-    For a POST request, after successful form validation, it saves a new kiln to the database.
-
-    Returns:
-        - Redirection to 'index' page: After successfully adding a new kiln.
-        - HTML template: Renders the add kiln form for GET requests or if form validation fails.
-    """
-    form = AddKilnForm()
-    
-    # ===================
-    # POST method: Add a clay
-    # ===================
-    response = add_item_to_db(form, Kiln, extract_kiln_data, 'index', 'A new kiln has been added.')
-    if response:
-        return response
-
-    # ===================
-    # GET method: Render the template for adding a kiln
-    # ===================
-    return render_template('addkiln.html', title='Add a new kiln', form=form)
-
-
-@app.route('/addfiringprogram', methods=['GET', 'POST'])
-@login_required
-def add_firing_program():
-    """
-    Endpoint to add a new firing program.
-    
-    The function creates or retrieves firing segments and associates them with the
-    new firing program. If a segment with the specified attributes already exists,
-    it will not be recreated but instead reused in the association.
-
-    Returns:
-        HTML template: On GET or unsuccessful POST.
-        redirect: Redirects to 'view_kilns' on successful POST.
-    """
-    
-    form = AddFiringProgram()
-    
-    # ===================
-    # POST method: Add a new firing program
-    # ===================
-    # Validation of the form data
-    if form.validate_on_submit():
-        
-        # Retrieve the type of the firing program: 'Glaze' or 'Bisque'
-        type = next(label for value, label in form.type.choices if value == form.type.data)
-        
         # Create new firing program instance
         firing_program = FiringProgram(type=type)
         
-        for segment_index, segment in enumerate(form.firing_segments.data):
+        firing_segments = form.firing_segments.data
+        
+        # Check if the entered segments already exist in the database
+        for segment_index, segment in enumerate(firing_segments):
+            
+            # Extract the segment data
+            data = extract_firing_segment_data(segment)
             
             # Check if a segment with the same attributes already exists
-            db_firing_segment = FiringSegment.query.filter_by(temp_start=segment['temp_start'],
-                                temp_end=segment['temp_end'], time_to_reach=segment['time_to_reach']).first()
+            db_firing_segment = FiringSegment.query.filter_by(**data).first()
             
-            # If segment doesn't exist, create and add to the session
+            # If segment doesn't exist, create and add to the session, then commit
             if not db_firing_segment:
-                db_firing_segment = FiringSegment(temp_start=segment['temp_start'],
-                                temp_end=segment['temp_end'], time_to_reach=segment['time_to_reach'])
+                db_firing_segment = FiringSegment(**data)
                 db.session.add(db_firing_segment)
-                db.session.commit()
             
             # Create and add program-segment association to the session
             program_segment = ProgramSegment(program=firing_program, segment=db_firing_segment,
@@ -617,11 +597,11 @@ def add_firing_program():
             
             # Add the firing program to the session and commit
             db.session.add(program_segment)
-            db.session.commit()
             
             # Define the name of the firing program
-            if segment_index == len(form.firing_segments.data) - 1:
-                firing_program.name = '{} {} hold {}'.format(type, segment['temp_end'], segment['time_to_reach'])
+            if segment_index == len(firing_segments) - 1:
+                firing_program.name = '{} {}{}'.format(firing_program.type, db_firing_segment.temp_end, 
+                                        ' hold ' + str(db_firing_segment.time_to_reach) if db_firing_segment.temp_start == db_firing_segment.temp_end else '')
         
         # Add the firing program to the database
         db.session.add(firing_program)
@@ -630,13 +610,14 @@ def add_firing_program():
         # Show a message upon success
         flash('The firing program {} has successfully saved.'.format(firing_program.name))
         
-        # Redirect to the page with the kilns overview
-        return redirect(url_for('view_kilns'))
+        # Return the JSON success message
+        return jsonify(success=True)
     
-    # ===================
-    # GET method: Render the form for adding a new firing program
-    # ===================
-    return render_template('addfiringprogram.html', form=form)
+    response_data = {
+        'success': False,
+        'errors': form.errors
+    }
+    return jsonify(response_data)
 
 
 @app.route('/get_segment/<int:segment_index>')
@@ -677,12 +658,32 @@ def view_glazes():
     Returns:
         HTML template: Renders the list of all glazes.
     """
-    glazes = Glaze.query.all()
+    glazes = Glaze.query.order_by(Glaze.brand, Glaze.brand_id).all()
     
     # A glaze form for the modal
     glaze_form = AddGlazeForm()
     
     return render_template('viewglazes.html', title='List of glazes', glazes=glazes, glaze_form=glaze_form)
+
+
+@app.route('/viewlinks')
+@login_required
+def view_links():
+    """
+    Render a list of all links in the database.
+
+    Retrieves all LINK objects from the database and sends them to the template 
+    for display.
+    
+    Returns:
+        HTML template: Renders the list of all links.
+    """
+    links = Link.query.order_by(Link.title).all()
+    
+    # A link form for the modal
+    form = AddLinkForm()
+    
+    return render_template('viewlinks.html', title='Links', form=form, links=links)
 
 
 @app.route('/showglaze/<int:glaze_id>')
@@ -717,9 +718,12 @@ def view_clays():
     Returns:
         HTML template: Renders the list of all clays.
     """
-    clays = Clay.query.all()
+    clays = Clay.query.order_by(Clay.brand, Clay.name_id).all()
     
-    return render_template('viewclays.html', title='List of clays', clays=clays)
+    # A clay form for the modal
+    clay_form = AddClayForm()
+    
+    return render_template('viewclays.html', title='List of clays', clays=clays, clay_form=clay_form)
 
 
 @app.route('/showclay/<int:clay_id>')
@@ -760,6 +764,12 @@ def view_kilns():
     # Retrieve all the FiringProgram objects
     firing_programs = FiringProgram.query.all()
     
+    # Fetch the kiln form for the modal
+    kiln_form = AddKilnForm()
+    
+    # Fetch the firing program form for the modal
+    program_form = AddFiringProgramForm()
+    
     # Instantiate the dictionary for the total firing time.
     # The keys of the dictionary are the IDs of the firing programs 
     # and the values are the firing times of the respective programs.
@@ -776,4 +786,20 @@ def view_kilns():
         total_firing_time[program.id] = program_firing_time(program)
     
     # Render the template with the list of kilns and firing programs with their respective segments
-    return render_template('viewkilns.html', title='List of kilns', kilns=kilns, firing_programs=firing_programs, total_firing_time=total_firing_time)
+    return render_template('viewkilns.html', title='List of kilns', kilns=kilns, firing_programs=firing_programs, total_firing_time=total_firing_time, kiln_form=kiln_form, program_form=program_form)
+
+
+
+@app.route('/deletelink/<int:link_id>', methods=['DELETE'])
+@login_required
+def delete_link(link_id):
+    
+    link = Link.query.get_or_404(link_id)
+    
+    try:
+        db.session.delete(link)
+        db.session.commit()
+        return jsonify(success=True, message=f'Deleted link with ID {link_id}')
+    except Exception as e:
+        app.logger.error(f"Error deleting link: {e}")
+        return jsonify(success=False, message='Internal Server Error'), 500

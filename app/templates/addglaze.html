@@ -14,7 +14,7 @@
             {{ glaze_form.hidden_tag() }}
             <div class="form-group">
                 {{ glaze_form.brand.label }}
-                {{ glaze_form.brand(class_="form-control") }}
+                {{ glaze_form.brand(class_="form-control", autocomplete_="off") }}
                 {% for error in glaze_form.brand.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}

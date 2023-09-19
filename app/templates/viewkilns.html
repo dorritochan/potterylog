@@ -1,4 +1,6 @@
 {% extends 'layout.html' %}
+{% include 'addkiln.html' %}
+{% include 'addfiringprogram.html' %}
 
 {% block main %}
 <h1>List of kilns</h1>
@@ -28,10 +30,10 @@
         {% endfor %}
     </body>
 </table>
-<a href="{{ url_for('add_kiln') }}">Add a new kiln</a>
+<button id="add-new-kiln" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-kiln" data-reload-page="true">Add a new kiln</button>
 
 <h1>List of firing programs</h1>
-<table>
+<table class="table table-striped">
     <thead>
         <tr>
             <th>ID</th>
@@ -44,26 +46,29 @@
         {% for program in firing_programs %}
         <tr>
             <td>{{ program.id or '' }}</td>
-            <td>{{ program.name or '' }}</td>
+            <td class="font-weight-bold">{{ program.name or '' }}</td>
             <td>
-                {% for segment in program.ordered_segments %}
-                    {% if segment.segment.temp_start == segment.segment.temp_end %}
-                        Hold {{ segment.segment.temp_start ~ '°C' or '' }}:
-                    {% else %}
-                        {{ segment.segment.temp_start ~ '°C' or '' }} -
-                        {{ segment.segment.temp_end ~ '°C' or '' }}:
-                    {% endif %}
-                    {% if segment.segment.time_to_reach %}
-                        {{ segment.segment.time_to_reach ~ 'min' or '' }}
-                    {% endif %}
-                    <br>
-                {% endfor %}
+                <dd>
+                    {% for segment in program.ordered_segments %}
+                        <li class="py-2">
+                            {% if segment.segment.temp_start == segment.segment.temp_end %}
+                                Hold {{ segment.segment.temp_start ~ '°C' or '' }}:
+                            {% else %}
+                                {{ segment.segment.temp_start ~ '°C' or '' }} -
+                                {{ segment.segment.temp_end ~ '°C' or '' }}:
+                            {% endif %}
+                            {% if segment.segment.time_to_reach %}
+                                {{ segment.segment.time_to_reach ~ 'min' or '' }}
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </dd>
             </td>
             <td>Min. {{ total_firing_time[program.id] }}</td>
         </tr>
         {% endfor %}
     </body>
 </table>
-<a href="{{ url_for('add_firing_program') }}">Add a new firing program</a>
+<button id="add-new-firing-program" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-firing-program" data-reload-page="true">Add a new firing program</button>
 
 {% endblock %}

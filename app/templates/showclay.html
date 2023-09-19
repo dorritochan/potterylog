@@ -2,10 +2,11 @@
 
 {% block main %}
 <h1>Clay {{ clay.get_clay_name() }}</h1>
-<table>
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Brand</th>
+            <th>Name or ID</th>
             <th>Color</th>
             <th>Min. temp.</th>
             <th>Max. temp.</th>
@@ -16,6 +17,7 @@
     <body>
         <tr>
             <td>{{ clay.brand or '' }}</td>
+            <td>{{ clay.name_id or '' }}</td>
             <td>{{ clay.color or '' }}</td>
             <td>{{ clay.temp_min ~ '°C' if clay.temp_min else '' }}</td>
             <td>{{ clay.temp_max ~ '°C' if clay.temp_max else '' }}</td>

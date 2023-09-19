@@ -115,11 +115,12 @@ class AddPotForm(FlaskForm):
     
 class AddClayForm(FlaskForm):
     brand = StringField('Brand', validators=[DataRequired()])
+    name_id = StringField('Name or ID', validators=[DataRequired()])
     color = StringField('Color')
-    temp_min = IntegerField('Minimum temperature') # in °C
-    temp_max = IntegerField('Maximum temperature') # in °C
-    grog_percent = IntegerField('Grog percentage %')
-    grog_size_max = FloatField('Grog size mm')
+    temp_min = IntegerField('Minimum temperature °C', validators=[Optional()])
+    temp_max = IntegerField('Maximum temperature °C', validators=[Optional()])
+    grog_percent = IntegerField('Grog percentage %', validators=[Optional()])
+    grog_size_max = FloatField('Grog size mm', validators=[Optional()])
     submit = SubmitField('Add clay')
     
     def validate_grog_size_max(self, grog_size_max):
@@ -127,9 +128,11 @@ class AddClayForm(FlaskForm):
         
         normalized_brand = normalize_string(self.brand.data)
         normalized_color = normalize_string(self.color.data)
+        normalized_name = normalize_string(self.name_id.data)
 
         clay = Clay.query.filter(
             Clay.brand.ilike(normalized_brand),
+            Clay.name_id.ilike(normalized_name),
             Clay.color.ilike(normalized_color),
             Clay.grog_percent == self.grog_percent.data,
             Clay.grog_size_max == grog_size_max.data
@@ -142,8 +145,8 @@ class AddGlazeForm(FlaskForm):
     name = StringField('Glaze name', validators=[DataRequired()])
     brand_id = StringField('Brand ID')
     color = StringField('Color')
-    temp_min = IntegerField('Minimum temperature °C')
-    temp_max = IntegerField('Maximum temperature °C')
+    temp_min = IntegerField('Minimum temperature °C', validators=[Optional()])
+    temp_max = IntegerField('Maximum temperature °C', validators=[Optional()])
     cone = SelectField('Cone', choices=[], coerce=int)
     glaze_url = StringField('Glaze URL', validators=[Optional(), URL()])
     submit = SubmitField('Add glaze')
@@ -189,20 +192,27 @@ class AddKilnForm(FlaskForm):
     name = StringField('Kiln name')
     brand = StringField('Brand name', validators=[DataRequired()])
     type = SelectField('Type', coerce=int, choices=[(1, 'Electric'), (2, 'Gas')])
-    capacity = IntegerField('Capacity') # in L
-    temp_max = IntegerField('Maximum temperature') # in °C
-    voltage = FloatField('Voltage kW') # in kW
+    capacity = IntegerField('Capacity L', validators=[Optional()])
+    temp_max = IntegerField('Maximum temperature °C', validators=[Optional()])
+    voltage = FloatField('Voltage kW')
     controller = StringField('Controller')
     submit = SubmitField('Add kiln')
     
 
 class FiringSegmentForm(FlaskForm):
-    temp_start = IntegerField('Start temperature', validators=[DataRequired()]) # in °C
-    temp_end = IntegerField('End temperature', validators=[DataRequired()]) # in °C
-    time_to_reach = IntegerField('Time to reach') # in minutes
+    temp_start = IntegerField('Start temperature °C', validators=[DataRequired()])
+    temp_end = IntegerField('End temperature °C', validators=[DataRequired()])
+    time_to_reach = IntegerField('Time to reach (min)')
     
     
-class AddFiringProgram(FlaskForm):
+class AddFiringProgramForm(FlaskForm):
     type = SelectField('Type', coerce=int, choices=[(1, 'Bisque'), (2, 'Glaze')])
     firing_segments = FieldList(FormField(FiringSegmentForm), min_entries=1)
     submit = SubmitField('Add program')
+    
+    
+class AddLinkForm(FlaskForm):
+    title = StringField('Title')
+    url = StringField('URL', validators=[Optional(), URL()])
+    description = TextAreaField('Description')
+    submit = SubmitField('Save')

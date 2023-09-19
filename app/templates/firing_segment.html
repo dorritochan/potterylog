@@ -1,6 +1,7 @@
 {{ segment.csrf_token }}
+<h5 class="text-secondary pt-4">Segment {{segment_index + 1}}</h5>
 <div id="firing-segment-{{ segment_index }}">
-    {{ segment.temp_start.label }} {{ segment.temp_start }} °C
-    {{ segment.temp_end.label }} {{ segment.temp_end }} °C
-    {{ segment.time_to_reach.label }}: {{ segment.time_to_reach }} min
+    {{ segment.temp_start.label }} {{ segment.temp_start(class_="form-control", autocomplete_="off") }}
+    {{ segment.temp_end.label }} {{ segment.temp_end(class_="form-control", autocomplete_="off") }}
+    {{ segment.time_to_reach.label }} {{ segment.time_to_reach(class_="form-control", autocomplete_="off") }}
 </div>

@@ -1,5 +1,6 @@
 {% extends 'layout.html' %}
 {% include 'addglaze.html' %}
+{% include 'addclay.html' %}
 
 {% block main %}
 <h1>{{ title }}</h1>
@@ -17,7 +18,7 @@
             <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </div>
-    <div class="form-group">
+    <div class="form-group" id="clay-field">
         {{ form.made_with_clay.label }}
         <select id="made_with_clay" name="made_with_clay" required>
             {% for value, label in form.made_with_clay.choices %}
@@ -27,7 +28,7 @@
         {% for error in form.made_with_clay.errors %}
             <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
-        <a href="{{ url_for('add_clay') }}">Add a new clay</a>
+        <button id="add-new-clay" type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal-add-clay" data-reload-page="false">Add a new clay</button>
     </div>
     <div class="form-group">
         {{ form.author.label }}

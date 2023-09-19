@@ -35,13 +35,13 @@ def set_select_field_choices(form):
     Args:
         form (FlaskForm): An AddPotForm with all its fields.
     """
-    form.made_with_clay.choices = [(0, '-')] + [(clay.id, clay.get_clay_name()) for clay in Clay.query.all()]
+    form.made_with_clay.choices = [(0, '-')] + [(clay.id, clay.get_clay_name()) for clay in Clay.query.order_by(Clay.brand, Clay.name_id).all()]
     form.bisque_fire_program_id.choices = [(0, '-')] + [(program.id, program.name) for program in FiringProgram.query.filter_by(type='Bisque')]
-    form.bisque_fire_kiln_id.choices = [(0, '-')] + [(kiln.id, kiln.name) for kiln in Kiln.query.all()]
+    form.bisque_fire_kiln_id.choices = [(0, '-')] + [(kiln.id, kiln.name) for kiln in Kiln.query.order_by(Kiln.name).all()]
     for glaze_form in form.used_glazes:
-        glaze_form.glaze.choices = [(0, '-')] + [(glaze.id, glaze.get_glaze_name()) for glaze in Glaze.query.all()]
+        glaze_form.glaze.choices = [(0, '-')] + [(glaze.id, glaze.get_glaze_name()) for glaze in Glaze.query.order_by(Glaze.brand, Glaze.brand_id).all()]
     form.glaze_fire_program_id.choices = [(0, '-')] + [(program.id, program.name) for program in FiringProgram.query.filter_by(type='Glaze')]
-    form.glaze_fire_kiln_id.choices = [(0, '-')] + [(kiln.id, kiln.name) for kiln in Kiln.query.all()]
+    form.glaze_fire_kiln_id.choices = [(0, '-')] + [(kiln.id, kiln.name) for kiln in Kiln.query.order_by(Kiln.name).all()]
     
 
 def get_field_id_or_default(pot_select_field):
@@ -156,6 +156,7 @@ def extract_clay_data(form):
     # Standard fields extraction
     data = {
         'brand': form.brand.data,
+        'name_id': form.name_id.data,
         'color': form.color.data,
         'temp_min': form.temp_min.data,
         'temp_max': form.temp_max.data,
@@ -183,6 +184,30 @@ def extract_kiln_data(form):
 
     return data
 
+
+def extract_firing_segment_data(firing_segment):
+    """Extracts data from the FiringSegmentForm form to create a new firing segment."""
+    
+    data = {
+        'temp_start': firing_segment['temp_start'],
+        'temp_end': firing_segment['temp_end'],
+        'time_to_reach': firing_segment['time_to_reach']
+    }
+
+    return data
+
+
+def extract_link_data(form):
+    """Extracts data from the AddLinkForm form to create a new link."""
+    
+    data = {
+        'title': form.title.data,
+        'url': form.url.data,
+        'description': form.description.data
+    }
+    
+    return data
+    
 
 def program_firing_time(firing_program):
     """
@@ -218,5 +243,5 @@ def program_firing_time(firing_program):
     
 def normalize_string(s):
     """Converts the string to lowercase, trims white spaces and replaces multiple spaces with a single space."""
-    s = s.lower().strip()
+    s = str(s).lower().strip()
     return re.sub(' +', ' ', s)

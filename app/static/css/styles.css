@@ -1,4 +1,56 @@
+body {
+    margin: 0;
+    font-family: 'Quicksand', sans-serif;
+}
+
 .img-small {
     max-width: 300px;
     max-height: 200px;
+}
+
+.carousel-control-prev-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23000' viewBox='0 0 8 8'%3E%3Cpath d='M5.25 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3E%3C/svg%3E") !important;
+}
+
+.carousel-control-next-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23000' viewBox='0 0 8 8'%3E%3Cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E") !important;
+}
+
+.custom-row>*{
+    padding-left: 0;
+}
+
+a.hover-border-link{
+    color: #0d6efd;
+    text-decoration: none;
+    padding: 8px 13px;    /* Add some padding for button-like shape */
+    border: 2px solid transparent;          /* No border by default */
+    transition: all 0.1s;  /* Smooth transition effect */
+}
+a.hover-border-link:hover {
+    border: 2px solid #0d6efd; /* Add border on hover */
+    color: #0d6efd;
+    background-color: transparent; /* Ensure there's no fill */
+    border-radius: 0.375rem;
+    cursor: pointer;
+}
+a.hover-border-link:active {
+    font-weight: bold;
+}
+
+.centered-content {
+    text-align: center;
+}
+
+.vertical-center {
+    vertical-align: middle;
+}
+
+[id^="row-pot-"]:hover {
+    cursor: pointer;
+}
+
+.table-striped>tbody>tr:nth-child(odd)>td, 
+.table-striped>tbody>tr:nth-child(odd)>th {
+    background-color: #0dcdfd35; 
 }

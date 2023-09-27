@@ -1,5 +1,6 @@
 {% extends 'layout.html' %}
 {% include 'addlink.html' %}
+{% include 'confirmdelete.html' %}
 
 {% block main %}
 <h1>Useful links</h1>
@@ -21,11 +22,15 @@
             <tr>
                 <td>{{ link.title or ''}}</td>
                 <td>
-                    <a href="{{ link.url }}" target="_blank">{{ link.url or '' }}</a>
+                    <a class="hover-border-link" href="{{ link.url or '' }}" target="_blank">
+                        {% if link.url %}
+                            Website
+                        {% endif %}
+                    </a>
                 </td>
                 <td>{{ link.description or '' }}</td>
                 <td>
-                    <button type="button" class="btn btn-outline-danger" id="btn-delete-link-{{ link.id }}">Delete</button>
+                    <button type="button" class="btn btn-outline-danger" id="btn-delete-item-{{ link.id }}" data-variable="link">Delete</button>
                 </td>
             </tr>
         {% endfor %}

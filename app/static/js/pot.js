@@ -100,18 +100,18 @@ $(document).ready(function() {
     });
     
 
-    $('#btn-add-clay').click(function(event) {
+    $('#btn-add-edit-clay').click(function(event) {
         event.preventDefault(); // Prevent the form from reloading the page
         event.stopPropagation();
 
         $.ajax({
             url: "/addclay",
             type: "POST",
-            data: $('#form-add-clay').serialize(),
+            data: $('#form-add-edit-clay').serialize(),
             success: function(response) {
                 if (response.success) {
                     // Close the modal and update the pot info, if necessary
-                    $('#modal-add-clay').modal('hide');
+                    $('#modal-add-edit-clay').modal('hide');
                     var shouldReload = $('#add-new-clay').data('reload-page');
                     if (shouldReload) {
                         location.reload();
@@ -125,7 +125,7 @@ $(document).ready(function() {
                         });
                     }
                 } else {
-                    $('#modal-add-clay').modal('show');
+                    $('#modal-add-edit-clay').modal('show');
                     // Clear previous errors
                     $(".form-error").remove();
 
@@ -135,7 +135,7 @@ $(document).ready(function() {
                         $.each(errors, function(_, error) {
                             var errorSpan = $("<span>").addClass("form-error").css("color", "red").text("[" + error + "]");
                             // Append errorSpan next to the respective input field
-                            $("#form-add-clay").find('[name="' + field + '"]').after(errorSpan);
+                            $("#form-add-edit-clay").find('[name="' + field + '"]').after(errorSpan);
                         });
                     });
                 }
@@ -242,17 +242,43 @@ $(document).ready(function() {
             }
         });
     });
-    
 
-    $("[id^='btn-delete-link-']").click(function() {
+
+    $("[id^='btn-delete-item-']").click(function() {
+        var idNumber = parseInt(this.id.split("-").pop());
+        var itemType = $(this).data("variable");
+
+        // Fetch the item's name using AJAX
+        $.get('/get_name_' + itemType + '/' + idNumber, function(response) {
+        
+        // Update the modal's content with the fetched data
+        $('#modal-confirm-delete-title').text('Confirm ' + itemType + ' deletion');
+        $('#txt-question-confirm-delete').html('Do you really want to delete the ' + itemType + ' <strong>' + response.item_name + '</strong>?');
+        var $btnDelete = $("[id^='btn-confirm-delete-item-']")
+        $btnDelete.attr("id", $btnDelete.attr("id") + idNumber)
+        $btnDelete.data('variable', itemType);
+
+        // Show the modal
+        $('#modal-confirm-delete').modal('show');
+    });
+
+
+    });
+
+    $("[id^='btn-confirm-delete-item-']").click(function() {
         // Get the number from the ID
         var idNumber = parseInt(this.id.split("-").pop());
+
+        // This is the type of item to be deleted, like 'pot' or 'link'
+        var itemType = $(this).data("variable");
+
+        console.log(idNumber);
+        console.log(itemType);
     
-        fetch('/deletelink/' + idNumber, { // Assuming 123 is the ID of the item you want to delete
+        fetch('/delete_' + itemType + '/' + idNumber, { 
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            // Include other headers as needed (e.g., authentication tokens)
         }
         })
         .then(response => {
@@ -269,8 +295,68 @@ $(document).ready(function() {
             console.log('There was a problem with the delete operation:', error.message);
         });
 
-        console.log(idNumber);
     });
+
+
+    $('#photo-carousel').carousel({
+        interval: false // This ensures manual controls and not automatic sliding.
+    });
+
+
+    $("[id^='photo-thumbnail-']").click(function() {
+        var indexPhoto = parseInt(this.id.split("-").pop());
+        console.log('clicked on thumbnail');
+
+        // Go to the clicked slide
+        $('#photo-carousel-modal').on('shown.bs.modal', function () {
+            $('#photo-carousel').carousel(indexPhoto);
+        });
+
+        $('#photo-carousel-modal').modal('show');
+
+
+    });
+
+
+    $("[id^='open-modal-edit-item-']").click(function() {
+        var idNumber = parseInt(this.id.split("-").pop());
+        console.log(idNumber);
+        var itemType = $(this).data("itemtype");
+        console.log(itemType);
+
+        fetch('/get_' + itemType + '/' + idNumber, { 
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Item loaded:', data);
+                for (let key in data) {
+                    // This assumes that the field names in the modal match the JSON attribute names
+                    $(`#modal-add-edit-${itemType} input[id='${key}']`).val(data[key]);
+                    $(`#modal-add-edit-${itemType}-title`).text('Edit ' + itemType + ' ' + data['brand'] + ' ' + data['name_id']);
+                }
+                $('#modal-add-edit-' + itemType).show('modal');
+            })
+            .catch(error => {
+                console.log('There was a problem with the get operation:', error.message);
+            });
+    });
+
+
+    $('[id^="row-pot-"]').click(function() {
+        var potId = parseInt(this.id.split('-').pop());
+        window.location.href = '/editpot/' + potId;
+    });
+
+    
 
 });
 
@@ -282,4 +368,6 @@ function getOptionsHtml(choices) {
     }
     return optionsHtml;
 }
+
+
 

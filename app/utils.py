@@ -3,6 +3,8 @@
 from app import app
 from app.models import Clay, FiringProgram, Kiln, Glaze
 
+from wtforms import validators
+
 import re
 
 
@@ -161,7 +163,8 @@ def extract_clay_data(form):
         'temp_min': form.temp_min.data,
         'temp_max': form.temp_max.data,
         'grog_percent': form.grog_percent.data,
-        'grog_size_max': form.grog_size_max.data
+        'grog_size_max': form.grog_size_max.data,
+        'url': form.url.data
     }
 
     return data
@@ -245,3 +248,29 @@ def normalize_string(s):
     """Converts the string to lowercase, trims white spaces and replaces multiple spaces with a single space."""
     s = str(s).lower().strip()
     return re.sub(' +', ' ', s)
+
+
+class CustomURL(object):
+    """A custom URL validator for WTForms, which not only accepts urls of 
+    the form https://example.com and http://example.com, but also
+    example.com"""
+    
+    def __init__(self, message=None):
+        if not message:
+            message = u'Invalid URL.'
+        self.message = message
+
+    def __call__(self, form, field):
+        pattern = re.compile(
+            r'^(?:http[s]?://)?'  # optional http or https
+            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain
+            r'localhost|'  # localhost
+            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or IP
+            r'(?::\d+)?'  # optional port
+            r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+        if not pattern.match(field.data):
+            raise validators.ValidationError(self.message)
+        
+        # After validation, modify the data if needed
+        if not field.data.startswith(('http://', 'https://')):
+            field.data = 'https://' + field.data

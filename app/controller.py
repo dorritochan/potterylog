@@ -790,16 +790,49 @@ def view_kilns():
 
 
 
-@app.route('/deletelink/<int:link_id>', methods=['DELETE'])
+@app.route('/delete_<item_type>/<int:item_id>', methods=['DELETE'])
 @login_required
-def delete_link(link_id):
+def delete_link(item_type, item_id):
     
-    link = Link.query.get_or_404(link_id)
+    if item_type == 'link':
+    
+        item = Link.query.get_or_404(item_id)
     
     try:
-        db.session.delete(link)
+        db.session.delete(item)
         db.session.commit()
-        return jsonify(success=True, message=f'Deleted link with ID {link_id}')
+        return jsonify(success=True, message=f'Deleted {item_type} with ID {item_id}')
     except Exception as e:
-        app.logger.error(f"Error deleting link: {e}")
+        app.logger.error(f"Error deleting {item_type}: {e}")
         return jsonify(success=False, message='Internal Server Error'), 500
+    
+    
+@app.route('/get_name_<item_type>/<int:item_id>', methods=['GET'])
+@login_required
+def get_item_name(item_id, item_type):
+    
+    if item_type == 'link':
+        link = Link.query.get_or_404(item_id)
+        item_name = link.title
+    
+    return jsonify(item_name=item_name)
+
+
+@app.route('/get_<item_type>/<int:item_id>', methods=['GET'])
+@login_required
+def get_item(item_type, item_id):
+    
+    if item_type == 'clay':
+        item = Clay.query.get_or_404(item_id)
+        form = AddClayForm(obj=item)
+        data = extract_clay_data(form)
+        
+    elif item_type == 'glaze':
+        item = Glaze.query.get_or_404(item_id)
+        form = AddGlazeForm(obj=item)
+        data = extract_glaze_data(form)
+        
+    else:
+        return jsonify(error=f"Unrecognized item type: {item_type}"), 400
+
+    return jsonify(**data)

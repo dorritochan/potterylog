@@ -117,10 +117,8 @@ class Glaze(db.Model):
         brand = self.brand or ''
         brand_id = self.brand_id or ''
         name = self.name or ''
-        temp_max = str(self.temp_max) + '°C' if self.temp_max else ''
-        cone = str(self.cone) + 'c' if self.cone else ''
 
-        return '{} {} {} {} {}'.format(brand, brand_id, name, temp_max, cone)
+        return '{} {} {}'.format(brand, brand_id, name)
     
     def __repr__(self):
         return '<Glaze {}, {}, {}>'.format(self.brand, self.color, self.temp_max)   
@@ -173,6 +171,7 @@ class Clay(db.Model):
     temp_max = db.Column(db.Integer) # in °C
     grog_percent = db.Column(db.Integer) # in %
     grog_size_max = db.Column(db.Float) # in mm
+    url = db.Column(db.String)
     pots = db.relationship('Pot', backref='made_with_clay', lazy='dynamic')
     
     def get_clay_name(self):
@@ -180,9 +179,8 @@ class Clay(db.Model):
         brand = self.brand or ''
         name_id = self.name_id or ''
         color = self.color or ''
-        temp_max = str(self.temp_max) + '°C' if self.temp_max else ''
         
-        return '{} {} {} {}'.format(brand, name_id, color, temp_max)
+        return '{} {} {}'.format(brand, name_id, color)
 
     def __repr__(self):
         return '<Clay {}, {}, {}, {}>'.format(self.brand, self.name_id, self.temp_max, self.grog_percent)   

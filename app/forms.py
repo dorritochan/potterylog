@@ -11,7 +11,7 @@ from wtforms.widgets import Input
 from datetime import datetime
 
 from app.models import User, Clay, FiringProgram, Kiln, Glaze
-from app.utils import normalize_string
+from app.utils import normalize_string, CustomURL
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -121,6 +121,7 @@ class AddClayForm(FlaskForm):
     temp_max = IntegerField('Maximum temperature °C', validators=[Optional()])
     grog_percent = IntegerField('Grog percentage %', validators=[Optional()])
     grog_size_max = FloatField('Grog size mm', validators=[Optional()])
+    url = StringField('URL', validators=[Optional(), CustomURL()])
     submit = SubmitField('Add clay')
     
     def validate_grog_size_max(self, grog_size_max):
@@ -148,7 +149,7 @@ class AddGlazeForm(FlaskForm):
     temp_min = IntegerField('Minimum temperature °C', validators=[Optional()])
     temp_max = IntegerField('Maximum temperature °C', validators=[Optional()])
     cone = SelectField('Cone', choices=[], coerce=int)
-    glaze_url = StringField('Glaze URL', validators=[Optional(), URL()])
+    glaze_url = StringField('Glaze URL', validators=[Optional(), CustomURL()])
     submit = SubmitField('Add glaze')
     
     def validate_name(self, name):
@@ -213,6 +214,6 @@ class AddFiringProgramForm(FlaskForm):
     
 class AddLinkForm(FlaskForm):
     title = StringField('Title')
-    url = StringField('URL', validators=[Optional(), URL()])
+    url = StringField('URL', validators=[Optional(), CustomURL()])
     description = TextAreaField('Description')
     submit = SubmitField('Save')

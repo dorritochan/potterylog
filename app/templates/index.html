@@ -1,58 +1,57 @@
 {% extends 'layout.html' %}
 
 {% block main %}
-<h1>Pots</h1>
-<div class="float-right">
-    <a href="{{ url_for('add_pot') }}" class="btn btn-primary" type="button">Add a new pot</a>
+<h1 class="m-3">Pots</h1>
+<div class="m-3">
+    <a href="{{ url_for('add_pot') }}" class="btn btn-primary" type="button">&plus; Add a new pot</a>
 </div>
 
-<div>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>View pot</th>
-                <th>ID</th>
-                <th>Photo</th>
-                <th>Type</th>
-                <th>Throwing time</th>
-                <th>Clay</th>
-                <th>Glazes</th>
-                <th>Bisque Program</th>
-                <th>Glaze Program</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for pot in pots %}
-            <tr>
-                <td>
-                    <a href="{{ url_for('edit_pot', pot_id=pot.id) }}">View details</a>
-                </td>
-                <td>{{ pot.id }}</td>
-                <td>
-                    <!-- Display the uploaded photos -->
-                    {% if pot.primary_image %}
-                        <img src="{{ url_for('static', filename='photos/' + pot.primary_image) }}" alt="Selected Photo" style="max-width: 300px; max-height: 300px; display: block;">
-                    {% endif %}
-                    
-                </td>
-                <td>{{ pot.vessel_type or ''}}</td>
-                <td>{{ pot.throw_date.strftime('%d.%m.%Y %H:%M') or ''}}</td>
-                <td>
-                    {% if pot.made_with_clay %}
-                        <a href="{{ url_for('show_clay', clay_id=pot.made_with_clay.id) }}">{{ pot.made_with_clay.get_clay_name() or '' }}</a>
-                    {% endif %}
-                </td>
-                <td>
-                    {% for glaze in pot.ordered_glaze_layers %}
-                    <a href="{{ url_for('show_glaze', glaze_id=glaze.glaze_id) }}">{{ glaze.glaze.get_glaze_name() or '' }}</a> x{{ glaze.number_of_layers or '1' }}<br>
-                    {% endfor %}
-                </td>
-                <td>{{ pot.bisque_fired_with_program.name or '' }}</td>
-                <td>{{ pot.glaze_fired_with_program.name or '' }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Photo</th>
+            <th>Type</th>
+            <th>Throwing time</th>
+            <th>Clay</th>
+            <th>Glazes</th>
+            <th>Bisque Program</th>
+            <th>Glaze Program</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pot in pots %}
+        <tr id="row-pot-{{ pot.id }}">
+            <a href="{{ url_for('edit_pot', pot_id=pot.id) }}">
+            <td>
+                <!-- Display the uploaded photos -->
+                <div class="container-fluid">
+                    <div class="row">
+                        {% if pot.primary_image %}
+                            <div class="col">
+                                <img src="{{ url_for('static', filename='photos/' + pot.primary_image) }}" alt="Selected Photo" style="width: 14rem; height: 8rem; object-fit: cover;" class="img-thumbnail">
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </td>
+            <td>{{ pot.vessel_type or ''}}</td>
+            <td>{{ pot.throw_date.strftime('%d.%m.%Y %H:%M') or ''}}</td>
+            <td>
+                {% if pot.made_with_clay %}
+                    <a href="{{ url_for('show_clay', clay_id=pot.made_with_clay.id) }}">{{ pot.made_with_clay.get_clay_name() or '' }}</a>
+                {% endif %}
+            </td>
+            <td>
+                {% for glaze in pot.ordered_glaze_layers %}
+                <a href="{{ url_for('show_glaze', glaze_id=glaze.glaze_id) }}">{{ glaze.glaze.get_glaze_name() or '' }}</a> x{{ glaze.number_of_layers or '1' }}<br>
+                {% endfor %}
+            </td>
+            <td>{{ pot.bisque_fired_with_program.name or '' }}</td>
+            <td>{{ pot.glaze_fired_with_program.name or '' }}</td>
+        </a>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 {% endblock %}

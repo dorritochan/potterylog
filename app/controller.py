@@ -792,14 +792,16 @@ def view_kilns():
 
 @app.route('/delete_<item_type>/<int:item_id>', methods=['DELETE'])
 @login_required
-def delete_link(item_type, item_id):
+def delete_item(item_type, item_id):
     
     if item_type == 'link':
         item = Link.query.get_or_404(item_id)
         
     elif item_type == 'clay':
         item = Clay.query.get_or_404(item_id)
-
+        
+    elif item_type == 'glaze':
+        item = Glaze.query.get_or_404(item_id)
     
     try:
         db.session.delete(item)
@@ -808,6 +810,39 @@ def delete_link(item_type, item_id):
     except Exception as e:
         app.logger.error(f"Error deleting {item_type}: {e}")
         return jsonify(success=False, message='Internal Server Error'), 500
+
+    
+@app.route('/update_<item_type>/<int:item_id>', methods=['PUT'])
+@login_required
+def update_item(item_type, item_id):
+    
+    if item_type == 'link':
+        form = AddLinkForm()
+        item = Link.query.get_or_404(item_id)
+        data = extract_link_data(form)
+                
+    elif item_type == 'clay':
+        form = AddClayForm()
+        item = Clay.query.get_or_404(item_id)
+        data = extract_clay_data(form)
+        
+    elif item_type == 'glaze':
+        form = AddGlazeForm()
+        item = Glaze.query.get_or_404(item_id)
+        data = extract_glaze_data(form)
+    
+    if form.validate_on_submit():
+        # Update the existing object with the new data
+        for key, value in data.items():
+            setattr(item, key, value)
+        db.session.commit()
+        return jsonify(success=True, message=f'Updated {item_type} with ID {item_id}')
+    
+    response_data = {
+        'success': False,
+        'errors': form.errors
+    }
+    return jsonify(response_data)
     
     
 @app.route('/get_name_<item_type>/<int:item_id>', methods=['GET'])

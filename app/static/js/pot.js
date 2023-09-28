@@ -105,10 +105,14 @@ $(document).ready(function() {
 
         $("#form-add-edit-" + itemType)[0].reset();
         $(`#modal-add-edit-${itemType}-title`).text('Add a new ' + itemType);
-        $(`#btn-add-${itemType}`).attr('value', 'Add ' + itemType);
-        $(`#btn-add-${itemType}`).attr('id', 'btn-add-' + itemType);
+        $(`#btn-add-${itemType}`).removeClass("hidden");
+        $(`[id^="btn-update-${itemType}"]`).attr("id", `btn-update-${itemType}`);
+        $(`[id^="btn-update-${itemType}"]`).addClass("hidden");
         $(`[id^="btn-delete-item-"][data-itemtype="${itemType}"]`).attr("id", "btn-delete-item-");
         $(`[id^="btn-delete-item-"][data-itemtype="${itemType}"]`).addClass("hidden");
+    });
+
+    $('[id^="modal-confirm-delete"]').on('hidden.bs.modal', function() {
         $("[id^='btn-confirm-delete-item-']").attr("id", "btn-confirm-delete-item-")
     });
 
@@ -155,32 +159,30 @@ $(document).ready(function() {
         });
     });
 
-    $('[id^="btn-update-clay"]').click(function(event) {
-        event.preventDefault(); // Prevent the form from reloading the page
-        event.stopPropagation();
+    $('[id^="btn-update-"]').click(function(event) {
+        var idNumber = parseInt(this.id.split("-").pop());
+        var itemType = $(this).data("itemtype");
+
+        console.log(idNumber);
+        console.log(itemType);
 
         $.ajax({
-            url: "/addclay",
-            type: "POST",
-            data: $('#form-add-edit-clay').serialize(),
+            url: "/update_" + itemType + "/" + idNumber,
+            type: "PUT",
+            data: $('#form-add-edit-' + itemType).serialize(),
             success: function(response) {
                 if (response.success) {
+                    console.log('success');
                     // Close the modal and update the pot info, if necessary
-                    $('#modal-add-edit-clay').modal('hide');
-                    var shouldReload = $('#add-new-clay').data('reload-page');
+                    $('#modal-add-edit-' + itemType).modal('hide');
+                    var shouldReload = $('[id^="open-modal-edit-item-"]').data('reload-page');
                     if (shouldReload) {
                         location.reload();
-                    } else {
-                        // update the list of glazes without a page reload
-                        $.get('/get_clay_choices', function(choicesData) {
-                            var firstOption = [[0, '-']];
-                            var choices = firstOption.concat(choicesData);
-                            
-                            $('#clay-field select[name$="clay"]').html(getOptionsHtml(choices));
-                        });
-                    }
+                    } 
                 } else {
-                    $('#modal-add-edit-clay').modal('show');
+                    console.log('failure');
+                    console.log(response);
+                    $('#modal-add-edit-' + itemType).modal('show');
                     // Clear previous errors
                     $(".form-error").remove();
 
@@ -190,7 +192,7 @@ $(document).ready(function() {
                         $.each(errors, function(_, error) {
                             var errorSpan = $("<span>").addClass("form-error").css("color", "red").text("[" + error + "]");
                             // Append errorSpan next to the respective input field
-                            $("#form-add-edit-clay").find('[name="' + field + '"]').after(errorSpan);
+                            $("#form-add-edit-" + itemType).find('[name="' + field + '"]').after(errorSpan);
                         });
                     });
                 }
@@ -411,9 +413,11 @@ $(document).ready(function() {
                     $(`#modal-add-edit-${itemType} input[id='${key}']`).val(data[key]);
                     $(`#modal-add-edit-${itemType}-title`).text('Edit ' + itemType + ' ' + data['brand'] + ' ' + data['name_id']);
                 }
-                var $btnUpdate = $('#btn-add-' + itemType);
+                $('#btn-add-' + itemType).addClass("hidden");
+                var $btnUpdate = $('#btn-update-' + itemType);
                 $btnUpdate.attr('value', 'Update ' + itemType);
                 $btnUpdate.attr('id', 'btn-update-' + itemType + '-' + idNumber)
+                $btnUpdate.removeClass("hidden");
                 var $btnDelete = $(`[id^="btn-delete-item-"][data-itemtype="${itemType}"]`);
                 $btnDelete.attr("id", $btnDelete.attr("id") + idNumber)
                 $btnDelete.removeClass("hidden");

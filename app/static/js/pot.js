@@ -98,9 +98,64 @@ $(document).ready(function() {
             }
         });
     });
-    
 
-    $('#btn-add-edit-clay').click(function(event) {
+    // Reset the add/edit clay modal to the default - adding
+    $('[id^="modal-add-edit-"]').on('hidden.bs.modal', function() {
+        const itemType = $(this).data('itemtype');
+
+        $("#form-add-edit-" + itemType)[0].reset();
+        $(`#modal-add-edit-${itemType}-title`).text('Add a new ' + itemType);
+        $(`#btn-add-${itemType}`).attr('value', 'Add ' + itemType);
+        $(`#btn-add-${itemType}`).attr('id', 'btn-add-' + itemType);
+        $(`[id^="btn-delete-item-"][data-itemtype="${itemType}"]`).attr("id", "btn-delete-item-");
+        $(`[id^="btn-delete-item-"][data-itemtype="${itemType}"]`).addClass("hidden");
+        $("[id^='btn-confirm-delete-item-']").attr("id", "btn-confirm-delete-item-")
+    });
+
+    $('#btn-add-clay').click(function(event) {
+        event.preventDefault(); // Prevent the form from reloading the page
+        event.stopPropagation();
+
+        $.ajax({
+            url: "/addclay",
+            type: "POST",
+            data: $('#form-add-edit-clay').serialize(),
+            success: function(response) {
+                if (response.success) {
+                    // Close the modal and update the pot info, if necessary
+                    $('#modal-add-edit-clay').modal('hide');
+                    var shouldReload = $('#add-new-clay').data('reload-page');
+                    if (shouldReload) {
+                        location.reload();
+                    } else {
+                        // update the list of glazes without a page reload
+                        $.get('/get_clay_choices', function(choicesData) {
+                            var firstOption = [[0, '-']];
+                            var choices = firstOption.concat(choicesData);
+                            
+                            $('#clay-field select[name$="clay"]').html(getOptionsHtml(choices));
+                        });
+                    }
+                } else {
+                    $('#modal-add-edit-clay').modal('show');
+                    // Clear previous errors
+                    $(".form-error").remove();
+
+                    // Loop through the errors and display them
+                    $.each(response.errors, function(field, errors) {
+                        // For each error of a field, create an error span
+                        $.each(errors, function(_, error) {
+                            var errorSpan = $("<span>").addClass("form-error").css("color", "red").text("[" + error + "]");
+                            // Append errorSpan next to the respective input field
+                            $("#form-add-edit-clay").find('[name="' + field + '"]').after(errorSpan);
+                        });
+                    });
+                }
+            }
+        });
+    });
+
+    $('[id^="btn-update-clay"]').click(function(event) {
         event.preventDefault(); // Prevent the form from reloading the page
         event.stopPropagation();
 
@@ -177,7 +232,6 @@ $(document).ready(function() {
         });
     });
 
-
     $('#btn-add-firing-program').click(function(event) {
         event.preventDefault();
         event.stopImmediatePropagation();
@@ -243,20 +297,31 @@ $(document).ready(function() {
         });
     });
 
-
+    // This function gets the name of the item (clay, link, glaze,...)
+    // after the button Delete was clicked and opens the delete confirmation 
+    // modal with the correct title
     $("[id^='btn-delete-item-']").click(function() {
         var idNumber = parseInt(this.id.split("-").pop());
-        var itemType = $(this).data("variable");
+        var itemType = $(this).data("itemtype");
+
+        console.log(idNumber);
+        console.log(itemType);
 
         // Fetch the item's name using AJAX
         $.get('/get_name_' + itemType + '/' + idNumber, function(response) {
         
+
+        // Hide the modal for editing if it was open
+        if ($(`#modal-add-edit-${itemType}`).hasClass('show')) {
+            $(`#modal-add-edit-${itemType}`).modal('hide');
+        }
+
         // Update the modal's content with the fetched data
         $('#modal-confirm-delete-title').text('Confirm ' + itemType + ' deletion');
         $('#txt-question-confirm-delete').html('Do you really want to delete the ' + itemType + ' <strong>' + response.item_name + '</strong>?');
         var $btnDelete = $("[id^='btn-confirm-delete-item-']")
         $btnDelete.attr("id", $btnDelete.attr("id") + idNumber)
-        $btnDelete.data('variable', itemType);
+        $btnDelete.data('itemtype', itemType);
 
         // Show the modal
         $('#modal-confirm-delete').modal('show');
@@ -265,12 +330,14 @@ $(document).ready(function() {
 
     });
 
+    // This function acts on click on the confirm delete button in the confirm modal
+    // and removes the item from the database. After that, the page is being refreshed.
     $("[id^='btn-confirm-delete-item-']").click(function() {
         // Get the number from the ID
         var idNumber = parseInt(this.id.split("-").pop());
 
         // This is the type of item to be deleted, like 'pot' or 'link'
-        var itemType = $(this).data("variable");
+        var itemType = $(this).data("itemtype");
 
         console.log(idNumber);
         console.log(itemType);
@@ -297,12 +364,13 @@ $(document).ready(function() {
 
     });
 
-
+    // This ensures manual controls and not automatic sliding of the carousel
     $('#photo-carousel').carousel({
-        interval: false // This ensures manual controls and not automatic sliding.
+        interval: false 
     });
 
-
+    // A click function on a photo thumbnail on Edit pot page opens
+    // the carousel and shows the clicked photo.
     $("[id^='photo-thumbnail-']").click(function() {
         var indexPhoto = parseInt(this.id.split("-").pop());
         console.log('clicked on thumbnail');
@@ -343,6 +411,13 @@ $(document).ready(function() {
                     $(`#modal-add-edit-${itemType} input[id='${key}']`).val(data[key]);
                     $(`#modal-add-edit-${itemType}-title`).text('Edit ' + itemType + ' ' + data['brand'] + ' ' + data['name_id']);
                 }
+                var $btnUpdate = $('#btn-add-' + itemType);
+                $btnUpdate.attr('value', 'Update ' + itemType);
+                $btnUpdate.attr('id', 'btn-update-' + itemType + '-' + idNumber)
+                var $btnDelete = $(`[id^="btn-delete-item-"][data-itemtype="${itemType}"]`);
+                $btnDelete.attr("id", $btnDelete.attr("id") + idNumber)
+                $btnDelete.removeClass("hidden");
+                
                 $('#modal-add-edit-' + itemType).show('modal');
             })
             .catch(error => {
@@ -350,7 +425,7 @@ $(document).ready(function() {
             });
     });
 
-
+    // This function opens the Edit pot page on click on a pot row on Index page
     $('[id^="row-pot-"]').click(function() {
         var potId = parseInt(this.id.split('-').pop());
         window.location.href = '/editpot/' + potId;

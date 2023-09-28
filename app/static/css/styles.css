@@ -50,7 +50,22 @@ a.hover-border-link:active {
     cursor: pointer;
 }
 
-.table-striped>tbody>tr:nth-child(odd)>td, 
+/* .table-striped>tbody>tr:nth-child(odd)>td, 
 .table-striped>tbody>tr:nth-child(odd)>th {
-    background-color: #0dcdfd35; 
+} */
+
+.responsive-image {
+    max-width: 120px; 
+    max-height: 120px;
+    width: 100%; 
+    height: auto;
+    object-fit: cover;
+}
+
+.hidden {
+    display: none;
+}
+
+.modal-footer > div {
+    margin-bottom: 20px;
 }

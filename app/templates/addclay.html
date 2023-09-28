@@ -1,5 +1,5 @@
 <!-- Modal -->
-<div class="modal fade" id="modal-add-edit-clay" tabindex="-1" role="dialog" aria-labelledby="modal-add-edit-clay-title" aria-hidden="true">
+<div class="modal fade" id="modal-add-edit-clay" tabindex="-1" role="dialog" aria-labelledby="modal-add-edit-clay-title" aria-hidden="true" data-itemtype="clay">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -69,11 +69,16 @@
                             <span style="color: red;">[{{ error }}]</span>
                         {% endfor %}
                     </div>
-                    <div class="modal-footer">
-                        {{ clay_form.submit(class_="btn btn-primary", id="btn-add-clay", form_="form-add-clay") }}
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    </div>
                 </form>
+            </div>
+            <div class="modal-footer align-baseline">
+                <div class="w-100">
+                    {{ clay_form.submit(class_="btn btn-primary", id="btn-add-clay", form_="form-add-clay") }}
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+                <div class="w-100">
+                    <button type="button" class="btn btn-outline-danger hidden" id="btn-delete-item-" data-itemtype="clay">Delete clay</button>
+                </div>
             </div>
         </div>
     </div>

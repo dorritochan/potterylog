@@ -795,8 +795,11 @@ def view_kilns():
 def delete_link(item_type, item_id):
     
     if item_type == 'link':
-    
         item = Link.query.get_or_404(item_id)
+        
+    elif item_type == 'clay':
+        item = Clay.query.get_or_404(item_id)
+
     
     try:
         db.session.delete(item)
@@ -814,6 +817,10 @@ def get_item_name(item_id, item_type):
     if item_type == 'link':
         link = Link.query.get_or_404(item_id)
         item_name = link.title
+        
+    elif item_type == 'clay':
+        clay = Clay.query.get_or_404(item_id)
+        item_name = clay.get_clay_name()
     
     return jsonify(item_name=item_name)
 

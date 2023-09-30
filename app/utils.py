@@ -26,7 +26,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 
-def set_select_field_choices(form):
+def set_pot_select_field_choices(form):
     """
     Setting the choices for the select fields on the 'pot' page.
 
@@ -46,12 +46,27 @@ def set_select_field_choices(form):
     form.glaze_fire_kiln_id.choices = [(0, '-')] + [(kiln.id, kiln.name) for kiln in Kiln.query.order_by(Kiln.name).all()]
     
 
-def get_field_id_or_default(pot_select_field):
+cones = [
+        '019', '018', '017', '016', '015', '014', '013', '012', '011',
+        '010', '09', '08', '07', '06', '05', '04', '03', '02', '01',
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
+        ]
+def set_cone_select_field_choices(form):
+    
+    form.cone.data = [(0, '')] + [(index + 1, cone) for index, cone in enumerate(cones)]
+
+kiln_types = ['Electric', 'Gas']
+def set_kiln_type_select_field_choices(form):
+    
+    form.type.data = [(index + 1, type) for index, type in enumerate(kiln_types)]
+    
+
+def get_field_id_or_default(select_field):
     """Return the id of the given field or 0 if it's None."""
-    return pot_select_field.id if pot_select_field else 0
+    return select_field.id if select_field else 0
 
 
-def populate_select_field_data(form, pot):
+def populate_pot_select_field_data(form, pot):
     """Fill in the form data with the values from a given pot."""
     fields_mapping = {
         'made_with_clay': pot.made_with_clay,
@@ -69,7 +84,35 @@ def populate_select_field_data(form, pot):
     form_glazes = [glaze.glaze_id for glaze in pot.used_glazes]
     for form_glaze, glaze_id in zip(form.used_glazes.entries, form_glazes):
         form_glaze.glaze.data = glaze_id
+
+
+def populate_cone_data(form, glaze):
+    """Fill in the form data with the values from a given glaze."""
+    fields_mapping = {
+        'cone': glaze.cone
+    }
+
+    for form_field, glaze_field in fields_mapping.items():
+        form_field_obj = getattr(form, form_field)
+        if glaze_field:
+            form_field_obj.data = cones.index(glaze_field) + 1
+        else:
+            form_field_obj.data = 0
     
+
+def populate_kiln_type_data(form, kiln):
+    fields_mapping = {
+        'type': kiln.type
+    }
+
+    for form_field, type_field in fields_mapping.items():
+        form_field_obj = getattr(form, form_field)
+        if type_field:
+            form_field_obj.data = kiln_types.index(type_field) + 1
+        else:
+            form_field_obj.data = 0
+
+
 
 def safe_query(model, id):
     """
@@ -179,7 +222,9 @@ def extract_kiln_data(form):
         'capacity': form.capacity.data,
         'temp_max': form.temp_max.data,
         'voltage': form.voltage.data,
-        'controller': form.controller.data
+        'url': form.url.data,
+        'controller': form.controller.data,
+        'controller_url': form.controller_url.data
     }
 
     # Special field extraction (since it doesn't directly map to a model field)

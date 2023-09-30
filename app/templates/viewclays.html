@@ -42,7 +42,7 @@
             <td class="vertical-center">{{ clay.grog_size_max ~ 'mm' if clay.grog_size_max else '' }}</td>
             <td class="vertical-center">
                 {% if clay.url %}
-                    <a class="hover-border-link" href="{{ clay.url or '' }}" target="_blank">
+                    <a class="hover-border-link" href="{{ clay.url }}" target="_blank">
                         Website
                     </a>
                 {% endif %}

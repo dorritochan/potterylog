@@ -1,18 +1,18 @@
 
 <!-- Modal -->
-<div class="modal fade" id="modal-add-firing-program" tabindex="-1" role="dialog" aria-labelledby="modal-add-firing_program-title" aria-hidden="true">
+<div class="modal fade" id="modal-add-edit-firing-program" tabindex="-1" role="dialog" aria-labelledby="modal-add-edit-firing_program-title" aria-hidden="true" data-itemtype="firing-program">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modal-add-firing-program-title">Add a new firing program</h5>
+                <h5 class="modal-title" id="modal-add-edit-firing-program-title">
+                    Add a new firing program
+                </h5>
                 <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-
-
-                <form action="" method="post" id="form-add-firing-program">
+                <form action="" method="post" id="form-add-edit-firing-program">
                     {{ program_form.hidden_tag() }}
                     <div class="form-group">
                         {{ program_form.type.label }} {{ program_form.type(class_="form-control") }}
@@ -36,12 +36,18 @@
                     {% for error in program_form.firing_segments.errors %}
                         <span style="color: red;">[{{ error }}]</span>
                     {% endfor %}
-                    <button id="add-segment" type="button" class="btn btn-secondary">Add Another Segment</button>
-                    <div class="modal-footer">
-                        {{ program_form.submit(class_="btn btn-primary", id="btn-add-firing-program", form_="form-add-firing-program") }}
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
+                    <button id="add-segment" type="button" class="btn btn-secondary">&plus; Add Another Segment</button>
                 </form>
+            </div>
+            <div class="modal-footer align-baseline">
+                <div class="w-100">
+                    {{ program_form.submit(class_="btn btn-primary", id="btn-add-firing-program") }}
+                    <button type="submit" class="btn btn-primary hidden" id="btn-update-firing-program" data-itemtype="firing-program">Update firing program</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+                <div class="w-100">
+                    <button type="button" class="btn btn-outline-danger hidden" id="btn-delete-item-" data-itemtype="firing-program">Delete firing program</button>
+                </div>
             </div>
         </div>
     </div>

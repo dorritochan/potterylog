@@ -195,7 +195,9 @@ class Kiln(db.Model):
     capacity = db.Column(db.Integer) # in L
     temp_max = db.Column(db.Integer) # in °C
     voltage = db.Column(db.Float(20)) # in kW
+    url = db.Column(db.String)
     controller = db.Column(db.String(200))
+    controller_url = db.Column(db.String)
     bisque_fired_pots  = db.relationship('Pot', back_populates='bisque_fired_with_kiln', foreign_keys='[Pot.bisque_fire_kiln_id]', lazy='dynamic')
     glaze_fired_pots  = db.relationship('Pot', back_populates='glaze_fired_with_kiln', foreign_keys='[Pot.glaze_fire_kiln_id]', lazy='dynamic')
     

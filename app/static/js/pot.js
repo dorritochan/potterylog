@@ -58,11 +58,11 @@ $(document).ready(function() {
         $.ajax({
             url: "/addglaze",
             type: "POST",
-            data: $('#form-add-glaze').serialize(),
+            data: $('#form-add-edit-glaze').serialize(),
             success: function(response) {
                 if (response.success) {
                     // Close the modal and update the pot info, if necessary
-                    $('#modal-add-glaze').modal('hide');
+                    $('#modal-add-edit-glaze').modal('hide');
                     var shouldReload = $('#add-new-glaze').data('reload-page');
                     if (shouldReload) {
                         location.reload();
@@ -81,7 +81,7 @@ $(document).ready(function() {
                         });
                     }
                 } else {
-                    $('#modal-add-glaze').modal('show');
+                    $('#modal-add-edit-glaze').modal('show');
                     // Clear previous errors
                     $(".form-error").remove();
 
@@ -91,7 +91,7 @@ $(document).ready(function() {
                         $.each(errors, function(_, error) {
                             var errorSpan = $("<span>").addClass("form-error").css("color", "red").text("[" + error + "]");
                             // Append errorSpan next to the respective input field
-                            $("#form-add-glaze").find('[name="' + field + '"]').after(errorSpan);
+                            $("#form-add-edit-glaze").find('[name="' + field + '"]').after(errorSpan);
                         });
                     });
                 }
@@ -102,6 +102,8 @@ $(document).ready(function() {
     // Reset the add/edit clay modal to the default - adding
     $('[id^="modal-add-edit-"]').on('hidden.bs.modal', function() {
         const itemType = $(this).data('itemtype');
+        console.log('Were in there');
+        console.log(itemType);
 
         $("#form-add-edit-" + itemType)[0].reset();
         $(`#modal-add-edit-${itemType}-title`).text('Add a new ' + itemType);
@@ -207,16 +209,16 @@ $(document).ready(function() {
         $.ajax({
             url: "/addkiln",
             method: "POST",
-            data: $('#form-add-kiln').serialize(),
+            data: $('#form-add-edit-kiln').serialize(),
             success: function(response) {
                 if (response.success) {
-                    $('#modal-add-kiln').modal('hide');
+                    $('#modal-add-edit-kiln').modal('hide');
                     var shouldReload = $('#add-new-kiln').data('reload-page');
                     if (shouldReload) {
                         location.reload();
                     }
                 } else {
-                    $('#modal-add-kiln').modal('show');
+                    $('#modal-add-edit-kiln').modal('show');
                     // Clear previous errors
                     $(".form-error").remove();
 
@@ -226,7 +228,7 @@ $(document).ready(function() {
                         $.each(errors, function(_, error) {
                             var errorSpan = $("<span>").addClass("form-error").css("color", "red").text("[" + error + "]");
                             // Append errorSpan next to the respective input field
-                            $("#form-add-kiln").find('[name="' + field + '"]').after(errorSpan);
+                            $("#form-add-edit-kiln").find('[name="' + field + '"]').after(errorSpan);
                         });
                     });
                 }
@@ -241,16 +243,16 @@ $(document).ready(function() {
         $.ajax({
             url: "/addfiringprogram",
             method: "POST",
-            data: $('#form-add-firing-program').serialize(),
+            data: $('#form-add-edit-firing-program').serialize(),
             success: function(response) {
                 if (response.success) {
-                    $('#modal-add-firing-program').modal('hide');
+                    $('#modal-add-edit-firing-program').modal('hide');
                     var shouldReload = $('#add-new-firing-program').data('reload-page');
                     if (shouldReload) {
                         location.reload();
                     }
                 } else {
-                    $('#modal-add-firing-program').modal('show');
+                    $('#modal-add-edit-firing-program').modal('show');
                     // Clear previous errors
                     $(".form-error").remove();
 
@@ -260,7 +262,7 @@ $(document).ready(function() {
                         $.each(errors, function(_, error) {
                             var errorSpan = $("<span>").addClass("form-error").css("color", "red").text("[" + error + "]");
                             // Append errorSpan next to the respective input field
-                            $("#form-add-firing-program").find('[name="' + field + '"]').after(errorSpan);
+                            $("#form-add-edit-firing-program").find('[name="' + field + '"]').after(errorSpan);
                         });
                     });
                 }
@@ -275,13 +277,13 @@ $(document).ready(function() {
         $.ajax({
             url: "/addlink",
             method: "POST",
-            data: $('#form-add-link').serialize(),
+            data: $('#form-add-edit-link').serialize(),
             success: function(response) {
                 if (response.success) {
-                    $('#modal-add-link').modal('hide');
+                    $('#modal-add-edit-link').modal('hide');
                     location.reload();
                 } else {
-                    $('#modal-add-link').modal('show');
+                    $('#modal-add-edit-link').modal('show');
                     // Clear previous errors
                     $(".form-error").remove();
 
@@ -291,7 +293,7 @@ $(document).ready(function() {
                         $.each(errors, function(_, error) {
                             var errorSpan = $("<span>").addClass("form-error").css("color", "red").text("[" + error + "]");
                             // Append errorSpan next to the respective input field
-                            $("#form-add-link").find('[name="' + field + '"]').after(errorSpan);
+                            $("#form-add-edit-link").find('[name="' + field + '"]').after(errorSpan);
                         });
                     });
                 }
@@ -409,15 +411,24 @@ $(document).ready(function() {
             .then(data => {
                 console.log('Item loaded:', data);
                 for (let key in data) {
-                    // This assumes that the field names in the modal match the JSON attribute names
                     $(`#modal-add-edit-${itemType} input[id='${key}']`).val(data[key]);
-                    $(`#modal-add-edit-${itemType}-title`).text('Edit ' + itemType + ' ' + data['brand'] + ' ' + data['name_id']);
+                    $(`#modal-add-edit-${itemType} select[id='${key}'] option:contains('${data[key]}')`).prop('selected', true).parent().trigger('change');
+                    $(`#modal-add-edit-${itemType} textarea[id='${key}']`).val(data[key]);
+                    fetch("/get_name_" + itemType + "/" + idNumber)
+                        .then(response => response.json())
+                        .then(data => {
+                            const titleText = 'Edit ' + itemType + ' ' + data.item_name;
+                            $(`#modal-add-edit-${itemType}-title`).text(titleText);
+                        })
+                        .catch(error => console.error('Error fetching name:', error));
                 }
                 $('#btn-add-' + itemType).addClass("hidden");
+
                 var $btnUpdate = $('#btn-update-' + itemType);
                 $btnUpdate.attr('value', 'Update ' + itemType);
                 $btnUpdate.attr('id', 'btn-update-' + itemType + '-' + idNumber)
                 $btnUpdate.removeClass("hidden");
+
                 var $btnDelete = $(`[id^="btn-delete-item-"][data-itemtype="${itemType}"]`);
                 $btnDelete.attr("id", $btnDelete.attr("id") + idNumber)
                 $btnDelete.removeClass("hidden");

@@ -22,8 +22,9 @@ from app.models import (
 )
 from app.utils import (
     allowed_file, 
-    set_select_field_choices, safe_query, 
-    populate_select_field_data, get_field_id_or_default, 
+    set_pot_select_field_choices, set_cone_select_field_choices, set_kiln_type_select_field_choices,
+    safe_query, 
+    populate_pot_select_field_data, populate_cone_data, populate_kiln_type_data,
     extract_pot_data, extract_glaze_data, extract_clay_data, extract_kiln_data, 
     extract_firing_segment_data, extract_link_data,
     program_firing_time
@@ -265,7 +266,7 @@ def add_pot():
     form = AddPotForm()
     
     # Set the choices for the select fields
-    set_select_field_choices(form)
+    set_pot_select_field_choices(form)
     
     # Set the label for the submit button
     form.submit.label.text = 'Add pot'
@@ -309,7 +310,7 @@ def edit_pot(pot_id):
     form = AddPotForm(obj=pot)
     
     # Set the choices for the select fields
-    set_select_field_choices(form)
+    set_pot_select_field_choices(form)
     
     # Set the label for the submit button
     form.submit.label.text = 'Update pot'
@@ -341,7 +342,7 @@ def edit_pot(pot_id):
     # ===================
 
     # Show the correct selected choices for select fields from the database
-    populate_select_field_data(form, pot)
+    populate_pot_select_field_data(form, pot)
 
     # Pre-populate the form with the related images
     if pot.images:
@@ -803,6 +804,12 @@ def delete_item(item_type, item_id):
     elif item_type == 'glaze':
         item = Glaze.query.get_or_404(item_id)
     
+    elif item_type == 'kiln':
+        item = Kiln.query.get_or_404(item_id)
+    
+    elif item_type == 'firing-program':
+        item = FiringProgram.query.get_or_404(item_id)
+    
     try:
         db.session.delete(item)
         db.session.commit()
@@ -831,6 +838,16 @@ def update_item(item_type, item_id):
         item = Glaze.query.get_or_404(item_id)
         data = extract_glaze_data(form)
     
+    elif item_type == 'kiln':
+        form = AddKilnForm()
+        item = Kiln.query.get_or_404(item_id)
+        data = extract_kiln_data(form)
+    
+    elif item_type == 'firing-program':
+        form = AddFiringProgramForm()
+        item = FiringProgram.query.get_or_404(item_id)
+        #data = extract_firing_program_data(form)
+    
     if form.validate_on_submit():
         # Update the existing object with the new data
         for key, value in data.items():
@@ -857,6 +874,18 @@ def get_item_name(item_id, item_type):
         clay = Clay.query.get_or_404(item_id)
         item_name = clay.get_clay_name()
     
+    elif item_type == 'glaze':
+        glaze = Glaze.query.get_or_404(item_id)
+        item_name = glaze.get_glaze_name()
+    
+    elif item_type == 'kiln':
+        kiln = Kiln.query.get_or_404(item_id)
+        item_name = kiln.name
+    
+    elif item_type == 'firing-program':
+        firing_program = FiringProgram.query.get_or_404(item_id)
+        item_name = firing_program.name
+    
     return jsonify(item_name=item_name)
 
 
@@ -864,7 +893,12 @@ def get_item_name(item_id, item_type):
 @login_required
 def get_item(item_type, item_id):
     
-    if item_type == 'clay':
+    if item_type == 'link':
+        item = Link.query.get_or_404(item_id)
+        form = AddLinkForm(obj=item)
+        data = extract_link_data(form)
+        
+    elif item_type == 'clay':
         item = Clay.query.get_or_404(item_id)
         form = AddClayForm(obj=item)
         data = extract_clay_data(form)
@@ -872,7 +906,21 @@ def get_item(item_type, item_id):
     elif item_type == 'glaze':
         item = Glaze.query.get_or_404(item_id)
         form = AddGlazeForm(obj=item)
+        set_cone_select_field_choices(form)
+        populate_cone_data(form, item)
         data = extract_glaze_data(form)
+    
+    elif item_type == 'kiln':
+        item = Kiln.query.get_or_404(item_id)
+        form = AddKilnForm(obj=item)
+        set_kiln_type_select_field_choices(form)
+        populate_kiln_type_data(form, item)
+        data = extract_kiln_data(form)
+        
+    elif item_type == 'firing-program':
+        item = FiringProgram.query.get_or_404(item_id)
+        form = AddFiringProgramForm()
+        #data = ...
         
     else:
         return jsonify(error=f"Unrecognized item type: {item_type}"), 400

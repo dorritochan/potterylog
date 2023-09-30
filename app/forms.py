@@ -124,22 +124,6 @@ class AddClayForm(FlaskForm):
     url = StringField('URL', validators=[Optional(), CustomURL()])
     submit = SubmitField('Add clay')
     
-    def validate_grog_size_max(self, grog_size_max):
-        '''Check if the clay already exists in the database'''
-        
-        normalized_brand = normalize_string(self.brand.data)
-        normalized_color = normalize_string(self.color.data)
-        normalized_name = normalize_string(self.name_id.data)
-
-        clay = Clay.query.filter(
-            Clay.brand.ilike(normalized_brand),
-            Clay.name_id.ilike(normalized_name),
-            Clay.color.ilike(normalized_color),
-            Clay.grog_percent == self.grog_percent.data,
-            Clay.grog_size_max == grog_size_max.data
-            ).first()
-        if clay:
-            raise ValidationError('This clay already exists.')
     
 class AddGlazeForm(FlaskForm):
     brand = StringField('Brand name', validators=[DataRequired()])
@@ -152,30 +136,6 @@ class AddGlazeForm(FlaskForm):
     glaze_url = StringField('Glaze URL', validators=[Optional(), CustomURL()])
     submit = SubmitField('Add glaze')
     
-    def validate_name(self, name):
-        '''Check if the glaze already exists in the database'''
-        
-        normalized_brand = normalize_string(self.brand.data)
-        normalized_name = normalize_string(name.data)
-        glaze = Glaze.query.filter(
-            Glaze.brand.ilike(normalized_brand),
-            Glaze.name.ilike(normalized_name)
-            ).first()
-        if glaze:
-            raise ValidationError('This glaze already exists.')
-    
-    def validate_brand_id(self, brand_id):
-        '''Check if the glaze already exists in the database'''
-        
-        normalized_brand = normalize_string(self.brand.data)
-        normalized_brand_id = normalize_string(brand_id.data)
-        if brand_id:
-            glaze = Glaze.query.filter(
-                Glaze.brand.ilike(normalized_brand),
-                Glaze.brand_id.ilike(normalized_brand_id)
-                ).first()
-            if glaze:
-                raise ValidationError('This glaze already exists.')
     
     def __init__(self, *args, **kwargs):
         super(AddGlazeForm, self).__init__(*args, **kwargs)
@@ -195,8 +155,10 @@ class AddKilnForm(FlaskForm):
     type = SelectField('Type', coerce=int, choices=[(1, 'Electric'), (2, 'Gas')])
     capacity = IntegerField('Capacity L', validators=[Optional()])
     temp_max = IntegerField('Maximum temperature °C', validators=[Optional()])
-    voltage = FloatField('Voltage kW')
+    voltage = FloatField('Voltage kW', validators=[Optional()])
+    url = StringField('URL', validators=[Optional(), CustomURL()])
     controller = StringField('Controller')
+    controller_url = StringField('Controller URL', validators=[Optional(), CustomURL()])
     submit = SubmitField('Add kiln')
     
 
@@ -216,4 +178,4 @@ class AddLinkForm(FlaskForm):
     title = StringField('Title')
     url = StringField('URL', validators=[Optional(), CustomURL()])
     description = TextAreaField('Description')
-    submit = SubmitField('Save')
+    submit = SubmitField('Add links')

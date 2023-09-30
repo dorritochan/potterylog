@@ -1,9 +1,15 @@
 {% extends 'layout.html' %}
 {% include 'addkiln.html' %}
 {% include 'addfiringprogram.html' %}
+{% include 'confirmdelete.html' %}
 
 {% block main %}
-<h1>List of kilns</h1>
+<h1 class="m-3">List of kilns</h1>
+
+<div class="m-3">
+    <button id="add-new-kiln" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-edit-kiln" data-reload-page="true">&plus; Add a new kiln</button>
+</div>
+
 <table class="table table-striped">
     <thead>
         <tr>
@@ -13,30 +19,57 @@
             <th>Capacity</th>
             <th>Max. temp.</th>
             <th>Voltage</th>
+            <th>URL</th>
             <th>Controller</th>
+            <th>Controller URL</th>
         </tr>
     </thead>
     <body>
         {% for kiln in kilns %}
         <tr>
-            <td>{{ kiln.name or '' }}</td>
-            <td>{{ kiln.brand or '' }}</td>
-            <td>{{ kiln.type or '' }}</td>
-            <td>{{ kiln.capacity ~ 'L' if kiln.capacity else '' }}</td>
-            <td>{{ kiln.temp_max ~ '°C' if kiln.temp_max else '' }}</td>
-            <td>{{ kiln.voltage ~ 'kW' if kiln.voltage else '' }}</td>
-            <td>{{ kiln.controller or '' }}</td>
+            <td class="vertical-center">{{ kiln.name or '' }}</td>
+            <td class="vertical-center">{{ kiln.brand or '' }}</td>
+            <td class="vertical-center">{{ kiln.type or '' }}</td>
+            <td class="vertical-center">{{ kiln.capacity ~ 'L' if kiln.capacity else '' }}</td>
+            <td class="vertical-center">{{ kiln.temp_max ~ '°C' if kiln.temp_max else '' }}</td>
+            <td class="vertical-center">{{ kiln.voltage ~ 'kW' if kiln.voltage else '' }}</td>
+            <td class="vertical-center">
+                {% if kiln.url %}
+                    <a class="hover-border-link" href="{{ kiln.url }}" target="_blank">
+                        Website
+                    </a>
+                {% endif %}
+            </td>
+            <td class="vertical-center">{{ kiln.controller or '' }}</td>
+            <td class="vertical-center">
+                {% if kiln.controller_url %}
+                    <a class="hover-border-link" href="{{ kiln.controller_url }}" target="_blank">
+                        Website
+                    </a>
+                {% endif %}
+            </td>
+            <td class="vertical-center">
+                <button type="button" class="btn btn-outline-secondary" id="open-modal-edit-item-{{ kiln.id }}" data-toggle="modal" data-target="#modal-add-edit-kiln" data-reload-page="true" data-itemtype="kiln">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                    </svg>
+                </button>
+            </td>
         </tr>
         {% endfor %}
     </body>
 </table>
-<button id="add-new-kiln" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-kiln" data-reload-page="true">Add a new kiln</button>
 
-<h1>List of firing programs</h1>
+<h1 class="m-3">List of firing programs</h1>
+
+<div class="m-3">
+    <button id="add-new-firing-program" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-edit-firing-program" data-reload-page="true">&plus; Add a new firing program</button>
+</div>
+
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>ID</th>
+            <th></th>
             <th>Name</th>
             <th>Segments</th>
             <th>Total firing time</th>
@@ -45,9 +78,9 @@
     <body>
         {% for program in firing_programs %}
         <tr>
-            <td>{{ program.id or '' }}</td>
-            <td class="font-weight-bold">{{ program.name or '' }}</td>
-            <td>
+            <td class="vertical-center">{{ program.id or '' }}</td>
+            <td class="font-weight-bold vertical-center">{{ program.name or '' }}</td>
+            <td class="vertical-center">
                 <dd>
                     {% for segment in program.ordered_segments %}
                         <li class="py-2">
@@ -64,11 +97,17 @@
                     {% endfor %}
                 </dd>
             </td>
-            <td>Min. {{ total_firing_time[program.id] }}</td>
+            <td class="vertical-center">Min. {{ total_firing_time[program.id] }}</td>
+            <td class="vertical-center">
+                <button type="button" class="btn btn-outline-secondary" id="open-modal-edit-item-{{ program.id }}" data-toggle="modal" data-target="#modal-add-edit-firing-program" data-reload-page="true" data-itemtype="firing-program">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                    </svg>
+                </button>
+            </td>
         </tr>
         {% endfor %}
     </body>
 </table>
-<button id="add-new-firing-program" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-firing-program" data-reload-page="true">Add a new firing program</button>
 
 {% endblock %}

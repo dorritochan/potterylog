@@ -1,4 +1,5 @@
-2023-09-29 23:49:33,140 ERROR: Exception on /get_glaze/7 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+2023-10-03 17:19:12,415 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 17:20:23,546 ERROR: Exception on /get_kiln/1 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -10,12 +11,11 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 884, in get_item
-    data = extract_glaze_data(form)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 151, in extract_glaze_data
-    data['cone'] = next(label for value, label in form.cone.choices if value == form.cone.data)
-StopIteration
-2023-09-29 23:49:35,851 ERROR: Exception on /get_glaze/19 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 914, in get_item
+    set_kiln_type_select_field_choices(form)
+UnboundLocalError: local variable 'form' referenced before assignment
+2023-10-03 17:39:50,476 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 17:39:56,613 ERROR: Exception on /get_kiln/1 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -27,12 +27,13 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 884, in get_item
-    data = extract_glaze_data(form)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 151, in extract_glaze_data
-    data['cone'] = next(label for value, label in form.cone.choices if value == form.cone.data)
-StopIteration
-2023-09-29 23:49:39,870 ERROR: Exception on /get_glaze/10 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 913, in get_item
+    data = extract_kiln_from_object(form)
+UnboundLocalError: local variable 'form' referenced before assignment
+2023-10-03 17:40:16,901 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 17:47:44,979 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 17:55:28,161 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 17:55:30,125 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -44,12 +45,26 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 884, in get_item
-    data = extract_glaze_data(form)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 151, in extract_glaze_data
-    data['cone'] = next(label for value, label in form.cone.choices if value == form.cone.data)
-StopIteration
-2023-09-29 23:49:42,439 ERROR: Exception on /get_glaze/19 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 775, in view_kilns
+    program_form = AddFiringProgramForm()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/wtforms/form.py", line 208, in __call__
+    return type.__call__(cls, *args, **kwargs)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/forms.py", line 178, in __init__
+    self.type.choices = set_firing_program_type_choices()
+TypeError: set_firing_program_type_choices() missing 1 required positional argument: 'form'
+2023-10-03 17:55:52,764 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 18:08:01,281 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 18:15:18,661 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 18:26:07,546 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 18:52:45,582 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 21:41:38,478 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 21:42:40,185 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 21:52:03,867 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 21:55:57,405 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 21:57:03,447 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 21:58:27,843 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 21:59:56,084 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 22:00:06,852 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -61,12 +76,13 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 884, in get_item
-    data = extract_glaze_data(form)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 151, in extract_glaze_data
-    data['cone'] = next(label for value, label in form.cone.choices if value == form.cone.data)
-StopIteration
-2023-09-29 23:53:05,162 ERROR: Exception on /get_glaze/21 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 790, in view_kilns
+    total_firing_time[program.id] = program_firing_time(program)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in program_firing_time
+    minutes_sum = sum(segment.segment.time_to_reach for segment in segments)
+TypeError: unsupported operand type(s) for +: 'int' and 'NoneType'
+2023-10-03 22:07:14,424 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 22:07:45,678 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -78,28 +94,8 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 884, in get_item
-    data = extract_glaze_data(form)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 151, in extract_glaze_data
-    data['cone'] = next(label for value, label in form.cone.choices if value == form.cone.data)
-StopIteration
-2023-09-30 00:10:51,391 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 00:10:56,396 ERROR: Exception on /get_glaze/20 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
-Traceback (most recent call last):
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 885, in get_item
-    populate_cone_data(form, item)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 92, in populate_cone_data
-    form_field_obj.data = get_field_id_or_default(glaze_field)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 61, in get_field_id_or_default
-    return select_field.id if select_field else 0
-AttributeError: 'str' object has no attribute 'id'
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 792, in view_kilns
+    total_firing_time[program.id] = program_firing_time(program)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in program_firing_time
+    minutes_sum = sum(segment.segment.time_to_reach for segment in segments)
+TypeError: unsupported operand type(s) for +: 'int' and 'NoneType'

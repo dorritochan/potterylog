@@ -31,22 +31,13 @@ $(document).ready(function() {
     var segmentCountElement = $('#segment-count');
     if (segmentCountElement.length){
         var segmentCount = JSON.parse(segmentCountElement.attr('data-variable'));
-        console.log("Script is loaded!");
+        console.log("segment Count");
+        console.log(segmentCount);
+        var initialSegmentContent = $('#firing-segments').html();
+
         $('#add-segment').click(function() {
-            console.log("Click!");
-            $.ajax({
-                type: 'GET',
-                url: '/get_segment/' + segmentCount,
-                headers: {
-                    'X-CSRFToken': '{{ form.csrf_token._value() }}'
-                },
-                success: function(data) {
-                    console.log('success');
-                    console.log(data);
-                    $('#firing-segments').append(data);
-                    segmentCount++;
-                }
-            });
+            addNewSegment(segmentCount);
+            segmentCount++;
         });
     }
 
@@ -99,11 +90,11 @@ $(document).ready(function() {
         });
     });
 
+    //var initialSegmentContent = $('#firing-segments').html();
+
     // Reset the add/edit clay modal to the default - adding
     $('[id^="modal-add-edit-"]').on('hidden.bs.modal', function() {
         const itemType = $(this).data('itemtype');
-        console.log('Were in there');
-        console.log(itemType);
 
         $("#form-add-edit-" + itemType)[0].reset();
         $(`#modal-add-edit-${itemType}-title`).text('Add a new ' + itemType);
@@ -112,6 +103,8 @@ $(document).ready(function() {
         $(`[id^="btn-update-${itemType}"]`).addClass("hidden");
         $(`[id^="btn-delete-item-"][data-itemtype="${itemType}"]`).attr("id", "btn-delete-item-");
         $(`[id^="btn-delete-item-"][data-itemtype="${itemType}"]`).addClass("hidden");
+        $('#firing-segments').html(initialSegmentContent);
+        segmentCount = JSON.parse(segmentCountElement.attr('data-variable'));
     });
 
     $('[id^="modal-confirm-delete"]').on('hidden.bs.modal', function() {
@@ -239,6 +232,7 @@ $(document).ready(function() {
     $('#btn-add-firing-program').click(function(event) {
         event.preventDefault();
         event.stopImmediatePropagation();
+        console.log('Add firing program...');
 
         $.ajax({
             url: "/addfiringprogram",
@@ -252,12 +246,15 @@ $(document).ready(function() {
                         location.reload();
                     }
                 } else {
+                    console.log(response.errors);
                     $('#modal-add-edit-firing-program').modal('show');
                     // Clear previous errors
                     $(".form-error").remove();
 
                     // Loop through the errors and display them
                     $.each(response.errors, function(field, errors) {
+                        console.log(field);
+                        console.log(errors);
                         // For each error of a field, create an error span
                         $.each(errors, function(_, error) {
                             var errorSpan = $("<span>").addClass("form-error").css("color", "red").text("[" + error + "]");
@@ -390,54 +387,67 @@ $(document).ready(function() {
     });
 
 
-    $("[id^='open-modal-edit-item-']").click(function() {
+    $("[id^='open-modal-edit-item-']").click(async function() {
         var idNumber = parseInt(this.id.split("-").pop());
-        console.log(idNumber);
         var itemType = $(this).data("itemtype");
-        console.log(itemType);
 
-        fetch('/get_' + itemType + '/' + idNumber, { 
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+        try {
+            const response = await fetch('/get_' + itemType + '/' + idNumber, { 
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Item loaded:', data);
-                for (let key in data) {
-                    $(`#modal-add-edit-${itemType} input[id='${key}']`).val(data[key]);
-                    $(`#modal-add-edit-${itemType} select[id='${key}'] option:contains('${data[key]}')`).prop('selected', true).parent().trigger('change');
-                    $(`#modal-add-edit-${itemType} textarea[id='${key}']`).val(data[key]);
-                    fetch("/get_name_" + itemType + "/" + idNumber)
-                        .then(response => response.json())
-                        .then(data => {
-                            const titleText = 'Edit ' + itemType + ' ' + data.item_name;
-                            $(`#modal-add-edit-${itemType}-title`).text(titleText);
-                        })
-                        .catch(error => console.error('Error fetching name:', error));
-                }
-                $('#btn-add-' + itemType).addClass("hidden");
-
-                var $btnUpdate = $('#btn-update-' + itemType);
-                $btnUpdate.attr('value', 'Update ' + itemType);
-                $btnUpdate.attr('id', 'btn-update-' + itemType + '-' + idNumber)
-                $btnUpdate.removeClass("hidden");
-
-                var $btnDelete = $(`[id^="btn-delete-item-"][data-itemtype="${itemType}"]`);
-                $btnDelete.attr("id", $btnDelete.attr("id") + idNumber)
-                $btnDelete.removeClass("hidden");
-                
-                $('#modal-add-edit-' + itemType).show('modal');
-            })
-            .catch(error => {
-                console.log('There was a problem with the get operation:', error.message);
             });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            console.log('Item loaded:', data);
+            
+            if (itemType == 'firing-program') {
+                segmentCount = data.number_of_segments;
+                for (let i = 1; i <= segmentCount; i++) {
+                    await addNewSegment(i)
+                }
+            }
+            
+            for (let key in data) {
+                $(`#modal-add-edit-${itemType} input[id='${key}']`).val(data[key]);
+                $(`#modal-add-edit-${itemType} select[id='${key}']`).val(data[key]).trigger('change');
+                $(`#modal-add-edit-${itemType} textarea[id='${key}']`).val(data[key]);
+                if (itemType == 'firing-program' && key != 'type' && key != 'number_of_segments') {
+                    var segmentIndex = key.split('-').pop();
+                    var $inputSegment = $(`#modal-add-edit-${itemType} div[id='firing-segments'] div[id='firing-segment-${segmentIndex}'] input[id='${key}']`);
+                    // var $inputSegment1 = $(`#modal-add-edit-firing-program div[id='firing-segments'] div[id='firing-segment-0'] input[id='temp_start-0']`);
+                    $inputSegment.val(data[key]);
+                }
+                fetch("/get_name_" + itemType + "/" + idNumber)
+                .then(response => response.json())
+                .then(data => {
+                    const titleText = 'Edit ' + itemType.replace("-", " ") + ' ' + data.item_name;
+                    $(`#modal-add-edit-${itemType}-title`).text(titleText);
+                })
+                .catch(error => console.error('Error fetching name:', error));
+            }
+
+            $('#btn-add-' + itemType).addClass("hidden");
+            
+            var $btnUpdate = $('#btn-update-' + itemType);
+            $btnUpdate.attr('value', 'Update ' + itemType);
+            $btnUpdate.attr('id', 'btn-update-' + itemType + '-' + idNumber)
+            $btnUpdate.removeClass("hidden");
+            
+            var $btnDelete = $(`[id^="btn-delete-item-"][data-itemtype="${itemType}"]`);
+            $btnDelete.attr("id", $btnDelete.attr("id") + idNumber)
+            $btnDelete.removeClass("hidden");
+            
+            $('#modal-add-edit-' + itemType).show('modal');
+
+        } catch(error) {
+                console.log('There was a problem with the get operation:', error.message);
+            };
     });
 
     // This function opens the Edit pot page on click on a pot row on Index page
@@ -459,5 +469,18 @@ function getOptionsHtml(choices) {
     return optionsHtml;
 }
 
+function addNewSegment(segmentCount) {
+    return $.ajax({  // return the jqXHR object (which is "thenable", or a promise-like object)
+        type: 'GET',
+        url: '/get_segment/' + segmentCount,
+        headers: {
+            'X-CSRFToken': '{{ form.csrf_token._value() }}'
+        },
+        success: function(data) {
+            console.log('success');
+            $('#firing-segments').append(data);
+        }
+    });
+}
 
 

@@ -1,11 +1,4 @@
-2023-09-30 02:33:57,541 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:34:24,945 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:34:43,539 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:34:59,066 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:35:50,714 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:37:41,214 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:48:49,960 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:48:51,579 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+2023-10-03 22:13:48,367 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -17,31 +10,12 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 789, in view_kilns
-    return render_template('viewkilns.html', title='List of kilns', kilns=kilns, firing_programs=firing_programs, total_firing_time=total_firing_time, kiln_form=kiln_form, program_form=program_form)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/templating.py", line 146, in render_template
-    template = app.jinja_env.get_or_select_template(template_name_or_list)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/jinja2/environment.py", line 1081, in get_or_select_template
-    return self.get_template(template_name_or_list, parent, globals)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/jinja2/environment.py", line 1010, in get_template
-    return self._load_template(name, globals)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/jinja2/environment.py", line 969, in _load_template
-    template = self.loader.load(self, name, self.make_globals(globals))
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/jinja2/loaders.py", line 138, in load
-    code = environment.compile(source, name, filename)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/jinja2/environment.py", line 768, in compile
-    self.handle_exception(source=source_hint)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/jinja2/environment.py", line 936, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/templates/viewkilns.html", line 35, in template
-    <td class="vertical-center">{{ kiln.url else '' }}</td>
-jinja2.exceptions.TemplateSyntaxError: expected token 'end of print statement', got 'else'
-2023-09-30 02:49:19,136 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:53:46,636 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:54:24,476 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:56:29,998 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:57:27,322 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:57:30,456 ERROR: Exception on /get_kiln/1 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 792, in view_kilns
+    total_firing_time[program.id] = program_firing_time(program)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 342, in program_firing_time
+    minutes_sum = sum(segment.segment.time_to_reach)
+TypeError: 'int' object is not iterable
+2023-10-03 22:13:49,495 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -53,14 +27,13 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 891, in get_item
-    data = extract_kiln_data(form)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 210, in extract_kiln_data
-    data['type'] = next(label for value, label in form.type.choices if value == form.type.data)
-StopIteration
-2023-09-30 02:58:29,455 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 03:02:27,531 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 03:02:30,730 ERROR: Exception on /get_kiln/1 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 792, in view_kilns
+    total_firing_time[program.id] = program_firing_time(program)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 342, in program_firing_time
+    minutes_sum = sum(segment.segment.time_to_reach)
+TypeError: 'int' object is not iterable
+2023-10-03 22:15:24,700 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 22:15:25,979 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -72,13 +45,12 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 891, in get_item
-    data = extract_kiln_data(form)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 210, in extract_kiln_data
-    data['type'] = next(label for value, label in form.type.choices if value == form.type.data)
-StopIteration
-2023-09-30 03:07:37,007 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 03:08:06,647 ERROR: Exception on /get_kiln/1 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 792, in view_kilns
+    total_firing_time[program.id] = program_firing_time(program)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in program_firing_time
+    for segment in segments.segment:
+AttributeError: 'AppenderQuery' object has no attribute 'segment'
+2023-10-03 22:15:26,870 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -90,11 +62,43 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 891, in get_item
-    data = extract_kiln_data(form)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 210, in extract_kiln_data
-    data['type'] = next(label for value, label in form.type.choices if value == form.type.data)
-StopIteration
-2023-09-30 03:08:39,975 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 03:09:34,742 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 03:09:52,917 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 792, in view_kilns
+    total_firing_time[program.id] = program_firing_time(program)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in program_firing_time
+    for segment in segments.segment:
+AttributeError: 'AppenderQuery' object has no attribute 'segment'
+2023-10-03 22:16:39,222 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 22:16:40,511 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+Traceback (most recent call last):
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 792, in view_kilns
+    total_firing_time[program.id] = program_firing_time(program)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in program_firing_time
+    for seg in segments.segment:
+AttributeError: 'AppenderQuery' object has no attribute 'segment'
+2023-10-03 22:23:18,963 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+Traceback (most recent call last):
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 792, in view_kilns
+    total_firing_time[program.id] = program_firing_time(program)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in program_firing_time
+    for seg in segments.segment:
+AttributeError: 'AppenderQuery' object has no attribute 'segment'

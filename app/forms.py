@@ -11,7 +11,11 @@ from wtforms.widgets import Input
 from datetime import datetime
 
 from app.models import User, Clay, FiringProgram, Kiln, Glaze
-from app.utils import normalize_string, CustomURL
+from app.utils import (
+    normalize_string, CustomURL, 
+    set_cone_choices, set_kiln_type_choices, set_firing_program_type_choices
+)
+
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -139,20 +143,12 @@ class AddGlazeForm(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(AddGlazeForm, self).__init__(*args, **kwargs)
-        
-        cones = [
-            '019', '018', '017', '016', '015', '014', '013', '012', '011',
-            '010', '09', '08', '07', '06', '05', '04', '03', '02', '01',
-            '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
-            ]
-        self.cone.choices = [(index + 1, cone) for index, cone in enumerate(cones)]
-        
-        self.cone.choices.insert(0, (0, ''))
+        self.cone.choices = set_cone_choices()
     
 class AddKilnForm(FlaskForm):
     name = StringField('Kiln name')
     brand = StringField('Brand name', validators=[DataRequired()])
-    type = SelectField('Type', coerce=int, choices=[(1, 'Electric'), (2, 'Gas')])
+    type = SelectField('Type', coerce=int)
     capacity = IntegerField('Capacity L', validators=[Optional()])
     temp_max = IntegerField('Maximum temperature °C', validators=[Optional()])
     voltage = FloatField('Voltage kW', validators=[Optional()])
@@ -161,17 +157,25 @@ class AddKilnForm(FlaskForm):
     controller_url = StringField('Controller URL', validators=[Optional(), CustomURL()])
     submit = SubmitField('Add kiln')
     
+    def __init__(self, *args, **kwargs):
+        super(AddKilnForm, self).__init__(*args, **kwargs)
+        self.type.choices = set_kiln_type_choices()
+    
 
 class FiringSegmentForm(FlaskForm):
     temp_start = IntegerField('Start temperature °C', validators=[DataRequired()])
     temp_end = IntegerField('End temperature °C', validators=[DataRequired()])
-    time_to_reach = IntegerField('Time to reach (min)')
+    time_to_reach = IntegerField('Time to reach (min)', validators=[Optional()], default=0)
     
     
 class AddFiringProgramForm(FlaskForm):
-    type = SelectField('Type', coerce=int, choices=[(1, 'Bisque'), (2, 'Glaze')])
+    type = SelectField('Type', coerce=int)
     firing_segments = FieldList(FormField(FiringSegmentForm), min_entries=1)
     submit = SubmitField('Add program')
+    
+    def __init__(self, *args, **kwargs):
+        super(AddFiringProgramForm, self).__init__(*args, **kwargs)
+        self.type.choices = set_firing_program_type_choices()
     
     
 class AddLinkForm(FlaskForm):

@@ -1,4 +1,5 @@
-2023-09-30 00:13:43,193 ERROR: Exception on /get_glaze/20 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+2023-10-03 22:09:52,621 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 22:09:54,007 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -10,15 +11,12 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 885, in get_item
-    populate_cone_data(form, item)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 92, in populate_cone_data
-    form_field_obj.data = get_field_id_or_default(glaze_field)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 61, in get_field_id_or_default
-    return select_field.id if select_field else 0
-AttributeError: 'str' object has no attribute 'id'
-2023-09-30 00:30:13,105 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 00:30:16,502 ERROR: Exception on /get_glaze/1 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 792, in view_kilns
+    total_firing_time[program.id] = program_firing_time(program)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in program_firing_time
+    minutes_sum = sum(segment.segment.time_to_reach for segment in segments)
+TypeError: unsupported operand type(s) for +: 'int' and 'NoneType'
+2023-10-03 22:11:16,307 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -30,12 +28,15 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 886, in get_item
-    data = extract_glaze_data(form)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 172, in extract_glaze_data
-    data['cone'] = next(label for value, label in form.cone.choices if value == form.cone.data)
-StopIteration
-2023-09-30 00:30:22,359 ERROR: Exception on /get_glaze/20 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 792, in view_kilns
+    total_firing_time[program.id] = program_firing_time(program)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in program_firing_time
+    minutes_sum = sum(segment.segment.time_to_reach for segment in segments)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in <genexpr>
+    minutes_sum = sum(segment.segment.time_to_reach for segment in segments)
+AttributeError: 'NoneType' object has no attribute 'time_to_reach'
+2023-10-03 22:12:30,104 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-03 22:12:31,479 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -47,13 +48,14 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 886, in get_item
-    data = extract_glaze_data(form)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 172, in extract_glaze_data
-    data['cone'] = next(label for value, label in form.cone.choices if value == form.cone.data)
-StopIteration
-2023-09-30 00:35:11,405 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 00:35:24,429 ERROR: Exception on /get_glaze/1 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 792, in view_kilns
+    total_firing_time[program.id] = program_firing_time(program)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in program_firing_time
+    minutes_sum = sum(segment.segment.time_to_reach for segment in segments if segment)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in <genexpr>
+    minutes_sum = sum(segment.segment.time_to_reach for segment in segments if segment)
+AttributeError: 'NoneType' object has no attribute 'time_to_reach'
+2023-10-03 22:12:32,273 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -65,16 +67,14 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 885, in get_item
-    populate_cone_data(form, item)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 92, in populate_cone_data
-    form_field_obj.data = cones.index(glaze_field) + 1
-ValueError: None is not in list
-2023-09-30 00:36:44,285 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 00:37:24,155 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 00:40:44,679 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 00:41:57,092 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 00:42:00,699 ERROR: Exception on /get_glaze/20 [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 792, in view_kilns
+    total_firing_time[program.id] = program_firing_time(program)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in program_firing_time
+    minutes_sum = sum(segment.segment.time_to_reach for segment in segments if segment)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in <genexpr>
+    minutes_sum = sum(segment.segment.time_to_reach for segment in segments if segment)
+AttributeError: 'NoneType' object has no attribute 'time_to_reach'
+2023-10-03 22:12:33,029 ERROR: Exception on /viewkilns [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -86,20 +86,11 @@ Traceback (most recent call last):
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 885, in get_item
-    data = extract_glaze_data(form)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 176, in extract_glaze_data
-    data['cone'] = next(label for value, label in form.cone.choices if value == form.cone.data)
-StopIteration
-2023-09-30 00:42:19,577 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:04:10,441 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:05:49,814 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:09:24,793 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:12:54,528 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:15:42,250 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:26:35,386 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:28:30,330 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:30:31,849 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:31:00,336 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:32:38,038 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-09-30 02:33:08,911 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 792, in view_kilns
+    total_firing_time[program.id] = program_firing_time(program)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in program_firing_time
+    minutes_sum = sum(segment.segment.time_to_reach for segment in segments if segment)
+  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/utils.py", line 339, in <genexpr>
+    minutes_sum = sum(segment.segment.time_to_reach for segment in segments if segment)
+AttributeError: 'NoneType' object has no attribute 'time_to_reach'
+2023-10-03 22:13:47,132 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]

@@ -44,21 +44,25 @@ def set_pot_select_field_choices(form):
         glaze_form.glaze.choices = [(0, '-')] + [(glaze.id, glaze.get_glaze_name()) for glaze in Glaze.query.order_by(Glaze.brand, Glaze.brand_id).all()]
     form.glaze_fire_program_id.choices = [(0, '-')] + [(program.id, program.name) for program in FiringProgram.query.filter_by(type='Glaze')]
     form.glaze_fire_kiln_id.choices = [(0, '-')] + [(kiln.id, kiln.name) for kiln in Kiln.query.order_by(Kiln.name).all()]
-    
 
-cones = [
-        '019', '018', '017', '016', '015', '014', '013', '012', '011',
-        '010', '09', '08', '07', '06', '05', '04', '03', '02', '01',
-        '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
+
+CONES = [
+            '', '019', '018', '017', '016', '015', '014', '013', '012', '011',
+            '010', '09', '08', '07', '06', '05', '04', '03', '02', '01',
+            '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
         ]
-def set_cone_select_field_choices(form):
+def set_cone_choices():
+    return [(index , cone) for index, cone in enumerate(CONES)]    
     
-    form.cone.data = [(0, '')] + [(index + 1, cone) for index, cone in enumerate(cones)]
+    
+KILN_TYPES = ['Electric', 'Gas']
+def set_kiln_type_choices():
+    return [(index + 1, type) for index, type in enumerate(KILN_TYPES)]
 
-kiln_types = ['Electric', 'Gas']
-def set_kiln_type_select_field_choices(form):
-    
-    form.type.data = [(index + 1, type) for index, type in enumerate(kiln_types)]
+
+FIRING_PROGRAM_TYPES = ['Bisque', 'Glaze']
+def set_firing_program_type_choices():
+    return [(index + 1, type) for index, type in enumerate(FIRING_PROGRAM_TYPES)]
     
 
 def get_field_id_or_default(select_field):
@@ -84,34 +88,6 @@ def populate_pot_select_field_data(form, pot):
     form_glazes = [glaze.glaze_id for glaze in pot.used_glazes]
     for form_glaze, glaze_id in zip(form.used_glazes.entries, form_glazes):
         form_glaze.glaze.data = glaze_id
-
-
-def populate_cone_data(form, glaze):
-    """Fill in the form data with the values from a given glaze."""
-    fields_mapping = {
-        'cone': glaze.cone
-    }
-
-    for form_field, glaze_field in fields_mapping.items():
-        form_field_obj = getattr(form, form_field)
-        if glaze_field:
-            form_field_obj.data = cones.index(glaze_field) + 1
-        else:
-            form_field_obj.data = 0
-    
-
-def populate_kiln_type_data(form, kiln):
-    fields_mapping = {
-        'type': kiln.type
-    }
-
-    for form_field, type_field in fields_mapping.items():
-        form_field_obj = getattr(form, form_field)
-        if type_field:
-            form_field_obj.data = kiln_types.index(type_field) + 1
-        else:
-            form_field_obj.data = 0
-
 
 
 def safe_query(model, id):
@@ -177,6 +153,23 @@ def extract_pot_data(form):
     return data
     
 
+def extract_clay_data(form):
+    """Extracts data from the AddClayForm form to create a new Clay."""
+    # Standard fields extraction
+    data = {
+        'brand': form.brand.data,
+        'name_id': form.name_id.data,
+        'color': form.color.data,
+        'temp_min': form.temp_min.data,
+        'temp_max': form.temp_max.data,
+        'grog_percent': form.grog_percent.data,
+        'grog_size_max': form.grog_size_max.data,
+        'url': form.url.data
+    }
+
+    return data
+
+
 def extract_glaze_data(form):
     """Extracts data from the AddGlazeForm form to create a new Glaze."""
     # Standard fields extraction
@@ -192,23 +185,6 @@ def extract_glaze_data(form):
     
     # Special field extraction (since it doesn't directly map to a model field)
     data['cone'] = next(label for value, label in form.cone.choices if value == form.cone.data)
-
-    return data
-
-
-def extract_clay_data(form):
-    """Extracts data from the AddClayForm form to create a new Clay."""
-    # Standard fields extraction
-    data = {
-        'brand': form.brand.data,
-        'name_id': form.name_id.data,
-        'color': form.color.data,
-        'temp_min': form.temp_min.data,
-        'temp_max': form.temp_max.data,
-        'grog_percent': form.grog_percent.data,
-        'grog_size_max': form.grog_size_max.data,
-        'url': form.url.data
-    }
 
     return data
 
@@ -233,14 +209,20 @@ def extract_kiln_data(form):
     return data
 
 
-def extract_firing_segment_data(firing_segment):
+def extract_firing_segment_data(firing_segment, segment_index=None):
     """Extracts data from the FiringSegmentForm form to create a new firing segment."""
-    
-    data = {
-        'temp_start': firing_segment['temp_start'],
-        'temp_end': firing_segment['temp_end'],
-        'time_to_reach': firing_segment['time_to_reach']
-    }
+    if segment_index is not None:
+        data = {
+            'temp_start-' + str(segment_index): firing_segment.temp_start,
+            'temp_end-' + str(segment_index): firing_segment.temp_end,
+            'time_to_reach-' + str(segment_index): firing_segment.time_to_reach
+        }
+    else:
+        data = {
+            'temp_start': firing_segment['temp_start'],
+            'temp_end': firing_segment['temp_end'],
+            'time_to_reach': firing_segment['time_to_reach']
+        }
 
     return data
 
@@ -255,6 +237,63 @@ def extract_link_data(form):
     }
     
     return data
+
+
+def extract_clay_from_object(clay):
+    """Extracts data from a clay object."""
+    return {
+        'brand': clay.brand,
+        'name_id': clay.name_id,
+        'color': clay.color,
+        'temp_min': clay.temp_min,
+        'temp_max': clay.temp_max,
+        'grog_percent': clay.grog_percent,
+        'grog_size_max': clay.grog_size_max,
+        'url': clay.url
+    }
+
+
+def extract_glaze_from_object(glaze):
+    """Extracts data from a glaze object"""
+    return {
+        'brand': glaze.brand,
+        'name': glaze.name,
+        'color': glaze.color,
+        'temp_min': glaze.temp_min,
+        'temp_max': glaze.temp_max,
+        'brand_id': glaze.brand_id,
+        'glaze_url': glaze.glaze_url,
+        'cone': CONES.index(glaze.cone if glaze.cone else '')
+    }
+
+
+def extract_kiln_from_object(kiln):
+    return {
+        'name': kiln.name,
+        'brand': kiln.brand,
+        'type': KILN_TYPES.index(kiln.type) + 1,
+        'capacity': kiln.capacity,
+        'temp_max': kiln.temp_max,
+        'voltage': kiln.voltage,
+        'url': kiln.url,
+        'controller': kiln.controller,
+        'controller_url': kiln.controller_url
+    }
+
+
+def extract_firing_program_from_object(firing_program):
+    return {
+        'type': FIRING_PROGRAM_TYPES.index(firing_program.type) + 1
+    }
+
+
+def extract_link_from_object(link):
+    """Extracts data from a Link object."""
+    return {
+        'title': link.title,
+        'url': link.url,
+        'description': link.description
+    }
     
 
 def program_firing_time(firing_program):
@@ -287,13 +326,12 @@ def program_firing_time(firing_program):
         return '{}h {}min'.format(hours, minutes)
     else:
         return '{}min'.format(minutes)
-    
-    
+
+
 def normalize_string(s):
     """Converts the string to lowercase, trims white spaces and replaces multiple spaces with a single space."""
     s = str(s).lower().strip()
     return re.sub(' +', ' ', s)
-
 
 class CustomURL(object):
     """A custom URL validator for WTForms, which not only accepts urls of 

@@ -22,13 +22,16 @@ from app.models import (
 )
 from app.utils import (
     allowed_file, 
-    set_pot_select_field_choices, set_cone_select_field_choices, set_kiln_type_select_field_choices,
+    set_pot_select_field_choices, set_firing_program_type_choices,
     safe_query, 
-    populate_pot_select_field_data, populate_cone_data, populate_kiln_type_data,
+    populate_pot_select_field_data,
     extract_pot_data, extract_glaze_data, extract_clay_data, extract_kiln_data, 
-    extract_firing_segment_data, extract_link_data,
+    extract_firing_segment_data, extract_link_data, extract_link_from_object,
+    extract_clay_from_object, extract_glaze_from_object, extract_kiln_from_object,
+    extract_firing_program_from_object,
     program_firing_time
 )
+
 
 
 @app.route('/')
@@ -601,9 +604,11 @@ def add_firing_program():
             
             # Define the name of the firing program
             if segment_index == len(firing_segments) - 1:
-                firing_program.name = '{} {}{}'.format(firing_program.type, db_firing_segment.temp_end, 
-                                        ' hold ' + str(db_firing_segment.time_to_reach) if db_firing_segment.temp_start == db_firing_segment.temp_end else '')
-        
+                if db_firing_segment.temp_start == db_firing_segment.temp_end:
+                    minutes_hold = ' hold ' + str(db_firing_segment.time_to_reach) if db_firing_segment.time_to_reach else ''
+                else:
+                    minutes_hold = ''
+                firing_program.name = '{} {}{}'.format(firing_program.type, db_firing_segment.temp_end, minutes_hold)
         # Add the firing program to the database
         db.session.add(firing_program)
         db.session.commit()
@@ -846,7 +851,7 @@ def update_item(item_type, item_id):
     elif item_type == 'firing-program':
         form = AddFiringProgramForm()
         item = FiringProgram.query.get_or_404(item_id)
-        #data = extract_firing_program_data(form)
+        ####
     
     if form.validate_on_submit():
         # Update the existing object with the new data
@@ -895,32 +900,33 @@ def get_item(item_type, item_id):
     
     if item_type == 'link':
         item = Link.query.get_or_404(item_id)
-        form = AddLinkForm(obj=item)
-        data = extract_link_data(form)
+        data = extract_link_from_object(item)
         
     elif item_type == 'clay':
         item = Clay.query.get_or_404(item_id)
-        form = AddClayForm(obj=item)
-        data = extract_clay_data(form)
+        data = extract_clay_from_object(item)
         
     elif item_type == 'glaze':
         item = Glaze.query.get_or_404(item_id)
-        form = AddGlazeForm(obj=item)
-        set_cone_select_field_choices(form)
-        populate_cone_data(form, item)
-        data = extract_glaze_data(form)
+        data = extract_glaze_from_object(item)
     
     elif item_type == 'kiln':
         item = Kiln.query.get_or_404(item_id)
-        form = AddKilnForm(obj=item)
-        set_kiln_type_select_field_choices(form)
-        populate_kiln_type_data(form, item)
-        data = extract_kiln_data(form)
+        data = extract_kiln_from_object(item)
         
     elif item_type == 'firing-program':
         item = FiringProgram.query.get_or_404(item_id)
-        form = AddFiringProgramForm()
-        #data = ...
+        data = extract_firing_program_from_object(item)
+        
+        for segment_index, segment in enumerate(item.associated_segments):
+            data.update(extract_firing_segment_data(segment.segment, segment_index))
+            segment_count = segment_index
+        
+        data.update(
+            {
+                'number_of_segments': segment_count
+            }
+        )
         
     else:
         return jsonify(error=f"Unrecognized item type: {item_type}"), 400

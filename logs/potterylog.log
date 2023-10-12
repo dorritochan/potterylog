@@ -101,3 +101,6 @@ sqlalchemy.orm.exc.StaleDataError: UPDATE statement on table 'pot_glaze' expecte
 2023-10-12 23:13:04,213 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
 2023-10-12 23:14:26,099 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
 2023-10-12 23:14:28,454 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-12 23:30:49,461 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-12 23:30:55,523 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-12 23:31:30,874 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]

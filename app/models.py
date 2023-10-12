@@ -37,8 +37,9 @@ def load_user(id):
 class PotGlaze(db.Model):
     __tablename__ = 'pot_glaze'
     
-    pot_id = db.Column(db.Integer, db.ForeignKey('pot.id'), primary_key=True)
-    glaze_id = db.Column(db.Integer, db.ForeignKey('glaze.id'), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    pot_id = db.Column(db.Integer, db.ForeignKey('pot.id'))
+    glaze_id = db.Column(db.Integer, db.ForeignKey('glaze.id'))
     number_of_layers = db.Column(db.Integer)
     display_order = db.Column(db.Integer)
     

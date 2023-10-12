@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block main %}
-<h1>Glaze {{ glaze.get_glaze_name() }}</h1>
+<h1 class="m-3">Glaze {{ glaze.get_glaze_name() }}</h1>
 <table class="table table-striped">
     <thead>
         <tr>
@@ -12,31 +12,44 @@
             <th>Min. temp.</th>
             <th>Max. temp.</th>
             <th>Cone</th>
-            <th>URL</th>
+            <th style="padding: 8px 13px;">URL</th>
         </tr>
     </thead>
     <body>
         <tr>
-            <td>{{ glaze.brand or '' }}</td>
-            <td>{{ glaze.brand_id or '' }}</td>
-            <td>{{ glaze.name or '' }}</td>
-            <td>{{ glaze.color or '' }}</td>
-            <td>{{ glaze.temp_min ~ '°C' if glaze.temp_min else '' }}</td>
-            <td>{{ glaze.temp_max ~ '°C' if glaze.temp_max else '' }}</td>
-            <td>{{ glaze.cone or '' }}</td>
-            <td>
-                <a href="{{ glaze.glaze_url }}" target="_blank">{{ glaze.glaze_url or '' }}</a>
+            <td class="vertical-center">{{ glaze.brand or '' }}</td>
+            <td class="vertical-center">{{ glaze.brand_id or '' }}</td>
+            <td class="vertical-center">{{ glaze.name or '' }}</td>
+            <td class="vertical-center">{{ glaze.color or '' }}</td>
+            <td class="vertical-center">{{ glaze.temp_min ~ '°C' if glaze.temp_min else '' }}</td>
+            <td class="vertical-center">{{ glaze.temp_max ~ '°C' if glaze.temp_max else '' }}</td>
+            <td class="vertical-center">{{ glaze.cone or '' }}</td>
+            <td class="vertical-center">
+                {% if glaze.glaze_url %}
+                    <a class="hover-border-link" href="{{ glaze.glaze_url or '' }}" target="_blank">
+                        Website
+                    </a>
+                {% endif %}
             </td>
         </tr>
     </body>
 </table>
-<h3>Pots used with this glaze</h3>
-{% for pot in glaze.glazed_pots %}
-<a href="{{ url_for('edit_pot', pot_id=pot.pot_id) }}">
-    {% if pot.pot.primary_image %}
-        <img src="{{ url_for('static', filename='photos/' + pot.pot.primary_image) }}" alt="Selected Photo" style="max-width: 300px; display: block;">
-    {% endif %}
-    {{ pot.pot_id }}
-</a>
-{% endfor %}
+<h3 class="m-3">Pots used with this glaze</h3>
+<div class="container-fluid">
+    <div class="row">
+        {% for pot in glaze.glazed_pots %}
+            <a href="{{ url_for('edit_pot', pot_id=pot.pot_id) }}" class="col-md-2 link-image-label">
+                <div id="photo-thumbnail-{{ loop.index0 }}">
+                    {% if pot.pot.primary_image %}
+                        <img src="{{ url_for('static', filename='photos/' + pot.pot.primary_image) }}" alt="Selected Photo" style="width: 14rem; height: 8rem; object-fit: cover;" class="img-thumbnail">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='photos/default_mug.jpg') }}" alt="Default photo" style="width: 14rem; height: 8rem; object-fit: cover;" class="img-thumbnail">
+                    {% endif %}
+                </div>
+                {{ pot.pot_id }}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+
 {% endblock %}

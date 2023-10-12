@@ -46,6 +46,16 @@ $(document).ready(function() {
         event.preventDefault(); // Prevent the form from reloading the page
         event.stopPropagation();
 
+        // Get the index of the last glaze-field- element and populate the select
+        // fields with updated glaze info in a loop
+        var lastGlazeLayerId = $('[id^="glaze-field-"]').last().attr('id');
+        var glazeLayerCount = parseInt(lastGlazeLayerId.split('-').pop(), 10);
+        let selectedChoices = [];
+        for (let index = 0; index <= glazeLayerCount; index++) {
+            var select = $('#glaze-field-' + index + ' select[name$="glaze"]');
+            selectedChoices.push(select.val());
+        }
+
         $.ajax({
             url: "/addglaze",
             type: "POST",
@@ -58,16 +68,15 @@ $(document).ready(function() {
                     if (shouldReload) {
                         location.reload();
                     } else {
-                        // update the list of glazes without a page reload
+                        // update the list of glazes without a page reload on the edit/add pot page
                         $.get('/get_glaze_choices', function(choicesData) {
-                            var firstOption = [[0, '-']];
-                            var choices = firstOption.concat(choicesData);
-                            // Get the index of the last glaze-field- element and populate the select
-                            // fields with updated glaze info in a loop
-                            var lastGlazeLayerId = $('[id^="glaze-field-"]').last().attr('id');
-                            var glazeLayerCount = parseInt(lastGlazeLayerId.split('-').pop(), 10);
+                            console.log
                             for (let index = 0; index <= glazeLayerCount; index++) {
-                                $('#glaze-field-' + index + ' select[name$="glaze"]').html(getOptionsHtml(choices));
+                                var firstOption = [[0, '-']];
+                                var choices = firstOption.concat(choicesData);
+                                var select = $('#glaze-field-' + index + ' select[name$="glaze"]');
+                                select.html(getOptionsHtml(choices));
+                                select.val(selectedChoices[index]);
                             }
                         });
                     }
@@ -103,8 +112,10 @@ $(document).ready(function() {
         $(`[id^="btn-update-${itemType}"]`).addClass("hidden");
         $(`[id^="btn-delete-item-"][data-itemtype="${itemType}"]`).attr("id", "btn-delete-item-");
         $(`[id^="btn-delete-item-"][data-itemtype="${itemType}"]`).addClass("hidden");
-        $('#firing-segments').html(initialSegmentContent);
-        segmentCount = JSON.parse(segmentCountElement.attr('data-variable'));
+        if (itemType == 'firing-program'){
+            $('#firing-segments').html(initialSegmentContent);
+            segmentCount = JSON.parse(segmentCountElement.attr('data-variable'));
+        }
     });
 
     $('[id^="modal-confirm-delete"]').on('hidden.bs.modal', function() {
@@ -114,6 +125,9 @@ $(document).ready(function() {
     $('#btn-add-clay').click(function(event) {
         event.preventDefault(); // Prevent the form from reloading the page
         event.stopPropagation();
+        
+        var select = $('#clay-field select[name$="clay"]');
+        let selectedChoice = select.val();
 
         $.ajax({
             url: "/addclay",
@@ -132,7 +146,8 @@ $(document).ready(function() {
                             var firstOption = [[0, '-']];
                             var choices = firstOption.concat(choicesData);
                             
-                            $('#clay-field select[name$="clay"]').html(getOptionsHtml(choices));
+                            select.html(getOptionsHtml(choices));
+                            select.val(selectedChoice);
                         });
                     }
                 } else {
@@ -186,6 +201,14 @@ $(document).ready(function() {
                         // For each error of a field, create an error span
                         $.each(errors, function(_, error) {
                             var errorSpan = $("<span>").addClass("form-error").css("color", "red").text("[" + error + "]");
+
+                            // Check if the field is related to firing segments
+                            if (itemType == 'firing-program') {
+                                if (error.includes('Both start and end temperatures are required for the first segment.')) {
+                                    $("#form-add-edit-" + itemType).find('[id="firing-segment-0"]').after(errorSpan);
+                                }
+
+                            } 
                             // Append errorSpan next to the respective input field
                             $("#form-add-edit-" + itemType).find('[name="' + field + '"]').after(errorSpan);
                         });
@@ -253,11 +276,14 @@ $(document).ready(function() {
 
                     // Loop through the errors and display them
                     $.each(response.errors, function(field, errors) {
-                        console.log(field);
-                        console.log(errors);
                         // For each error of a field, create an error span
                         $.each(errors, function(_, error) {
                             var errorSpan = $("<span>").addClass("form-error").css("color", "red").text("[" + error + "]");
+
+                            // Check if the field is related to firing segments
+                            if (error.includes('Both start and end temperatures are required for the first segment.')) {
+                                $("#form-add-edit-firing-program").find('[id="firing-segment-0"]').after(errorSpan);
+                            }
                             // Append errorSpan next to the respective input field
                             $("#form-add-edit-firing-program").find('[name="' + field + '"]').after(errorSpan);
                         });
@@ -408,7 +434,9 @@ $(document).ready(function() {
             
             if (itemType == 'firing-program') {
                 segmentCount = data.number_of_segments;
-                for (let i = 1; i <= segmentCount; i++) {
+                console.log("segment Count");
+                console.log(segmentCount);
+                for (let i = 1; i < segmentCount; i++) {
                     await addNewSegment(i)
                 }
             }
@@ -454,6 +482,12 @@ $(document).ready(function() {
     $('[id^="row-pot-"]').click(function() {
         var potId = parseInt(this.id.split('-').pop());
         window.location.href = '/editpot/' + potId;
+    });
+
+
+    // This function navigates to the index page on click on the Cancel button when adding a pot
+    $('[id="btn-cancel-add-pot"]').click(function() {
+        window.location.href = '/index'
     });
 
     

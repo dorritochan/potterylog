@@ -163,20 +163,35 @@ class AddKilnForm(FlaskForm):
     
 
 class FiringSegmentForm(FlaskForm):
-    temp_start = IntegerField('Start temperature °C', validators=[DataRequired()])
-    temp_end = IntegerField('End temperature °C', validators=[DataRequired()])
+    temp_start = IntegerField('Start temperature °C', validators=[Optional()])
+    temp_end = IntegerField('End temperature °C', validators=[Optional()])
     time_to_reach = IntegerField('Time to reach (min)', validators=[Optional()], default=0)
+    
+    def __init__(self, *args, **kwargs):
+        self.is_first_segment = kwargs.pop('is_first_segment', False)
+        super(FiringSegmentForm, self).__init__(*args, **kwargs)
+    
+    # def validate_temp_fields(form):
+    #     if not form.temp_start.data and not form.temp_end.data:
+    #         raise ValidationError('Both start and end temperatures are required for this segment.')
     
     
 class AddFiringProgramForm(FlaskForm):
     type = SelectField('Type', coerce=int)
+    name = StringField('Name')
     firing_segments = FieldList(FormField(FiringSegmentForm), min_entries=1)
     submit = SubmitField('Add program')
     
     def __init__(self, *args, **kwargs):
         super(AddFiringProgramForm, self).__init__(*args, **kwargs)
         self.type.choices = set_firing_program_type_choices()
-    
+        
+    def validate_firing_segments(form, field):
+        first_segment = field.entries[0]
+        
+        if not first_segment.form.temp_start.data and not first_segment.form.temp_end.data:
+            first_segment.form.temp_start.errors.append('Both start and end temperatures are required for the first segment.')
+            raise ValidationError('Both start and end temperatures are required for the first segment.')
     
 class AddLinkForm(FlaskForm):
     title = StringField('Title')

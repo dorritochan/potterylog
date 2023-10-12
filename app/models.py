@@ -1,9 +1,11 @@
-from app import db 
+from app import db, app
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login
 from pytz import timezone
+from sqlalchemy import event
+import os
 
 germany_timezone = timezone('Europe/Berlin')
 
@@ -74,7 +76,7 @@ class Pot(db.Model):
     bisque_fire_notes = db.Column(db.Text)
     # Glazing
     glaze_date = db.Column(db.DateTime, index=True)
-    used_glazes = db.relationship('PotGlaze', back_populates='pot', lazy='dynamic', cascade='all')
+    used_glazes = db.relationship('PotGlaze', back_populates='pot', lazy='dynamic', cascade='all, delete-orphan')
     glaze_notes = db.Column(db.Text)
     # Glaze firing
     glaze_fire_start = db.Column(db.DateTime, index=True)
@@ -87,10 +89,11 @@ class Pot(db.Model):
     glaze_fire_notes = db.Column(db.Text)
     
     def get_pot_name(self):
-        return 'Pot {} {} {}'.format(self.id, self.vessel_type, self.throw_date)
+        return 'Pot {} {}'.format(self.id, self.vessel_type)
     
     def __repr__(self):
         return '<Pot {}, {}, {}>'.format(self.throw_date, self.vessel_type, self.clay_type)
+
 
 
 class Image(db.Model):
@@ -99,6 +102,17 @@ class Image(db.Model):
     pot_id = db.Column(db.Integer, db.ForeignKey('pot.id'), nullable=False)
     pot = db.relationship('Pot', back_populates='images')
     
+@event.listens_for(Image, 'before_delete')
+def delete_image_files(mapper, connection, target):
+    """
+    Remove the image file associated with the Image object before its record is deleted.
+    """
+    if target.filename:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], target.filename)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            
+            
 class Glaze(db.Model):
     __tablename__ = 'glaze'
     id = db.Column(db.Integer, primary_key=True)
@@ -133,7 +147,7 @@ class ProgramSegment(db.Model):
     segment_order = db.Column(db.Integer)
     
     program = db.relationship('FiringProgram', back_populates='associated_segments')
-    segment = db.relationship('FiringSegment', back_populates='associated_programs')
+    segment = db.relationship('FiringSegment', back_populates='associated_programs', cascade='all, delete')
     
     
 class FiringProgram(db.Model):
@@ -141,7 +155,7 @@ class FiringProgram(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(20)) # Bisque or Glaze
     name = db.Column(db.String(100))
-    associated_segments = db.relationship('ProgramSegment', back_populates='program', lazy='dynamic', cascade='all')
+    associated_segments = db.relationship('ProgramSegment', back_populates='program', lazy='dynamic', cascade='all, delete-orphan')
     bisque_pots = db.relationship('Pot', back_populates='bisque_fired_with_program', foreign_keys='[Pot.bisque_fire_program_id]', lazy='dynamic')
     glaze_pots = db.relationship('Pot', back_populates='glaze_fired_with_program', foreign_keys='[Pot.glaze_fire_program_id]', lazy='dynamic')
     

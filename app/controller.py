@@ -26,9 +26,9 @@ from app.utils import (
     safe_query, 
     populate_pot_select_field_data,
     extract_pot_data, extract_glaze_data, extract_clay_data, extract_kiln_data, 
-    extract_firing_segment_data, extract_link_data, extract_link_from_object,
-    extract_clay_from_object, extract_glaze_from_object, extract_kiln_from_object,
-    extract_firing_program_from_object,
+    extract_firing_segment_data, extract_link_data, extract_firing_program_data,
+    extract_link_from_object, extract_clay_from_object, extract_glaze_from_object, 
+    extract_kiln_from_object, extract_firing_program_from_object,
     program_firing_time
 )
 
@@ -212,23 +212,45 @@ def fetch_pot(form, pot=None):
         # Create a new Pot object if none is provided, otherwise update the existing one
         if pot is None:
             pot = Pot(**data)
+            # Process and save glazes associated with the pot
+            for glaze_layer_index, glaze_layer in enumerate(form.used_glazes.data):
+                glaze = safe_query(Glaze, glaze_layer['glaze'])
+                if glaze and glaze_layer['number_of_layers'] > 0:
+                    pot_glaze = PotGlaze(
+                        pot=pot, 
+                        glaze=glaze, 
+                        number_of_layers=glaze_layer['number_of_layers'], 
+                        display_order=glaze_layer_index
+                        )
+                    
+                    db.session.add(pot_glaze)
         else:
             # Update the existing Pot object with the new data
             for key, value in data.items():
                 setattr(pot, key, value)
-                
-        # Process and save glazes associated with the pot
-        for glaze_layer_index, glaze_layer in enumerate(form.used_glazes.data):
-            glaze = safe_query(Glaze, glaze_layer['glaze'])
-            if glaze and glaze_layer['number_of_layers'] > 0:
-                pot_glaze = PotGlaze(
-                    pot=pot, 
-                    glaze=glaze, 
-                    number_of_layers=glaze_layer['number_of_layers'], 
-                    display_order=glaze_layer_index + 1
-                    )
-                
-                db.session.add(pot_glaze)
+            
+            glazes_count = len(list(pot.used_glazes))
+            order_additional_index = 0
+            for glaze_layer_index, glaze_layer in enumerate(form.used_glazes.data):
+                glaze = safe_query(Glaze, glaze_layer['glaze'])
+                if glaze_layer_index + 1 <= glazes_count:
+                    db_pot_glaze = PotGlaze.query.filter_by(pot=pot, display_order=glaze_layer_index).first()
+                    # Don't make a new PotGlaze object, but modify the existing ones
+                    if glaze and glaze_layer['number_of_layers'] > 0:
+                        db_pot_glaze.glaze = glaze
+                        db_pot_glaze.number_of_layers = glaze_layer['number_of_layers']
+                        db_pot_glaze.display_order = glaze_layer_index+order_additional_index
+                    else:
+                        # Delete the existing PotGlaze object
+                        db.session.delete(db_pot_glaze)
+                        order_additional_index -= 1
+                else:
+                    if glaze and glaze_layer['number_of_layers'] > 0:
+                        db_pot_glaze_new = PotGlaze(pot=pot, glaze=glaze, number_of_layers=glaze_layer['number_of_layers'], display_order=glaze_layer_index+order_additional_index)
+                        db.session.add(db_pot_glaze_new)     
+                    else:
+                        order_additional_index -= 1
+                        
                 
         # Process and save images associated with the pot
         for photo in form.photos.data:
@@ -343,7 +365,9 @@ def edit_pot(pot_id):
     # ===================
     # GET method: Render the pot form with prepopulated data
     # ===================
-
+    for glaze in pot.used_glazes:
+        print(glaze.glaze_id)
+        print(glaze.display_order)
     # Show the correct selected choices for select fields from the database
     populate_pot_select_field_data(form, pot)
 
@@ -569,7 +593,7 @@ def add_firing_program():
         
         try:
             # Extract the form data
-            type = next(label for value, label in form.type.choices if value == form.type.data)
+            data = extract_firing_program_data(form)
         except Exception as e:
             # Log the exception for debugging
             app.logger.error(f"Error extracting form data: {e}")
@@ -577,23 +601,20 @@ def add_firing_program():
             return jsonify(success=False, error="Error while extracting the form data")
         
         # Create new firing program instance
-        firing_program = FiringProgram(type=type)
+        firing_program = FiringProgram(**data)
         
-        firing_segments = form.firing_segments.data
+        # Remove empty segments
+        firing_segments = [segment for segment in form.firing_segments.data if segment['temp_start'] and segment['temp_end']]
         
         # Check if the entered segments already exist in the database
         for segment_index, segment in enumerate(firing_segments):
             
             # Extract the segment data
-            data = extract_firing_segment_data(segment)
+            data_segment = extract_firing_segment_data(segment)
             
-            # Check if a segment with the same attributes already exists
-            db_firing_segment = FiringSegment.query.filter_by(**data).first()
+            db_firing_segment = FiringSegment(**data_segment)
             
-            # If segment doesn't exist, create and add to the session, then commit
-            if not db_firing_segment:
-                db_firing_segment = FiringSegment(**data)
-                db.session.add(db_firing_segment)
+            db.session.add(db_firing_segment)
             
             # Create and add program-segment association to the session
             program_segment = ProgramSegment(program=firing_program, segment=db_firing_segment,
@@ -602,13 +623,6 @@ def add_firing_program():
             # Add the firing program to the session and commit
             db.session.add(program_segment)
             
-            # Define the name of the firing program
-            if segment_index == len(firing_segments) - 1:
-                if db_firing_segment.temp_start == db_firing_segment.temp_end:
-                    minutes_hold = ' hold ' + str(db_firing_segment.time_to_reach) if db_firing_segment.time_to_reach else ''
-                else:
-                    minutes_hold = ''
-                firing_program.name = '{} {}{}'.format(firing_program.type, db_firing_segment.temp_end, minutes_hold)
         # Add the firing program to the database
         db.session.add(firing_program)
         db.session.commit()
@@ -800,7 +814,11 @@ def view_kilns():
 @login_required
 def delete_item(item_type, item_id):
     
-    if item_type == 'link':
+    if item_type == 'pot':
+        item = Pot.query.get_or_404(item_id)
+        
+        
+    elif item_type == 'link':
         item = Link.query.get_or_404(item_id)
         
     elif item_type == 'clay':
@@ -851,12 +869,51 @@ def update_item(item_type, item_id):
     elif item_type == 'firing-program':
         form = AddFiringProgramForm()
         item = FiringProgram.query.get_or_404(item_id)
-        ####
-    
-    if form.validate_on_submit():
-        # Update the existing object with the new data
+        data = extract_firing_program_data(form)
+        segments = ProgramSegment.query.filter_by(program=item).order_by(ProgramSegment.segment_order).all()
+        segment_ids = [segment.segment_id for segment in segments]
+        segment_count = len(list(segments))
+        print(segment_count)
+        
+        if form.validate_on_submit():
+            # Update the existing object with the new data
+            for key, value in data.items():
+                setattr(item, key, value)
+        
+            firing_segments = form.firing_segments.data
+            #[segment for segment in form.firing_segments.data if segment['temp_start'] and segment['temp_end']]
+        
+            print(enumerate(firing_segments))
+            for segment_index, segment in enumerate(firing_segments):
+                # Extract the segment data
+                data_segment = extract_firing_segment_data(segment)
+                print(data_segment)
+                
+                if segment_index + 1 <= segment_count:
+                    db_firing_segment = FiringSegment.query.get_or_404(segment_ids[segment_index])
+                    
+                    if segment['temp_start'] and segment['temp_end']:
+                        for key, value in data_segment.items():
+                            setattr(db_firing_segment, key, value)
+                    else:
+                        db.session.delete(db_firing_segment)
+                else:
+                    if segment['temp_start'] and segment['temp_end']:
+                        # Create and add program-segment association to the session
+                        db_firing_segment = FiringSegment(**data_segment)
+                        program_segment = ProgramSegment(program=item, segment=db_firing_segment,
+                                                            segment_order=segment_index)
+                    
+                        # Add the firing program to the session and commit
+                        db.session.add(db_firing_segment)
+                        db.session.add(program_segment)
+                    
+            db.session.commit()
+            return jsonify(success=True, message=f'Updated {item_type} with ID {item_id}')
+        
+    if form.validate_on_submit() and item_type != 'firing-program':
         for key, value in data.items():
-            setattr(item, key, value)
+                setattr(item, key, value)
         db.session.commit()
         return jsonify(success=True, message=f'Updated {item_type} with ID {item_id}')
     
@@ -864,6 +921,7 @@ def update_item(item_type, item_id):
         'success': False,
         'errors': form.errors
     }
+    print(form.errors)
     return jsonify(response_data)
     
     
@@ -871,7 +929,11 @@ def update_item(item_type, item_id):
 @login_required
 def get_item_name(item_id, item_type):
     
-    if item_type == 'link':
+    if item_type == 'pot':
+        item = Pot.query.get_or_404(item_id)
+        item_name = item.get_pot_name()
+    
+    elif item_type == 'link':
         link = Link.query.get_or_404(item_id)
         item_name = link.title
         
@@ -920,8 +982,8 @@ def get_item(item_type, item_id):
         
         for segment_index, segment in enumerate(item.associated_segments):
             data.update(extract_firing_segment_data(segment.segment, segment_index))
-            segment_count = segment_index
         
+        segment_count = len(list(item.associated_segments))
         data.update(
             {
                 'number_of_segments': segment_count

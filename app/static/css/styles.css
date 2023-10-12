@@ -1,6 +1,13 @@
 body {
     margin: 0;
     font-family: 'Quicksand', sans-serif;
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    min-height: 100vh; /* Minimum height of viewport */
+}
+
+.content {
+    flex: 1; /* Grow to occupy available space */
 }
 
 .img-small {
@@ -50,10 +57,6 @@ a.hover-border-link:active {
     cursor: pointer;
 }
 
-/* .table-striped>tbody>tr:nth-child(odd)>td, 
-.table-striped>tbody>tr:nth-child(odd)>th {
-} */
-
 .responsive-image {
     max-width: 120px; 
     max-height: 120px;
@@ -68,4 +71,53 @@ a.hover-border-link:active {
 
 .modal-footer > div {
     margin-bottom: 20px;
+}
+
+a.link-image-label {
+    text-decoration: none;
+    cursor: pointer;
+    color: black;
+}
+
+a.link-table-item {
+    text-decoration: none;
+    cursor: pointer;
+    color: #0d6efd;
+}
+
+a.link-table-item:hover {
+    font-weight: bold;
+}
+
+.table.table-striped td:nth-child(1), .table.table-striped th:nth-child(1) {
+    padding-left: 22px; /* Adjust this value to your preference */
+}
+
+.table-hover-color.table-hover tbody tr:hover td, 
+.table-hover-color.table-hover tbody tr:hover th {
+    background-color: #fdf50d47;
+}
+
+.small-text {
+    font-size: 15px;
+    color: rgb(176, 174, 174);
+}
+
+.social-footer {
+    margin: 40px 0 0 0;
+    padding: 20px 0;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    text-align: center;
+}
+
+.social-footer a {
+    margin: 0 10px;
+    color: #b2b2b2;
+    font-size: 24px;
+    transition: color 0.3s;
+}
+
+.social-footer a:hover {
+    color: #0d6efd;
 }

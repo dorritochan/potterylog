@@ -208,6 +208,15 @@ def extract_kiln_data(form):
 
     return data
 
+def extract_firing_program_data(form):
+    data = {
+        'name': form.name.data
+    }
+    data['type'] = next(label for value, label in form.type.choices if value == form.type.data)
+    
+    return data
+    
+
 
 def extract_firing_segment_data(firing_segment, segment_index=None):
     """Extracts data from the FiringSegmentForm form to create a new firing segment."""
@@ -283,7 +292,8 @@ def extract_kiln_from_object(kiln):
 
 def extract_firing_program_from_object(firing_program):
     return {
-        'type': FIRING_PROGRAM_TYPES.index(firing_program.type) + 1
+        'type': FIRING_PROGRAM_TYPES.index(firing_program.type) + 1,
+        'name': firing_program.name
     }
 
 

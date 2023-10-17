@@ -1,5 +1,54 @@
 
 $(document).ready(function() {
+
+    Fancybox.bind("[data-fancybox='gallery']", {
+        compact: false,
+        contentClick: "iterateZoom",
+        Images: {
+            Panzoom: {
+            maxScale: 2,
+            },
+        },
+        Toolbar:{
+            items: {
+                delete: {
+                    tpl: `<button class="f-button fancybox-button--delete" data-fancybox-delete id="btn-delete-image-fancybox"><i class="bi bi-trash3"></i></button>`,
+                    click: () => {
+                        var imgFullSrc = $('.fancybox__slide.has-image.is-selected img').attr('src');
+                        var currentFancyboxLink = $(`a[data-fancybox="gallery"][href="${imgFullSrc}"]`)
+                        var potId = currentFancyboxLink.data("pot-id");
+                        set_confirm_modal_data_image_delete(imgFullSrc, potId);
+                    }
+                },
+            },
+            display: {
+                left: ["infobar"],
+                middle: [
+                    "zoomIn",
+                    "zoomOut",
+                    "toggle1to1",
+                    "rotateCCW",
+                    "rotateCW",
+                    "flipX",
+                    "flipY",
+                ],
+                right: [
+                    "slideshow",
+                    "fullscreen",
+                    "thumbs",
+                    "delete",
+                    "close",
+                ],
+            }
+        },
+        on: {
+            init: function(instance) {
+                console.log("Fancybox initialized!", instance);
+            }
+        }
+    });
+
+
     var glazeCountElement = $('#glaze-count');
     if (glazeCountElement.length) {
         var glazeCount = JSON.parse(glazeCountElement.attr('data-variable'));
@@ -338,38 +387,71 @@ $(document).ready(function() {
         $.get('/get_name_' + itemType + '/' + idNumber, function(response) {
         
 
-        // Hide the modal for editing if it was open
-        if ($(`#modal-add-edit-${itemType}`).hasClass('show')) {
-            $(`#modal-add-edit-${itemType}`).modal('hide');
-        }
+            // Hide the modal for editing if it was open
+            if ($(`#modal-add-edit-${itemType}`).hasClass('show')) {
+                $(`#modal-add-edit-${itemType}`).modal('hide');
+            }
 
-        // Update the modal's content with the fetched data
-        $('#modal-confirm-delete-title').text('Confirm ' + itemType + ' deletion');
-        $('#txt-question-confirm-delete').html('Do you really want to delete the ' + itemType + ' <strong>' + response.item_name + '</strong>?');
-        var $btnDelete = $("[id^='btn-confirm-delete-item-']")
-        $btnDelete.attr("id", $btnDelete.attr("id") + idNumber)
-        $btnDelete.data('itemtype', itemType);
+            // Update the modal's content with the fetched data
+            $('#modal-confirm-delete-title').text('Confirm ' + itemType + ' deletion');
+            $('#txt-question-confirm-delete').html('Do you really want to delete the ' + itemType + ' <strong>' + response.item_name + '</strong>?');
+            var $btnDelete = $("[id^='btn-confirm-delete-item-']")
+            $btnDelete.attr("id", $btnDelete.attr("id") + idNumber)
+            $btnDelete.data('itemtype', itemType);
 
-        // Show the modal
-        $('#modal-confirm-delete').modal('show');
+            // Show the modal
+            $('#modal-confirm-delete').modal('show');
+        });
     });
 
+    $("[id^='btn-delete-image']").click(function(event) {
 
+        // Prevent default behavior
+        event.preventDefault();
+        // Stop event propagation
+        event.stopPropagation();
+
+        var imgFullSrc = $(this).data("image-src");
+        var potId = parseInt($(this).data("pot-id"));
+
+        console.log(imgFullSrc);
+        console.log(potId);
+
+        set_confirm_modal_data_image_delete(imgFullSrc, potId);
+
+        
     });
+
 
     // This function acts on click on the confirm delete button in the confirm modal
     // and removes the item from the database. After that, the page is being refreshed.
     $("[id^='btn-confirm-delete-item-']").click(function() {
-        // Get the number from the ID
-        var idNumber = parseInt(this.id.split("-").pop());
-
+        
         // This is the type of item to be deleted, like 'pot' or 'link'
         var itemType = $(this).data("itemtype");
+        
+        if (itemType == 'image') {
+            var imgSrc = $(this).attr('id').replace('btn-confirm-delete-item-', '');
+            var potId = $(this).data("pot-id");
+        } else {
+            // Get the number from the ID
+            var idNumber = parseInt(this.id.split("-").pop());
+        }
+
 
         console.log(idNumber);
         console.log(itemType);
-    
-        fetch('/delete_' + itemType + '/' + idNumber, { 
+        console.log(imgSrc);
+        console.log(potId);
+        
+        var url = ''
+        if (itemType == 'image') {
+            url = '/delete_image_from_pot/' + imgSrc + '/' + potId;
+        } else {
+            url = '/delete_' + itemType + '/' + idNumber;
+        }
+
+        fetch(url, { 
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -388,27 +470,6 @@ $(document).ready(function() {
         .catch(error => {
             console.log('There was a problem with the delete operation:', error.message);
         });
-
-    });
-
-    // This ensures manual controls and not automatic sliding of the carousel
-    $('#photo-carousel').carousel({
-        interval: false 
-    });
-
-    // A click function on a photo thumbnail on Edit pot page opens
-    // the carousel and shows the clicked photo.
-    $("[id^='photo-thumbnail-']").click(function() {
-        var indexPhoto = parseInt(this.id.split("-").pop());
-        console.log('clicked on thumbnail');
-
-        // Go to the clicked slide
-        $('#photo-carousel-modal').on('shown.bs.modal', function () {
-            $('#photo-carousel').carousel(indexPhoto);
-        });
-
-        $('#photo-carousel-modal').modal('show');
-
 
     });
 
@@ -514,6 +575,41 @@ function addNewSegment(segmentCount) {
             console.log('success');
             $('#firing-segments').append(data);
         }
+    });
+}
+
+function set_confirm_modal_data_image_delete(imgFullSrc, potId) {
+
+
+    var imgSrc = '';
+    // var encodedImgSrc = encodeURIComponent(imgFullSrc);
+    $.get('/image_name/', { image_source: imgFullSrc }, function(response) {
+        imgSrc = response.item_name;
+    }).fail(function() {
+        console.error("Error fetching image name.");
+    });
+
+    console.log(imgSrc);
+
+    // Fetch the item's name using AJAX
+    $.get('/get_name_pot/' + potId, function(response) {
+    
+
+        // Update the modal's content with the fetched data
+        $('#modal-confirm-delete-title').text('Confirm image deletion');
+        $('#txt-question-confirm-delete').html('Do you really want to delete the image <strong>' + imgSrc + '</strong> from the pot ' + response.item_name + '?');
+        var $btnDelete = $("[id^='btn-confirm-delete-item-']")
+        $btnDelete.attr("id", $btnDelete.attr("id") + imgSrc)
+        $btnDelete.data('itemtype', 'image');
+        $btnDelete.data('pot-id', potId);
+
+        // Show the image
+        $('#image-confirm-modal').attr("src", imgFullSrc);
+        $('#image-confirm-modal').attr("alt", imgFullSrc);
+        $('#image-container-confirm-modal').removeClass("hidden");
+
+        // Show the modal
+        $('#modal-confirm-delete').modal('show');
     });
 }
 

@@ -46,7 +46,7 @@
                         <img src="{{ url_for('static', filename='photos/default_mug.jpg') }}" alt="Default photo" style="width: 14rem; height: 8rem; object-fit: cover;" class="img-thumbnail">
                     {% endif %}
                 </div>
-                {{ pot.id }}
+                {{ pot.get_pot_name() }}
             </a>
         {% endfor %}
     </div>

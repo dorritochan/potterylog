@@ -1,6 +1,6 @@
 # Standard library imports
 from datetime import datetime
-import os
+import os, uuid
 
 # Third-party imports
 from flask import render_template, flash, redirect, url_for, request, jsonify
@@ -32,7 +32,7 @@ from app.utils import (
     program_firing_time
 )
 
-
+UPLOAD_FOLDER = app.config['UPLOAD_FOLDER'];
 
 @app.route('/')
 @app.route('/home')
@@ -229,6 +229,7 @@ def fetch_pot(form, pot=None):
             for key, value in data.items():
                 setattr(pot, key, value)
             
+            # Glaze layers logic
             glazes_count = len(list(pot.used_glazes))
             order_additional_index = 0
             for glaze_layer_index, glaze_layer in enumerate(form.used_glazes.data):
@@ -256,13 +257,16 @@ def fetch_pot(form, pot=None):
         for photo in form.photos.data:
             if photo and allowed_file(photo.filename):
                 filename = secure_filename(photo.filename)
-                photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                base, ext = os.path.splitext(filename)
+                unique_filename = f"{base}_{uuid.uuid4()}{ext}"
                 
-                image = Image(filename=filename, pot=pot)
+                photo.save(os.path.join(UPLOAD_FOLDER, unique_filename))
+                
+                image = Image(filename=unique_filename, pot=pot)
                 db.session.add(image)
                 
                 # Set the primary image for the pot
-                pot.primary_image = filename        
+                pot.primary_image = unique_filename        
                 
     return pot
 
@@ -841,6 +845,29 @@ def delete_item(item_type, item_id):
         app.logger.error(f"Error deleting {item_type}: {e}")
         return jsonify(success=False, message='Internal Server Error'), 500
 
+
+@app.route('/delete_image_from_pot/<image_source>/<int:pot_id>', methods=['DELETE'])
+@login_required
+def delete_image_from_pot(image_source, pot_id):
+    
+    pot = Pot.query.get_or_404(pot_id)
+    image = Image.query.filter_by(filename=image_source, pot=pot).first()
+    image_name = image.filename
+    try:
+        db.session.delete(image)
+        db.session.commit()
+
+        if pot.primary_image == image_name:
+            pot_images = Image.query.filter_by(pot=pot).all()
+            last_image = pot_images[-1]
+            pot.primary_image = last_image.filename
+            db.session.commit()
+
+        return jsonify(success=True, message=f'Deleted image with src {image_source}')
+    except Exception as e:
+        app.logger.error(f"Error deleting {image}: {e}")
+        return jsonify(success=False, message='Internal Server Error'), 500
+
     
 @app.route('/update_<item_type>/<int:item_id>', methods=['PUT'])
 @login_required
@@ -952,6 +979,18 @@ def get_item_name(item_id, item_type):
     elif item_type == 'firing-program':
         firing_program = FiringProgram.query.get_or_404(item_id)
         item_name = firing_program.name
+    
+    return jsonify(item_name=item_name)
+
+
+@app.route('/image_name/', methods=['GET'])
+@login_required
+def image_name():
+    # image_source is in the format /static/photos/<filename>
+    image_source = request.args.get('image_source')
+    
+    end_pos = image_source.find('/static/photos/') + len('/static/photos/')
+    item_name = image_source[end_pos:]
     
     return jsonify(item_name=item_name)
 

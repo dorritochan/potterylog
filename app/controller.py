@@ -30,7 +30,8 @@ from app.utils import (
     extract_firing_segment_data, extract_link_data, extract_firing_program_data,
     extract_link_from_object, extract_clay_from_object, extract_glaze_from_object, 
     extract_kiln_from_object, extract_firing_program_from_object,
-    program_firing_time
+    program_firing_time,
+    pot_to_dict
 )
 
 UPLOAD_FOLDER = app.config['UPLOAD_FOLDER']
@@ -1045,4 +1046,9 @@ def order_pots(factor, asc_desc):
 
     order_func = asc if asc_desc == 'asc' else desc
     pots = Pot.query.order_by(order_func(column)).all()
-    return jsonify(pots)
+    for pot in pots:
+        ordered_glaze_layers = PotGlaze.query.filter_by(pot_id=pot.id).order_by(PotGlaze.display_order).all()
+        pot.ordered_glaze_layers = ordered_glaze_layers
+        
+    pots_data = [pot_to_dict(pot) for pot in pots]
+    return jsonify(pots_data)

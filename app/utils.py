@@ -367,3 +367,16 @@ class CustomURL(object):
         # After validation, modify the data if needed
         if not field.data.startswith(('http://', 'https://')):
             field.data = 'https://' + field.data
+
+
+def pot_to_dict(pot):
+    return {
+        'id': pot.id,
+        'primary_image': pot.primary_image or '',
+        'throw_date': pot.throw_date.strftime('%d.%m.%Y') if pot.throw_date else '',
+        'vessel_type': pot.vessel_type or '',
+        # 'made_with_clay': pot.made_with_clay or '',
+        # 'glazes': pot.ordered_glaze_layers or '',
+        'bisque_fired_with_program': pot.bisque_fired_with_program.name if pot.bisque_fired_with_program else '',
+        'glaze_fired_with_program': pot.glaze_fired_with_program.name if pot.glaze_fired_with_program else ''
+    }

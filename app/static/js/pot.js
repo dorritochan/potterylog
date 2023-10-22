@@ -73,34 +73,42 @@ $(document).ready(function() {
         });
 
         // Styling the current sorting icon
-        var iconClasses = ["fa-solid fa-sort", "fa-solid fa-sort-up", "fa-solid fa-sort-down"];
+        var iconClasses = ["fa-solid fa-sort-up", "fa-solid fa-sort-down"];
         var currentIconClass = currentIcon.attr('class');
         currentIcon.removeClass(currentIconClass);
         var currentIconClassIndex = iconClasses.indexOf(currentIconClass);
         var nextIconClassIndex = currentIconClassIndex + 1;
         console.log(nextIconClassIndex);
-        if (currentIconClassIndex == 2) {
+        if (currentIconClassIndex == 1) {
             nextIconClassIndex = 0;
         }
-        currentIcon.addClass(iconClasses[nextIconClassIndex]);
+        var nextIcon = iconClasses[nextIconClassIndex];
+        currentIcon.addClass(nextIcon);
+
+        console.log(nextIcon);
+        var ascDesc = '';
+        if (nextIcon == 'fa-solid fa-sort-up') {
+            ascDesc = 'desc';
+        } else if (nextIcon == 'fa-solid fa-sort-down') {
+            ascDesc = 'asc';
+        }
 
         $.ajax({
             type: 'GET',
-            url: '/order_pots_by' + column + '/<asc_desc>',
-            headers: {
-                'X-CSRFToken': '{{ form.csrf_token._value() }}'
-            },
+            url: '/order_pots_by_' + column + '/' + ascDesc,
             success: function(data) {
-                
-                
-                // // Fetch the glaze choices and set them for the newly added field
-                // $.get('/get_glaze_choices', function(choicesData) {
-                //     var firstOption = [[0, '-']];
-                //     var choices = firstOption.concat(choicesData);
-                //     $('#glaze-field-' + glazeCount + ' select[name$="glaze"]').html(getOptionsHtml(choices));
-                //     glazeCount++;
-                // });
+                console.log('success');
+                console.log(data);
 
+                // Loop through pots data and build rows
+                var allRowsHTML = '';
+                for(var i = 0; i < data.length; i++) {
+                    allRowsHTML += buildPotRow(data[i]);
+                }
+
+                // Replace the table content with the new rows
+                $('tbody').html(allRowsHTML);
+                
             }
         });
         
@@ -598,7 +606,8 @@ $(document).ready(function() {
     });
 
     // This function opens the Edit pot page on click on a pot row on Index page
-    $('[id^="row-pot-"]').click(function() {
+    $('tbody').on('click', '[id^="row-pot-"]', function() {
+        console.log('BLA');
         var potId = parseInt(this.id.split('-').pop());
         window.location.href = '/editpot/' + potId;
     });
@@ -672,3 +681,31 @@ function set_confirm_modal_data_image_delete(imgFullSrc, potId) {
 }
 
 
+function buildPotRow(pot) {
+    // Build the base URL for some links
+    var base_url = window.location.origin; // Gets the base URL (e.g., http://example.com)
+
+    // Initialize a variable for HTML string
+    var rowHTML = '<tr id="row-pot-' + pot.id + '">';
+
+    // ID column
+    rowHTML += '<td>' + pot.id + '</td>';
+
+    // Image column
+    var imageSrc = pot.primary_image ? (base_url + '/static/photos/' + pot.primary_image) : (base_url + '/static/photos/default_mug.jpg');
+    rowHTML += '<td><div class="container-fluid"><div class="row"><div class="col p-0 image-container-index"><img src="' + imageSrc + '" alt="Selected Photo" class="img-thumbnail img-fluid responsive-image"></div></div></div></td>';
+
+    // Other columns...
+    rowHTML += '<td>' + pot.throw_date + '</td>';
+    rowHTML += '<td>' + pot.vessel_type + '</td>';
+    rowHTML += '<td></td>';
+    rowHTML += '<td></td>';
+    rowHTML += '<td>' + pot.bisque_fired_with_program + '</td>';
+    rowHTML += '<td>' + pot.glaze_fired_with_program + '</td>';
+
+
+    // End the row
+    rowHTML += '</a></tr>';
+
+    return rowHTML;
+}

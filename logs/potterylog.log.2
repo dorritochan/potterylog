@@ -1,4 +1,4 @@
-2023-10-20 23:01:02,918 ERROR: Exception on /index [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+2023-10-20 23:10:36,574 ERROR: Exception on /index [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -30,8 +30,8 @@ Traceback (most recent call last):
     return [make_row(row) for row in rows]
   File "lib/sqlalchemy/cyextension/resultproxy.pyx", line 24, in sqlalchemy.cyextension.resultproxy.BaseRow.__init__
   File "lib/sqlalchemy/cyextension/processors.pyx", line 45, in sqlalchemy.cyextension.processors.str_to_date
-ValueError: Invalid isoformat string: '2023-09-15 15:34:00.000000'
-2023-10-20 23:03:41,589 ERROR: Exception on /index [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+TypeError: fromisoformat: argument must be str
+2023-10-20 23:10:37,439 ERROR: Exception on /index [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -63,8 +63,9 @@ Traceback (most recent call last):
     return [make_row(row) for row in rows]
   File "lib/sqlalchemy/cyextension/resultproxy.pyx", line 24, in sqlalchemy.cyextension.resultproxy.BaseRow.__init__
   File "lib/sqlalchemy/cyextension/processors.pyx", line 45, in sqlalchemy.cyextension.processors.str_to_date
-ValueError: Invalid isoformat string: '2023-09-15 15:34:00.000000'
-2023-10-20 23:03:42,338 ERROR: Exception on /index [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+TypeError: fromisoformat: argument must be str
+2023-10-20 23:12:00,764 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+2023-10-20 23:12:02,238 ERROR: Exception on /index [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
   File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
@@ -96,7 +97,4 @@ Traceback (most recent call last):
     return [make_row(row) for row in rows]
   File "lib/sqlalchemy/cyextension/resultproxy.pyx", line 24, in sqlalchemy.cyextension.resultproxy.BaseRow.__init__
   File "lib/sqlalchemy/cyextension/processors.pyx", line 45, in sqlalchemy.cyextension.processors.str_to_date
-ValueError: Invalid isoformat string: '2023-09-15 15:34:00.000000'
-2023-10-20 23:10:24,326 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-20 23:10:29,536 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-20 23:10:34,119 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+TypeError: fromisoformat: argument must be str

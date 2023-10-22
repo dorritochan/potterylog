@@ -192,6 +192,7 @@ a.link-table-item:hover {
     bottom: 0;
     z-index: -1;
 }
-.fas.fa-sort {
+
+.sorting-column i {
     font-size: 0.8rem;
 }

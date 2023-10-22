@@ -6,6 +6,7 @@ import os, uuid
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy.exc import DatabaseError
+from sqlalchemy import asc, desc
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 
@@ -32,7 +33,7 @@ from app.utils import (
     program_firing_time
 )
 
-UPLOAD_FOLDER = app.config['UPLOAD_FOLDER'];
+UPLOAD_FOLDER = app.config['UPLOAD_FOLDER']
 
 @app.route('/')
 @app.route('/home')
@@ -52,7 +53,7 @@ def index():
     """
     
     # Get the list of all pots
-    pots = Pot.query.order_by(Pot.throw_date.asc()).all()
+    pots = Pot.query.order_by(Pot.throw_date.desc(), Pot.vessel_type.asc()).all()
     
     # For each pot, retrieve and set its glaze layers in the correct order (by `display_order`).
     # This is done by adding a new attribute, `ordered_glaze_layers`, to the pot instance.
@@ -1033,3 +1034,15 @@ def get_item(item_type, item_id):
         return jsonify(error=f"Unrecognized item type: {item_type}"), 400
 
     return jsonify(**data)
+
+
+@app.route('/order_pots_by_<factor>/<asc_desc>')
+@login_required
+def order_pots(factor, asc_desc):
+    column = getattr(Pot, factor, None)
+    if not column:
+        return jsonify(error="Not a valid column in Pot model.")
+
+    order_func = asc if asc_desc == 'asc' else desc
+    pots = Pot.query.order_by(order_func(column)).all()
+    return jsonify(pots)

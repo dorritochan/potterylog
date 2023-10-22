@@ -3,7 +3,7 @@ from flask_wtf.file import FileAllowed
 from wtforms import (
     StringField, PasswordField, BooleanField, SubmitField, DateTimeField, 
     SelectField, TextAreaField, SelectMultipleField, widgets, MultipleFileField, 
-    IntegerField, FormField, FieldList, FloatField
+    IntegerField, FormField, FieldList, FloatField, DateField
 )
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, InputRequired, Optional, URL
 from wtforms.widgets import Input
@@ -52,12 +52,12 @@ class AddPotForm(FlaskForm):
     made_with_clay = SelectField('Clay', validators=[InputRequired()], choices=[], coerce=int)
     author = StringField('Author', validators=[DataRequired()], default='Dora')
     photos = MultipleFileField('Upload photos', validators=[FileAllowed(['jpg', 'jpeg', 'png', 'gif', 'heic', 'heif'])])
-    throw_date = DateTimeField('Throwing date and time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()], widget=Input(input_type='datetime-local'), default=datetime.now)
+    throw_date = DateField('Throwing date', format='%Y-%m-%d', validators=[DataRequired()], widget=Input(input_type='date'), default=datetime.now)
     throw_weight = StringField('Throwing weight') 
     throw_height = StringField('Throwing heights')
     throw_width = StringField('Throwing widths')
     throw_notes = TextAreaField('Throwing notes')
-    trim_date = DateTimeField('Trimming date and time', format='%Y-%m-%dT%H:%M', widget=Input(input_type='datetime-local'), validators=[Optional()])
+    trim_date = DateField('Trimming date', format='%Y-%m-%d', widget=Input(input_type='date'), validators=[Optional()])
     trim_weight = StringField('Trimmed weight')
     trim_surface_treatment = StringField('Surface treatment')
     trim_notes = TextAreaField('Trimming notes')
@@ -67,7 +67,7 @@ class AddPotForm(FlaskForm):
     bisque_fire_end = DateTimeField('Bisque firing ended at', format='%Y-%m-%dT%H:%M', widget=Input(input_type='datetime-local'), validators=[Optional()])
     bisque_fire_open = DateTimeField('Kiln opened at', format='%Y-%m-%dT%H:%M', widget=Input(input_type='datetime-local'), validators=[Optional()])
     bisque_fire_notes = TextAreaField('Bisque firing notes')
-    glaze_date = DateTimeField('Glazing at', format='%Y-%m-%dT%H:%M', widget=Input(input_type='datetime-local'), validators=[Optional()])
+    glaze_date = DateField('Glazing date', format='%Y-%m-%d', widget=Input(input_type='date'), validators=[Optional()])
     used_glazes = FieldList(FormField(GlazeLayerForm), min_entries=1)
     glaze_notes = TextAreaField('Glazing notes')
     glaze_fire_start = DateTimeField('Glaze firing started at', format='%Y-%m-%dT%H:%M', widget=Input(input_type='datetime-local'), validators=[Optional()])

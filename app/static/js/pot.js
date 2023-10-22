@@ -48,6 +48,64 @@ $(document).ready(function() {
         }
     });
 
+    $('[id^="sort-pot-"]').click(function() {
+        var column = this.id.split("-").pop();
+        console.log(column);
+
+        var allIcons = $('[id^="sort-pot-"').find('i');
+
+        var currentIcon = $(this).find('i');
+
+        allIcons.each(function(index, element) {
+        
+            // For jQuery operations on the element, you can wrap it with $():
+            var icon = $(element);
+
+            // Skip the current icon
+            if (icon.is(currentIcon)) {
+                return;  // Continue to the next iteration
+            }
+
+            var iconClass = icon.attr('class');
+            icon.removeClass(iconClass);
+            icon.addClass('fa-solid fa-sort');
+        
+        });
+
+        // Styling the current sorting icon
+        var iconClasses = ["fa-solid fa-sort", "fa-solid fa-sort-up", "fa-solid fa-sort-down"];
+        var currentIconClass = currentIcon.attr('class');
+        currentIcon.removeClass(currentIconClass);
+        var currentIconClassIndex = iconClasses.indexOf(currentIconClass);
+        var nextIconClassIndex = currentIconClassIndex + 1;
+        console.log(nextIconClassIndex);
+        if (currentIconClassIndex == 2) {
+            nextIconClassIndex = 0;
+        }
+        currentIcon.addClass(iconClasses[nextIconClassIndex]);
+
+        $.ajax({
+            type: 'GET',
+            url: '/order_pots_by' + column + '/<asc_desc>',
+            headers: {
+                'X-CSRFToken': '{{ form.csrf_token._value() }}'
+            },
+            success: function(data) {
+                
+                
+                // // Fetch the glaze choices and set them for the newly added field
+                // $.get('/get_glaze_choices', function(choicesData) {
+                //     var firstOption = [[0, '-']];
+                //     var choices = firstOption.concat(choicesData);
+                //     $('#glaze-field-' + glazeCount + ' select[name$="glaze"]').html(getOptionsHtml(choices));
+                //     glazeCount++;
+                // });
+
+            }
+        });
+        
+    });
+
 
     var glazeCountElement = $('#glaze-count');
     if (glazeCountElement.length) {

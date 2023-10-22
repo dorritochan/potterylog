@@ -56,18 +56,18 @@ class Pot(db.Model):
     images = db.relationship('Image', back_populates='pot', cascade='all, delete-orphan')
     primary_image = db.Column(db.String(255))
     # Throwing
-    throw_date = db.Column(db.DateTime, index=True, default=lambda: germany_timezone.localize(datetime.now()))
+    throw_date = db.Column(db.Date, index=True, default=lambda: germany_timezone.localize(datetime.now()))
     throw_weight = db.Column(db.Integer, index=True) # in g
     throw_height = db.Column(db.String(140)) # in cm
     throw_width = db.Column(db.String(140)) # in cm
     throw_notes = db.Column(db.Text)
     # Trimming
-    trim_date = db.Column(db.DateTime, index=True)
+    trim_date = db.Column(db.Date, index=True)
     trim_weight = db.Column(db.Integer, index=True) # in g
     trim_surface_treatment = db.Column(db.String(140), index=True)
     trim_notes = db.Column(db.Text)
     # Bisque firing
-    bisque_fire_start = db.Column(db.DateTime, index=True)
+    bisque_fire_start = db.Column(db.Date, index=True)
     bisque_fire_program_id = db.Column(db.Integer, db.ForeignKey('firing_program.id'), index=True)
     bisque_fired_with_program = db.relationship('FiringProgram', back_populates='bisque_pots', foreign_keys=[bisque_fire_program_id])
     bisque_fire_kiln_id = db.Column(db.Integer, db.ForeignKey('kiln.id'), index=True, default=1)
@@ -76,7 +76,7 @@ class Pot(db.Model):
     bisque_fire_open = db.Column(db.DateTime)
     bisque_fire_notes = db.Column(db.Text)
     # Glazing
-    glaze_date = db.Column(db.DateTime, index=True)
+    glaze_date = db.Column(db.Date, index=True)
     used_glazes = db.relationship('PotGlaze', back_populates='pot', lazy='dynamic', cascade='all, delete-orphan')
     glaze_notes = db.Column(db.Text)
     # Glaze firing

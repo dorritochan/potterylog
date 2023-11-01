@@ -248,6 +248,20 @@ def extract_link_data(form):
     return data
 
 
+def extract_commission_data(form):
+    """Extracts data from the AddCommissionForm form to create a new commission."""
+    data = {
+        'deadline': form.deadline.data,
+        'commissioner': form.commissioner.data,
+        'object': form.object.data,
+        'amount': form.amount.data,
+        'description': form.description.data,
+        'done': form.done.data
+    }
+    
+    return data
+
+
 def extract_clay_from_object(clay):
     """Extracts data from a clay object."""
     return {
@@ -303,6 +317,18 @@ def extract_link_from_object(link):
         'title': link.title,
         'url': link.url,
         'description': link.description
+    }
+
+
+def extract_commission_from_object(commission):
+    """Extracts data from a Commission object."""
+    return {
+        'deadline': commission.deadline if commission.deadline else '',
+        'commissioner': commission.commissioner or '',
+        'object': commission.object or '',
+        'amount': commission.amount or 1,
+        'description': commission.description or '',
+        'done': commission.done
     }
     
 
@@ -370,13 +396,23 @@ class CustomURL(object):
 
 
 def pot_to_dict(pot):
+    glazes_list = [
+        {
+            "name": glaze.glaze.get_glaze_name() if glaze.glaze else '',
+            "layers": glaze.number_of_layers or 1,
+            "glaze_id": glaze.glaze_id
+        } 
+        for glaze in pot.ordered_glaze_layers if glaze.glaze
+    ]
+    
     return {
         'id': pot.id,
         'primary_image': pot.primary_image or '',
         'throw_date': pot.throw_date.strftime('%d.%m.%Y') if pot.throw_date else '',
         'vessel_type': pot.vessel_type or '',
-        # 'made_with_clay': pot.made_with_clay or '',
-        # 'glazes': pot.ordered_glaze_layers or '',
+        'made_with_clay_id': pot.made_with_clay.id if pot.made_with_clay else '',
+        'made_with_clay_name': pot.made_with_clay.get_clay_name() if pot.made_with_clay else '',
+        'glazes': glazes_list,
         'bisque_fired_with_program': pot.bisque_fired_with_program.name if pot.bisque_fired_with_program else '',
         'glaze_fired_with_program': pot.glaze_fired_with_program.name if pot.glaze_fired_with_program else ''
     }

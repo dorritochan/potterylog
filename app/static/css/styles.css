@@ -193,6 +193,16 @@ a.link-table-item:hover {
     z-index: -1;
 }
 
+.sorting-column {
+    cursor: pointer;
+}
+
 .sorting-column i {
     font-size: 0.8rem;
+    margin-left: 5px;   /* Adds space between column name and icon */
+    opacity: 0.5;       /* Makes icon slightly translucent */
+}
+
+.sorting-column:hover i {
+    opacity: 1;         /* Makes icon fully opaque when column is hovered */
 }

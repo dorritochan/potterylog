@@ -197,4 +197,15 @@ class AddLinkForm(FlaskForm):
     title = StringField('Title')
     url = StringField('URL', validators=[Optional(), CustomURL()])
     description = TextAreaField('Description')
-    submit = SubmitField('Add links')
+    submit = SubmitField('Add link')
+    
+    
+class AddCommissionForm(FlaskForm):
+    deadline = DateField('Deadline', format='%Y-%m-%d', validators=[Optional()], widget=Input(input_type='date'))
+    commissioner = StringField('Commissioner', validators=[DataRequired()])
+    object = StringField('Object', validators=[DataRequired()])
+    amount = IntegerField('Amount', validators=[Optional()], default=1)
+    description = TextAreaField('Description')
+    done = BooleanField('Done', default=False)
+    
+    submit = SubmitField('Add commission')

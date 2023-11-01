@@ -6,13 +6,23 @@
     <a href="{{ url_for('add_pot') }}" class="btn btn-primary" type="button">&plus; Add a new pot</a>
 </div>
 
+{% raw %}
+<div id="index_table">
 <table class="table table-striped table-hover-color table-hover">
     <thead>
         <tr>
             <th>ID</th>
             <th>Image</th>
-            <th id="sort-pot-throw_date"  class="sorting-column">Throwing date <i class="fa-solid fa-sort"></i></th>
-            <th id="sort-pot-vessel_type"  class="sorting-column">Type <i class="fa-solid fa-sort"></i></th>
+            <th @click="sort('throw_date')" class="sorting-column">
+                Throwing date
+                <i v-if="currentSort === 'throw_date'" :class="sortAsc ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                <i v-else class="fas fa-sort"></i>
+            </th>
+            <th @click="sort('vessel_type')" class="sorting-column">
+                Type
+                <i v-if="currentSort === 'vessel_type'" :class="sortAsc ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                <i v-else class="fas fa-sort"></i>
+            </th>
             <th>Clay</th>
             <th>Glazes</th>
             <th>Bisque Program</th>
@@ -20,43 +30,41 @@
         </tr>
     </thead>
     <tbody>
-        {% for pot in pots %}
-        <tr id="row-pot-{{ pot.id }}">
+        <tr v-for="pot in sortedPots" :key="pot.id" @click="editPot(pot.id)">
             <td>{{ pot.id }}</td>
             <td>
                 <div class="container-fluid">
                     <div class="row">
-                        {% if pot.primary_image %}
+                        <div v-if="pot.primary_image">
                             <div class="col p-0 image-container-index">
-                                <img src="{{ url_for('static', filename='photos/' + pot.primary_image) }}" alt="Selected Photo" class="img-thumbnail img-fluid responsive-image">
+                                <!-- Display the primary image -->
+                                <img :src="'static/photos/' + pot.primary_image" alt="Selected Photo" class="img-thumbnail img-fluid responsive-image">
                             </div>
-                        {% else %}
+                        </div>
+                        <div v-else>
                             <div class="col p-0 image-container-index">
-                                <img src="{{ url_for('static', filename='photos/default_mug.jpg') }}" alt="Selected Photo" class="img-thumbnail img-fluid responsive-image">
+                                <!-- Display a default image -->
+                                <img :src="'static/photos/default_mug.jpg'" alt="Default Photo" class="img-thumbnail img-fluid responsive-image">
                             </div>
-                        {% endif %}
+                        </div>
                     </div>
                 </div>
             </td>
-            <td>{{ pot.throw_date.strftime('%d.%m.%Y') or ''}}</td>
-            <td>{{ pot.vessel_type or ''}}</td>
+            <td>{{ pot.throw_date }}</td>
+            <td>{{ pot.vessel_type }}</td>
             <td>
-                {% if pot.made_with_clay %}
-                    <a href="{{ url_for('show_clay', clay_id=pot.made_with_clay.id) }}" class="link-table-item">{{ pot.made_with_clay.get_clay_name() or '' }}</a>
-                {% endif %}
+                <a v-if="pot.made_with_clay_id" :href="'/showclay/' + pot.made_with_clay_id" class="link-table-item">{{ pot.made_with_clay_name }}</a>
             </td>
             <td>
-                {% for glaze in pot.ordered_glaze_layers %}
-                    {% if glaze.glaze %}
-                        <a href="{{ url_for('show_glaze', glaze_id=glaze.glaze_id) }}" class="link-table-item">{{ glaze.glaze.get_glaze_name() or '' }}</a> x{{ glaze.number_of_layers or '1' }}<br>
-                    {% endif %}
-                {% endfor %}
+                <div v-for="glaze in pot.glazes" :key="glaze.glaze_id">
+                    <a :href="'/showglaze/' + glaze.glaze_id" class="link-table-item">{{ glaze.name }}</a> x{{ glaze.layers }}<br>
+                </div>
             </td>
-            <td>{{ pot.bisque_fired_with_program.name or '' }}</td>
-            <td>{{ pot.glaze_fired_with_program.name or '' }}</td>
+            <td>{{ pot.bisque_fired_with_program }}</td>
+            <td>{{ pot.glaze_fired_with_program }}</td>
         </tr>
-        {% endfor %}
     </tbody>
 </table>
-
+</div>
+{% endraw %}
 {% endblock %}

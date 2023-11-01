@@ -15,11 +15,11 @@ from app import app, db
 from app.forms import (
     LoginForm, RegistrationForm, AddPotForm, AddClayForm, AddGlazeForm,
     GlazeLayerForm, AddKilnForm, AddFiringProgramForm, FiringSegmentForm,
-    AddLinkForm
+    AddLinkForm, AddCommissionForm
 )
 from app.models import (
     User, Pot, Clay, FiringProgram, Kiln, Glaze, Image, PotGlaze, 
-    ProgramSegment, FiringSegment, FiringProgram, Link
+    ProgramSegment, FiringSegment, FiringProgram, Link, Commission
 )
 from app.utils import (
     allowed_file, 
@@ -27,9 +27,9 @@ from app.utils import (
     safe_query, 
     populate_pot_select_field_data,
     extract_pot_data, extract_glaze_data, extract_clay_data, extract_kiln_data, 
-    extract_firing_segment_data, extract_link_data, extract_firing_program_data,
+    extract_firing_segment_data, extract_link_data, extract_firing_program_data, extract_commission_data,
     extract_link_from_object, extract_clay_from_object, extract_glaze_from_object, 
-    extract_kiln_from_object, extract_firing_program_from_object,
+    extract_kiln_from_object, extract_firing_program_from_object, extract_commission_from_object, 
     program_firing_time,
     pot_to_dict
 )
@@ -41,30 +41,9 @@ UPLOAD_FOLDER = app.config['UPLOAD_FOLDER']
 @app.route('/index')
 @login_required
 def index():
-    """
-    Display a list of pottery pots with ordered glaze layers.
-
-    This route fetches a list of pottery pots from the database and orders them by their throw date.
-    For each pot, it also retrieves the ordered glaze layers associated with that pot.
-
-    Requires the user to be logged in.
-
-    Returns: 
-        HTML template: Displays the list of pots with ordered glaze layers.
-    """
     
-    # Get the list of all pots
-    pots = Pot.query.order_by(Pot.throw_date.desc(), Pot.vessel_type.asc()).all()
-    
-    # For each pot, retrieve and set its glaze layers in the correct order (by `display_order`).
-    # This is done by adding a new attribute, `ordered_glaze_layers`, to the pot instance.
-    # Note: `pot.used_glazes` and `pot.ordered_glaze_layers` contain the same data but may differ in order.
-    for pot in pots:
-        ordered_glaze_layers = PotGlaze.query.filter_by(pot_id=pot.id).order_by(PotGlaze.display_order).all()
-        pot.ordered_glaze_layers = ordered_glaze_layers
-    
-    # Render the 'index.html' template with the list of pots
-    return render_template('index.html', title='Pottery log', pots=pots)
+    # Simply render the 'index.html' template
+    return render_template('index.html', title='Pottery log')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -371,9 +350,7 @@ def edit_pot(pot_id):
     # ===================
     # GET method: Render the pot form with prepopulated data
     # ===================
-    for glaze in pot.used_glazes:
-        print(glaze.glaze_id)
-        print(glaze.display_order)
+
     # Show the correct selected choices for select fields from the database
     populate_pot_select_field_data(form, pot)
 
@@ -504,6 +481,16 @@ def add_link():
     form = AddLinkForm()
     
     response = add_item_to_db(form, Link, extract_link_data, 'A new link has been saved.')
+    return response
+
+
+@app.route('/addcommission', methods=['POST'])
+@login_required
+def add_commission():
+    
+    form = AddCommissionForm()
+    
+    response = add_item_to_db(form, Commission, extract_commission_data, 'A new commission has been saved.')
     return response
 
 
@@ -712,6 +699,26 @@ def view_links():
     return render_template('viewlinks.html', title='Links', form=form, links=links)
 
 
+@app.route('/viewcommissions')
+@login_required
+def view_commissions():
+    """
+    Render a list of all commissions in the database.
+
+    Retrieves all LINK objects from the database and sends them to the template 
+    for display.
+    
+    Returns:
+        HTML template: Renders the list of all links.
+    """
+    commissions = Commission.query.order_by(Commission.deadline.desc()).all()
+    
+    # A link form for the modal
+    form = AddCommissionForm()
+    
+    return render_template('viewcommissions.html', title='Commissions', form=form, commissions=commissions)
+
+
 @app.route('/showglaze/<int:glaze_id>')
 @login_required
 def show_glaze(glaze_id):
@@ -839,6 +846,9 @@ def delete_item(item_type, item_id):
     elif item_type == 'firing-program':
         item = FiringProgram.query.get_or_404(item_id)
     
+    elif item_type == 'commission':
+        item = Commission.query.get_or_404(item_id)
+    
     try:
         db.session.delete(item)
         db.session.commit()
@@ -894,6 +904,11 @@ def update_item(item_type, item_id):
         form = AddKilnForm()
         item = Kiln.query.get_or_404(item_id)
         data = extract_kiln_data(form)
+    
+    elif item_type == 'commission':
+        form = AddCommissionForm()
+        item = Commission.query.get_or_404(item_id)
+        data = extract_commission_data(form)
     
     elif item_type == 'firing-program':
         form = AddFiringProgramForm()
@@ -982,6 +997,10 @@ def get_item_name(item_id, item_type):
         firing_program = FiringProgram.query.get_or_404(item_id)
         item_name = firing_program.name
     
+    elif item_type == 'commission':
+        commission = Commission.query.get_or_404(item_id)
+        item_name = commission.get_name()
+    
     return jsonify(item_name=item_name)
 
 
@@ -1030,6 +1049,10 @@ def get_item(item_type, item_id):
                 'number_of_segments': segment_count
             }
         )
+    elif item_type == 'commission':
+        item = Commission.query.get_or_404(item_id)
+        data = extract_commission_from_object(item)
+        print(data)
         
     else:
         return jsonify(error=f"Unrecognized item type: {item_type}"), 400
@@ -1037,15 +1060,12 @@ def get_item(item_type, item_id):
     return jsonify(**data)
 
 
-@app.route('/order_pots_by_<factor>/<asc_desc>')
+@app.route('/get_pots')
 @login_required
-def order_pots(factor, asc_desc):
-    column = getattr(Pot, factor, None)
-    if not column:
-        return jsonify(error="Not a valid column in Pot model.")
-
-    order_func = asc if asc_desc == 'asc' else desc
-    pots = Pot.query.order_by(order_func(column)).all()
+def get_pots():
+    
+    pots = Pot.query.order_by(Pot.id).all()
+    
     for pot in pots:
         ordered_glaze_layers = PotGlaze.query.filter_by(pot_id=pot.id).order_by(PotGlaze.display_order).all()
         pot.ordered_glaze_layers = ordered_glaze_layers

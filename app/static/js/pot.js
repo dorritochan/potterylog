@@ -48,72 +48,7 @@ $(document).ready(function() {
         }
     });
 
-    $('[id^="sort-pot-"]').click(function() {
-        var column = this.id.split("-").pop();
-        console.log(column);
-
-        var allIcons = $('[id^="sort-pot-"').find('i');
-
-        var currentIcon = $(this).find('i');
-
-        allIcons.each(function(index, element) {
-        
-            // For jQuery operations on the element, you can wrap it with $():
-            var icon = $(element);
-
-            // Skip the current icon
-            if (icon.is(currentIcon)) {
-                return;  // Continue to the next iteration
-            }
-
-            var iconClass = icon.attr('class');
-            icon.removeClass(iconClass);
-            icon.addClass('fa-solid fa-sort');
-        
-        });
-
-        // Styling the current sorting icon
-        var iconClasses = ["fa-solid fa-sort-up", "fa-solid fa-sort-down"];
-        var currentIconClass = currentIcon.attr('class');
-        currentIcon.removeClass(currentIconClass);
-        var currentIconClassIndex = iconClasses.indexOf(currentIconClass);
-        var nextIconClassIndex = currentIconClassIndex + 1;
-        console.log(nextIconClassIndex);
-        if (currentIconClassIndex == 1) {
-            nextIconClassIndex = 0;
-        }
-        var nextIcon = iconClasses[nextIconClassIndex];
-        currentIcon.addClass(nextIcon);
-
-        console.log(nextIcon);
-        var ascDesc = '';
-        if (nextIcon == 'fa-solid fa-sort-up') {
-            ascDesc = 'desc';
-        } else if (nextIcon == 'fa-solid fa-sort-down') {
-            ascDesc = 'asc';
-        }
-
-        $.ajax({
-            type: 'GET',
-            url: '/order_pots_by_' + column + '/' + ascDesc,
-            success: function(data) {
-                console.log('success');
-                console.log(data);
-
-                // Loop through pots data and build rows
-                var allRowsHTML = '';
-                for(var i = 0; i < data.length; i++) {
-                    allRowsHTML += buildPotRow(data[i]);
-                }
-
-                // Replace the table content with the new rows
-                $('tbody').html(allRowsHTML);
-                
-            }
-        });
-        
-    });
-
+    
 
     var glazeCountElement = $('#glaze-count');
     if (glazeCountElement.length) {
@@ -439,6 +374,38 @@ $(document).ready(function() {
         });
     });
 
+
+    $('#btn-add-commission').click(function(event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        $.ajax({
+            url: "/addcommission",
+            method: "POST",
+            data: $('#form-add-edit-commission').serialize(),
+            success: function(response) {
+                if (response.success) {
+                    $('#modal-add-edit-commission').modal('hide');
+                    location.reload();
+                } else {
+                    $('#modal-add-edit-commission').modal('show');
+                    // Clear previous errors
+                    $(".form-error").remove();
+
+                    // Loop through the errors and display them
+                    $.each(response.errors, function(field, errors) {
+                        // For each error of a field, create an error span
+                        $.each(errors, function(_, error) {
+                            var errorSpan = $("<span>").addClass("form-error").css("color", "red").text("[" + error + "]");
+                            // Append errorSpan next to the respective input field
+                            $("#form-add-edit-commission").find('[name="' + field + '"]').after(errorSpan);
+                        });
+                    });
+                }
+            }
+        });
+    });
+
     // This function gets the name of the item (clay, link, glaze,...)
     // after the button Delete was clicked and opens the delete confirmation 
     // modal with the correct title
@@ -569,13 +536,20 @@ $(document).ready(function() {
             }
             
             for (let key in data) {
+                if (itemType == 'commission' && key == 'deadline') {
+                    console.log(key);
+                    console.log(data[key]);
+                    const formattedDate = formatDateToYYYYMMDD(data[key]);
+                    console.log(formattedDate);
+                    $(`#${key}`).val(formattedDate).trigger('change');
+                    console.log($(`#${key}`).val());
+                }
                 $(`#modal-add-edit-${itemType} input[id='${key}']`).val(data[key]);
                 $(`#modal-add-edit-${itemType} select[id='${key}']`).val(data[key]).trigger('change');
                 $(`#modal-add-edit-${itemType} textarea[id='${key}']`).val(data[key]);
                 if (itemType == 'firing-program' && key != 'type' && key != 'number_of_segments') {
                     var segmentIndex = key.split('-').pop();
                     var $inputSegment = $(`#modal-add-edit-${itemType} div[id='firing-segments'] div[id='firing-segment-${segmentIndex}'] input[id='${key}']`);
-                    // var $inputSegment1 = $(`#modal-add-edit-firing-program div[id='firing-segments'] div[id='firing-segment-0'] input[id='temp_start-0']`);
                     $inputSegment.val(data[key]);
                 }
                 fetch("/get_name_" + itemType + "/" + idNumber)
@@ -605,20 +579,57 @@ $(document).ready(function() {
             };
     });
 
-    // This function opens the Edit pot page on click on a pot row on Index page
-    $('tbody').on('click', '[id^="row-pot-"]', function() {
-        console.log('BLA');
-        var potId = parseInt(this.id.split('-').pop());
-        window.location.href = '/editpot/' + potId;
-    });
-
-
     // This function navigates to the index page on click on the Cancel button when adding a pot
     $('[id="btn-cancel-add-pot"]').click(function() {
         window.location.href = '/index'
     });
 
-    
+
+    // Vue instance
+    new Vue({
+        el: '#index_table',
+        data: {
+            pots: [], // This would be your initial dataset from the server.
+            currentSort: null,
+            sortAsc: true // We start with ascending sort
+        },
+        created: function() {
+            // Axios AJAX request
+            axios.get('/get_pots')
+                .then(response => {
+                    // Assuming the server responds with a JSON array of pots
+                    this.pots = response.data;
+                    console.log(response.data);
+                })
+                .catch(error => {
+                    console.error("There was an error fetching the pots:", error);
+                });
+        },
+        computed: {
+            sortedPots() {
+                return this.pots.sort((a, b) => {
+                    if (this.sortAsc) {
+                        return a[this.currentSort] > b[this.currentSort] ? 1 : -1;
+                    } else {
+                        return a[this.currentSort] < b[this.currentSort] ? 1 : -1;
+                    }
+                });
+            }
+        },
+        methods: {
+            editPot(id) {
+                window.location.href = '/editpot/' + id;
+            },
+            sort(column) {
+                if (this.currentSort === column) {
+                    this.sortAsc = !this.sortAsc; // Toggle sorting order
+                } else {
+                    this.currentSort = column;
+                    this.sortAsc = true; // Reset to ascending order
+                }
+            }
+        }
+    });
 
 });
 
@@ -678,34 +689,14 @@ function set_confirm_modal_data_image_delete(imgFullSrc, potId) {
         // Show the modal
         $('#modal-confirm-delete').modal('show');
     });
+    
 }
 
-
-function buildPotRow(pot) {
-    // Build the base URL for some links
-    var base_url = window.location.origin; // Gets the base URL (e.g., http://example.com)
-
-    // Initialize a variable for HTML string
-    var rowHTML = '<tr id="row-pot-' + pot.id + '">';
-
-    // ID column
-    rowHTML += '<td>' + pot.id + '</td>';
-
-    // Image column
-    var imageSrc = pot.primary_image ? (base_url + '/static/photos/' + pot.primary_image) : (base_url + '/static/photos/default_mug.jpg');
-    rowHTML += '<td><div class="container-fluid"><div class="row"><div class="col p-0 image-container-index"><img src="' + imageSrc + '" alt="Selected Photo" class="img-thumbnail img-fluid responsive-image"></div></div></div></td>';
-
-    // Other columns...
-    rowHTML += '<td>' + pot.throw_date + '</td>';
-    rowHTML += '<td>' + pot.vessel_type + '</td>';
-    rowHTML += '<td></td>';
-    rowHTML += '<td></td>';
-    rowHTML += '<td>' + pot.bisque_fired_with_program + '</td>';
-    rowHTML += '<td>' + pot.glaze_fired_with_program + '</td>';
-
-
-    // End the row
-    rowHTML += '</a></tr>';
-
-    return rowHTML;
+function formatDateToYYYYMMDD(dateString) {
+    const dateObj = new Date(dateString);
+    const year = dateObj.getUTCFullYear();
+    const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-indexed in JS
+    const day = String(dateObj.getUTCDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
 }

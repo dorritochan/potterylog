@@ -89,6 +89,8 @@ class Pot(db.Model):
     glaze_fire_open = db.Column(db.DateTime, index=True)
     glaze_fire_notes = db.Column(db.Text)
     
+    commissions = db.relationship('CommissionPot', back_populates='pot', lazy='dynamic')
+    
     def get_pot_name(self):
         return 'Pot {} {}'.format(self.id, self.vessel_type)
     
@@ -228,4 +230,33 @@ class Link(db.Model):
     description = db.Column(db.String)
     
     def __repr__(self):
-        return 'Link {}'.format(self.name)
+        return 'Link {}'.format(self.title)
+
+
+class CommissionPot(db.Model):
+    __tablename__ = 'commission_pot'
+    id = db.Column(db.Integer, primary_key=True)
+    commission_id = db.Column(db.Integer, db.ForeignKey('pot.id'))
+    pot_id = db.Column(db.Integer, db.ForeignKey('commission.id'))
+    
+    pot = db.relationship('Pot', back_populates='commissions')
+    commission = db.relationship('Commission', back_populates='pots')
+    
+
+class Commission(db.Model):
+    __tablename__ = 'commission'
+    id = db.Column(db.Integer, primary_key=True)
+    deadline = db.Column(db.Date, index=True, default=lambda: germany_timezone.localize(datetime.now()))
+    commissioner = db.Column(db.String, index=True)
+    object = db.Column(db.String)
+    amount = db.Column(db.Integer)
+    description = db.Column(db.String)
+    done = db.Column(db.Boolean, default=False)
+    
+    pots = db.relationship('CommissionPot', back_populates='commission', lazy='dynamic')
+    
+    def __repr__(self):
+        return 'Commission {} {}'.format(self.commissioner, self.object)
+    
+    def get_name(self):
+        return 'Commission {} {}'.format(self.commissioner, self.object)

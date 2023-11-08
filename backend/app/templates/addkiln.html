@@ -1,0 +1,92 @@
+<!-- Modal -->
+<div class="modal fade" id="modal-add-edit-kiln" tabindex="-1" role="dialog" aria-labelledby="modal-add-edit-kiln-title" aria-hidden="true" data-itemtype="kiln">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-add-edit-kiln-title">
+                    Add a new kiln
+                </h5>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" id="form-add-edit-kiln">
+                    {{ kiln_form.hidden_tag() }}
+                    <div class="form-group">
+                        {{ kiln_form.name.label }}
+                        {{ kiln_form.name(class_="form-control", autocomplete_="off") }}
+                        {% for error in kiln_form.name.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ kiln_form.brand.label }}
+                        {{ kiln_form.brand(class_="form-control", autocomplete_="off") }}
+                        {% for error in kiln_form.brand.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ kiln_form.type.label }}: {{ kiln_form.type(class="form-control") }}
+                        {% for error in kiln_form.type.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ kiln_form.capacity.label }}
+                        {{ kiln_form.capacity(class_="form-control", autocomplete_="off") }}
+                        {% for error in kiln_form.capacity.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ kiln_form.temp_max.label }}
+                        {{ kiln_form.temp_max(class_="form-control", autocomplete_="off") }}
+                        {% for error in kiln_form.temp_max.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ kiln_form.voltage.label }}
+                        {{ kiln_form.voltage(class_="form-control", autocomplete_="off") }}
+                        {% for error in kiln_form.voltage.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ kiln_form.url.label }}
+                        {{ kiln_form.url(class_="form-control", autocomplete_="off") }}
+                        {% for error in kiln_form.url.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ kiln_form.controller.label }}
+                        {{ kiln_form.controller(class_="form-control", autocomplete_="off") }}
+                        {% for error in kiln_form.controller.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {{ kiln_form.controller_url.label }}
+                        {{ kiln_form.controller_url(class_="form-control", autocomplete_="off") }}
+                        {% for error in kiln_form.controller_url.errors %}
+                            <span style="color: red;">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="w-100">
+                    {{ kiln_form.submit(class_="btn btn-primary", id="btn-add-kiln") }}
+                    <button type="submit" class="btn btn-primary hidden" id="btn-update-kiln" data-itemtype="kiln">Update kiln</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+                <div class="w-100">
+                    <button type="button" class="btn btn-outline-danger hidden" id="btn-delete-item-" data-itemtype="kiln">Delete kiln</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

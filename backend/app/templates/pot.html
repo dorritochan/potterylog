@@ -1,0 +1,329 @@
+{% extends 'layout.html' %}
+{% include 'addglaze.html' %}
+{% include 'addclay.html' %}
+{% include 'modalcarousel.html' %}
+{% include 'confirmdelete.html' %}
+
+
+{% block main %}
+<div class="m-3">
+    {% if title=='Edit pot' %}
+    <h1>{{ title}} {{ pot_id }}</h1>
+    {% else %}
+    <h1>{{ title }}</h1>
+    {% endif %}
+</div>
+
+<form method="post" enctype="multipart/form-data" id="form-pot" class="m-3">
+    {{ form.hidden_tag() }}
+    
+    <div class="container-fluid">
+        <div class="row custom-row">
+            <fieldset class="col-md-4">
+                <div class="input-group mb-3">
+                    {{ form.author.label(class_="input-group-text") }}
+                    {{ form.author(class_="form-control", autocomplete_="off") }}
+                    {% for error in form.author.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    <h3 class="text-secondary">Upload photos</h3>
+                    <div class="input-group mb-3">
+                        <input type="file" name="photos" multiple class="form-control">
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset class="mb-3">
+                {% if form.photos.data%}
+                    <div class="container-fluid">
+                        <div class="row">
+                            {% for photo in form.photos.data %}
+                            <div class="col-md-2 thumbnail-container mb-3" id="photo-thumbnail-{{ loop.index0 }}">
+                                <a data-fancybox="gallery" href="{{photo}}" data-pot-id="{{ pot_id }}" data-image-src="{{ photo }}">
+                                    <img src="{{photo}}" class="" alt="{{ photo }}" data-pot-id="{{ pot_id }}"/>
+                                    <div class="icon-overlay">
+                                        <i class="fa fa-search"></i>
+                                    </div>
+                                    <div class="corner-delete" id="btn-delete-image" data-image-src="{{ photo }}" data-pot-id="{{ pot_id }}">
+                                        <i class="bi bi-trash3"></i>
+                                    </div>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </fieldset>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row custom-row">
+            <fieldset class="col-md-4">
+                <h3 class="text-secondary">Throwing</h3>
+                <div class="input-group mb-3">
+                    {{ form.vessel_type.label(class_="input-group-text") }}
+                    {{ form.vessel_type(class_="form-control", autocomplete_="off") }}
+                    {% for error in form.vessel_type.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3" id="clay-field">
+                    {{ form.made_with_clay.label(class_="input-group-text") }}
+                    <select id="made_with_clay" name="made_with_clay" required class="form-select">
+                        {% for value, label in form.made_with_clay.choices %}
+                            <option value="{{ value }}" {% if value == form.made_with_clay.data %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.made_with_clay.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <button id="add-new-clay" type="button" class="btn btn-outline-secondary mb-3 col-3" data-toggle="modal" data-target="#modal-add-edit-clay" data-reload-page="false">&plus; Add a new clay</button>
+                <div class="input-group mb-3">
+                    {{ form.throw_date.label(class_="input-group-text") }}
+                    {{ form.throw_date(class_="form-control") }}
+                    {% for error in form.throw_date.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.throw_weight.label(class_="input-group-text") }}
+                    {{ form.throw_weight(id_="pot-weight", class_="form-control", autocomplete_="off") }}
+                    <label class="input-group-text" for="pot-weight">g</label>
+                    {% for error in form.throw_weight.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.throw_height.label(class_="input-group-text") }}
+                    {{ form.throw_height(id_="pot-height", class_="form-control", autocomplete_="off") }}
+                    <label class="input-group-text" for="pot-height">cm</label>
+                    {% for error in form.throw_height.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.throw_width.label(class_="input-group-text", for_="pot-width") }}
+                    {{ form.throw_width(id_="pot-width", class_="form-control", autocomplete_="off") }}
+                    <label class="input-group-text" for_="pot-width">cm</label>
+                    {% for error in form.throw_width.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.throw_notes.label(class_="input-group-text") }}
+                    {{ form.throw_notes(class_="form-control", autocomplete_="off") }}
+                    {% for error in form.throw_notes.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+            </fieldset>
+
+            <fieldset class="col-md-4">
+                <h3 class="text-secondary">Trimming</h3>
+                <div class="input-group mb-3">
+                    {{ form.trim_date.label(class_="input-group-text") }}
+                    {{ form.trim_date(class_="form-control", autocomplete_="off") }}
+                    {% for error in form.trim_date.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.trim_weight.label(class_="input-group-text") }}
+                    {{ form.trim_weight(id_="trimmed-pot-weight", class_="form-control", autocomplete_="off") }}
+                    <label class="input-group-text" for="trimmed-pot-weight">g</label>
+                    {% for error in form.trim_weight.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.trim_surface_treatment.label(class_="input-group-text") }}
+                    {{ form.trim_surface_treatment(class_="form-control", autocomplete_="off") }}
+                    {% for error in form.trim_surface_treatment.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.trim_notes.label(class_="input-group-text") }}
+                    {{ form.trim_notes(class_="form-control", autocomplete_="off") }}
+                    {% for error in form.trim_notes.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+            </fieldset>
+
+            <fieldset class="col-md-4">
+                <h3 class="text-secondary">Bisque firing</h3>
+                <div class="input-group mb-3">
+                    {{ form.bisque_fire_start.label(class_="input-group-text") }}
+                    {{ form.bisque_fire_start(class_="form-control") }}
+                    {% for error in form.bisque_fire_start.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.bisque_fire_program_id.label(class_="input-group-text") }}
+                    <select id="bisque_fire_program_id" name="bisque_fire_program_id" required class="form-select">
+                        {% for value, label in form.bisque_fire_program_id.choices %}
+                            <option value="{{ value }}" {% if value == form.bisque_fire_program_id.data %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.bisque_fire_program_id.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.bisque_fire_kiln_id.label(class_="input-group-text") }}
+                    <select id="bisque_fire_kiln_id" name="bisque_fire_kiln_id" required class="form-select">
+                        {% for value, label in form.bisque_fire_kiln_id.choices %}
+                            <option value="{{ value }}" {% if value == form.bisque_fire_kiln_id.data %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.bisque_fire_kiln_id.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.bisque_fire_end.label(class_="input-group-text") }}
+                    {{ form.bisque_fire_end(class_="form-control") }}
+                    {% for error in form.bisque_fire_end.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.bisque_fire_open.label(class_="input-group-text") }}
+                    {{ form.bisque_fire_open(class_="form-control") }}
+                    {% for error in form.bisque_fire_open.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.bisque_fire_notes.label(class_="input-group-text") }}
+                    {{ form.bisque_fire_notes(class_="form-control", autocomplete_="off") }}
+                    {% for error in form.bisque_fire_notes.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="row custom-row">
+            <fieldset class="col-md-6">
+                <h3 class="text-secondary">Glazing</h3>
+                <div class="input-group mb-3">
+                    {{ form.glaze_date.label(class_="input-group-text") }}
+                    {{ form.glaze_date(class_="form-control") }}
+                    {% for error in form.glaze_date.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    <div id="glaze-fields">
+                        <div hidden id="glaze-count" data-variable="{{ form.used_glazes.data | length | tojson }}"></div>
+                        {% for glaze_form in form.used_glazes %}
+                            {% set index=loop.index0 %}
+                            {{ glaze_form.csrf_token }}
+                            <div id="glaze-field-{{ index }}">
+                                <div class="input-group mb-1">
+                                    {{ glaze_form.glaze.label(class_="input-group-text") }} 
+                                    {{ glaze_form.glaze(class_="form-select", id_="glaze-layer") }}
+                                    <div class="w-25">
+                                        <label class="input-group-text" for="glaze-layer-count">&times;</label> 
+                                        {{ glaze_form.number_of_layers(class_="form-control", id_='glaze-layer-count') }}
+                                    </div>
+                                </div>
+                                <div class="input-group mb-3">
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% for error in form.used_glazes.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="d-flex justify-content-between">
+                    <button id="add-glaze-layer" type="button" class="btn btn-outline-primary mb-3 col-3">&plus; Add a new glaze layer</button>
+                    <button id="add-new-glaze" form="form-add-glaze" type="button" class="btn btn-outline-secondary mb-3 col-3" data-toggle="modal" data-target="#modal-add-edit-glaze" data-reload-page="false">&plus; Add a new glaze</button>
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.glaze_notes.label(class_="input-group-text") }}
+                    {{ form.glaze_notes(class_="form-control", autocomplete_="off") }}
+                    {% for error in form.glaze_notes.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+            </fieldset>
+
+            <fieldset class="col-md-6">
+                <h3 class="text-secondary">Glaze firing</h3>
+                <div class="input-group mb-3">
+                    {{ form.glaze_fire_start.label(class_="input-group-text") }}
+                    {{ form.glaze_fire_start(class_="form-control") }}
+                    {% for error in form.glaze_fire_start.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.glaze_fire_program_id.label(class_="input-group-text") }}
+                    <select id="glaze_fire_program_id" name="glaze_fire_program_id" required class="form-select">
+                        {% for value, label in form.glaze_fire_program_id.choices %}
+                            <option value="{{ value }}" {% if value == form.glaze_fire_program_id.data %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.glaze_fire_program_id.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.glaze_fire_kiln_id.label(class_="input-group-text") }}
+                    <select id="glaze_fire_kiln_id" name="glaze_fire_kiln_id" required class="form-select">
+                        {% for value, label in form.glaze_fire_kiln_id.choices %}
+                            <option value="{{ value }}" {% if value == form.glaze_fire_kiln_id.data %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.glaze_fire_kiln_id.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.glaze_fire_end.label(class_="input-group-text") }}
+                    {{ form.glaze_fire_end(class_="form-control") }}
+                    {% for error in form.glaze_fire_end.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.glaze_fire_open.label(class_="input-group-text") }}
+                    {{ form.glaze_fire_open(class_="form-control") }}
+                    {% for error in form.glaze_fire_open.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="input-group mb-3">
+                    {{ form.glaze_fire_notes.label(class_="input-group-text") }}
+                    {{ form.glaze_fire_notes(class_="form-control", autocomplete_="off") }}
+                    {% for error in form.glaze_fire_notes.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <div class="mb-3">
+        {{ form.submit(class_="btn btn-primary col-3", id_="btn-pot", form_="form-pot") }}
+    </div>
+</form>
+
+{% if title == 'Edit pot' %}
+<div class="m-3">
+    <button type="button" class="btn btn-outline-danger col-3" id="btn-delete-item-{{ pot_id }}" data-itemtype="pot">Delete pot</button>
+</div>
+{% else %}
+<div class="m-3">
+    <button type="button" class="btn btn-outline-secondary col-3" id="btn-cancel-add-pot">Cancel</button>
+</div>
+{% endif %}
+
+{% endblock %}

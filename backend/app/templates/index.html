@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+
+{% block main %}
+<h1 class="m-3">Pots</h1>
+<div class="m-3">
+    <a href="{{ url_for('add_pot') }}" class="btn btn-primary" type="button">&plus; Add a new pot</a>
+</div>
+
+{% raw %}
+<div id="index_table">
+<table class="table table-striped table-hover-color table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Image</th>
+            <th @click="sort('throw_date')" class="sorting-column">
+                Throwing date
+                <i v-if="currentSort === 'throw_date'" :class="sortAsc ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                <i v-else class="fas fa-sort"></i>
+            </th>
+            <th @click="sort('vessel_type')" class="sorting-column">
+                Type
+                <i v-if="currentSort === 'vessel_type'" :class="sortAsc ? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+                <i v-else class="fas fa-sort"></i>
+            </th>
+            <th>Clay</th>
+            <th>Glazes</th>
+            <th>Bisque Program</th>
+            <th>Glaze Program</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr v-for="pot in sortedPots" :key="pot.id" @click="editPot(pot.id)">
+            <td>{{ pot.id }}</td>
+            <td>
+                <div class="container-fluid">
+                    <div class="row">
+                        <div v-if="pot.primary_image">
+                            <div class="col p-0 image-container-index">
+                                <!-- Display the primary image -->
+                                <img :src="'static/photos/' + pot.primary_image" alt="Selected Photo" class="img-thumbnail img-fluid responsive-image">
+                            </div>
+                        </div>
+                        <div v-else>
+                            <div class="col p-0 image-container-index">
+                                <!-- Display a default image -->
+                                <img :src="'static/photos/default_mug.jpg'" alt="Default Photo" class="img-thumbnail img-fluid responsive-image">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td>{{ pot.throw_date }}</td>
+            <td>{{ pot.vessel_type }}</td>
+            <td>
+                <a v-if="pot.made_with_clay_id" :href="'/showclay/' + pot.made_with_clay_id" class="link-table-item">{{ pot.made_with_clay_name }}</a>
+            </td>
+            <td>
+                <div v-for="glaze in pot.glazes" :key="glaze.glaze_id">
+                    <a :href="'/showglaze/' + glaze.glaze_id" class="link-table-item">{{ glaze.name }}</a> x{{ glaze.layers }}<br>
+                </div>
+            </td>
+            <td>{{ pot.bisque_fired_with_program }}</td>
+            <td>{{ pot.glaze_fired_with_program }}</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+{% endraw %}
+{% endblock %}

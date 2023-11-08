@@ -1,0 +1,10 @@
+{{ segment.csrf_token }}
+<h5 class="text-secondary pt-4">Segment {{segment_index + 1}}</h5>
+<div id="firing-segment-{{ segment_index }}">
+    {% set temp_start_id = "temp_start-" ~ segment_index %}
+    {% set temp_end_id = "temp_end-" ~ segment_index %}
+    {% set time_to_reach_id = "time_to_reach-" ~ segment_index %}
+    {{ segment.temp_start.label }} {{ segment.temp_start(class_="form-control", autocomplete_="off",  id_=temp_start_id) }}
+    {{ segment.temp_end.label }} {{ segment.temp_end(class_="form-control", autocomplete_="off",  id_=temp_end_id) }}
+    {{ segment.time_to_reach.label }} {{ segment.time_to_reach(class_="form-control", autocomplete_="off",  id_=time_to_reach_id) }}
+</div>

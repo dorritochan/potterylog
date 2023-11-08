@@ -1,0 +1,11 @@
+{{ glaze_layer.csrf_token }}
+<div id="glaze-field-{{ index }}">
+    <div class="input-group mb-3">
+        {{ glaze_layer.glaze.label(class_="input-group-text") }} 
+        {{ glaze_layer.glaze(class_="form-select", id_="glaze-layer") }}
+        <div class="w-25">
+            <label class="input-group-text" for="glaze-layer">&times;</label> 
+            {{ glaze_layer.number_of_layers(class_="form-control") }}
+        </div>
+    </div>
+</div>

@@ -4,11 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from sqlalchemy import MetaData
-import logging
-from logging.handlers import SMTPHandler
-from logging.handlers import RotatingFileHandler
-import os
-
+from flask_cors import CORS
 
 convention = {
     "ix": 'ix_%(column_0_label)s',
@@ -20,26 +16,19 @@ convention = {
 
 metadata = MetaData(naming_convention=convention)
 
-app = Flask(__name__)
-app.config.from_object(Config)
-db = SQLAlchemy(app, metadata=metadata)
-migrate = Migrate(app, db, render_as_batch=True)
-login = LoginManager(app)
-login.login_view = 'login'
+def create_app():
+    app = Flask(__name__)
+    CORS(app)
+    app.config.from_object(Config)
+    
+    db = SQLAlchemy(app, metadata=metadata)
+    
+    migrate = Migrate(app, db, render_as_batch=True)
+    
+    login = LoginManager(app)
+    login.login_view = 'login'
 
-# log errors by email
-if not app.debug:
-    if not os.path.exists('logs'):
-        os.mkdir('logs')
-    file_handler = RotatingFileHandler('logs/potterylog.log', maxBytes=10240,
-                                    backupCount=10)
-    file_handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
-    file_handler.setLevel(logging.INFO)
-    app.logger.addHandler(file_handler)
-
-    app.logger.setLevel(logging.INFO)
-    app.logger.info('Potterylog startup')
-
-
-from app import controller, models, errors
+    from .clay import clay
+    app.register_blueprint(clay)
+    
+    return app

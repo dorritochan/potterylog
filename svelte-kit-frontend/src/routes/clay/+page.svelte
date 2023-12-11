@@ -1,0 +1,68 @@
+<script>
+	export let data;
+</script>
+
+<svelte:head>
+    <title>List of clays</title>
+</svelte:head>
+
+<h1 class="m-3">List of clays</h1>
+
+<div class="m-3">
+    <button id="add-new-clay" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-edit-clay" data-reload-page="true">&plus; Add a new clay</button>
+</div>
+
+<table class="table table-striped table-hover-color table-hover">
+    <thead>
+        <tr>
+            <th>View pots</th>
+            <th>Brand</th>
+            <th>Name or ID</th>
+            <th>Color</th>
+            <th>Min. temp.</th>
+            <th>Max. temp.</th>
+            <th>Grog percentage</th>
+            <th>Grog size</th>
+            <th style="padding: 8px 13px;">URL</th>
+        </tr>
+    </thead>
+    <tbody>
+        {#each data.clays as clay}
+        <tr>
+            <td>
+                <a href="clay/{ clay.id }" class="hover-border-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-cup" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M.11 3.187A.5.5 0 0 1 .5 3h13a.5.5 0 0 1 .488.608l-.22.991a3.001 3.001 0 0 1-1.3 5.854l-.132.59A2.5 2.5 0 0 1 9.896 13H4.104a2.5 2.5 0 0 1-2.44-1.958L.012 3.608a.5.5 0 0 1 .098-.42Zm12.574 6.288a2 2 0 0 0 .866-3.899l-.866 3.9ZM1.124 4l1.516 6.825A1.5 1.5 0 0 0 4.104 12h5.792a1.5 1.5 0 0 0 1.464-1.175L12.877 4H1.123Z"/>
+                    </svg>
+                </a>
+            </td>
+            <td>{ clay.brand || '' }</td>
+            <td>{ clay.name_id || '' }</td>
+            <td>{ clay.color || '' }</td>
+            <td>{ clay.temp_min !== null ? clay.temp_min + '°C' : ''}</td>
+            <td>{ clay.temp_max !== null ? clay.temp_max + '°C' : '' }</td>
+            <td>{ clay.grog_percent !== null ? clay.grog_percent + '%' : '' }</td>
+            <td>{ clay.grog_size_max !== null ? clay.grog_size_max + 'mm' : '' }</td>
+            <td>
+                {#if clay.url }
+                    <a class="hover-border-link" href="{ clay.url || '' }" target="_blank">
+                        Website
+                    </a>
+                {/if}
+            </td>
+            <td>
+                <button type="button" class="btn btn-outline-secondary" id="open-modal-edit-item-{ clay.id }" data-toggle="modal" data-target="#modal-add-edit-clay" data-reload-page="true" data-itemtype="clay">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                    </svg>
+                </button>
+            </td>
+        </tr>
+        {/each}
+    </tbody>
+</table>
+
+
+
+
+

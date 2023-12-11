@@ -1,100 +1,91 @@
-2023-10-20 23:10:36,574 ERROR: Exception on /index [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+2023-12-06 11:44:52,847 ERROR: Exception on /api/pots [GET] [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
     rv = self.handle_user_exception(e)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
     rv = self.dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 55, in index
-    pots = Pot.query.order_by(Pot.throw_date.desc(), Pot.vessel_type.asc()).all()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/query.py", line 2697, in all
-    return self._iter().all()  # type: ignore
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 1756, in all
-    return self._allrows()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 529, in _allrows
-    rows = self._fetchall_impl()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 1663, in _fetchall_impl
-    return self._real_result._fetchall_impl()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 2263, in _fetchall_impl
-    return list(self.iterator)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/loading.py", line 190, in chunks
-    fetch = cursor._raw_all_rows()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 521, in _raw_all_rows
-    return [make_row(row) for row in rows]
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 521, in <listcomp>
-    return [make_row(row) for row in rows]
-  File "lib/sqlalchemy/cyextension/resultproxy.pyx", line 24, in sqlalchemy.cyextension.resultproxy.BaseRow.__init__
-  File "lib/sqlalchemy/cyextension/processors.pyx", line 45, in sqlalchemy.cyextension.processors.str_to_date
-TypeError: fromisoformat: argument must be str
-2023-10-20 23:10:37,439 ERROR: Exception on /index [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/controller.py", line 55, in get_pots
+    return jsonify(pots_schema.dump(pots))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 549, in dump
+    result = self._serialize(processed_obj, many=many)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 511, in _serialize
+    return [
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 512, in <listcomp>
+    self._serialize(d, many=False)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 517, in _serialize
+    value = field_obj.serialize(attr_name, obj, accessor=self.get_attribute)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 340, in serialize
+    return self._serialize(value, attr, obj, **kwargs)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 971, in _serialize
+    ret = self._format_num(value)  # type: _T
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 948, in _format_num
+    return self.num_type(value)
+ValueError: invalid literal for int() with base 10: ''
+2023-12-06 11:45:16,219 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-06 11:45:18,099 ERROR: Exception on /api/pots [GET] [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
     rv = self.handle_user_exception(e)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
     rv = self.dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 55, in index
-    pots = Pot.query.order_by(Pot.throw_date.desc(), Pot.vessel_type.asc()).all()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/query.py", line 2697, in all
-    return self._iter().all()  # type: ignore
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 1756, in all
-    return self._allrows()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 529, in _allrows
-    rows = self._fetchall_impl()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 1663, in _fetchall_impl
-    return self._real_result._fetchall_impl()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 2263, in _fetchall_impl
-    return list(self.iterator)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/loading.py", line 190, in chunks
-    fetch = cursor._raw_all_rows()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 521, in _raw_all_rows
-    return [make_row(row) for row in rows]
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 521, in <listcomp>
-    return [make_row(row) for row in rows]
-  File "lib/sqlalchemy/cyextension/resultproxy.pyx", line 24, in sqlalchemy.cyextension.resultproxy.BaseRow.__init__
-  File "lib/sqlalchemy/cyextension/processors.pyx", line 45, in sqlalchemy.cyextension.processors.str_to_date
-TypeError: fromisoformat: argument must be str
-2023-10-20 23:12:00,764 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-20 23:12:02,238 ERROR: Exception on /index [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/controller.py", line 57, in get_pots
+    return jsonify(pots_schema.dump(pots))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 549, in dump
+    result = self._serialize(processed_obj, many=many)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 511, in _serialize
+    return [
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 512, in <listcomp>
+    self._serialize(d, many=False)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 517, in _serialize
+    value = field_obj.serialize(attr_name, obj, accessor=self.get_attribute)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 340, in serialize
+    return self._serialize(value, attr, obj, **kwargs)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 971, in _serialize
+    ret = self._format_num(value)  # type: _T
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 948, in _format_num
+    return self.num_type(value)
+ValueError: invalid literal for int() with base 10: ''
+2023-12-06 11:45:34,669 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-06 11:45:36,538 ERROR: Exception on /api/pots [GET] [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
     rv = self.handle_user_exception(e)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
     rv = self.dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 55, in index
-    pots = Pot.query.order_by(Pot.throw_date.desc(), Pot.vessel_type.asc()).all()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/query.py", line 2697, in all
-    return self._iter().all()  # type: ignore
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 1756, in all
-    return self._allrows()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 529, in _allrows
-    rows = self._fetchall_impl()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 1663, in _fetchall_impl
-    return self._real_result._fetchall_impl()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 2263, in _fetchall_impl
-    return list(self.iterator)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/orm/loading.py", line 190, in chunks
-    fetch = cursor._raw_all_rows()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 521, in _raw_all_rows
-    return [make_row(row) for row in rows]
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 521, in <listcomp>
-    return [make_row(row) for row in rows]
-  File "lib/sqlalchemy/cyextension/resultproxy.pyx", line 24, in sqlalchemy.cyextension.resultproxy.BaseRow.__init__
-  File "lib/sqlalchemy/cyextension/processors.pyx", line 45, in sqlalchemy.cyextension.processors.str_to_date
-TypeError: fromisoformat: argument must be str
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/controller.py", line 55, in get_pots
+    print(pots_schema.dump(pots))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 549, in dump
+    result = self._serialize(processed_obj, many=many)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 511, in _serialize
+    return [
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 512, in <listcomp>
+    self._serialize(d, many=False)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 517, in _serialize
+    value = field_obj.serialize(attr_name, obj, accessor=self.get_attribute)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 340, in serialize
+    return self._serialize(value, attr, obj, **kwargs)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 971, in _serialize
+    ret = self._format_num(value)  # type: _T
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 948, in _format_num
+    return self.num_type(value)
+ValueError: invalid literal for int() with base 10: ''
+2023-12-06 11:47:04,139 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-06 11:47:21,338 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]

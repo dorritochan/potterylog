@@ -264,7 +264,16 @@ def extract_commission_data(form):
 
 def extract_clay_from_object(clay):
     """Extracts data from a clay object."""
+    pots = [
+        {
+            'id': pot.id,
+            'image': pot.primary_image,
+            'name': pot.get_pot_name()
+        }
+        for pot in clay.pots if clay.pots
+    ]
     return {
+        'id': clay.id,
         'brand': clay.brand,
         'name_id': clay.name_id,
         'color': clay.color,
@@ -272,8 +281,12 @@ def extract_clay_from_object(clay):
         'temp_max': clay.temp_max,
         'grog_percent': clay.grog_percent,
         'grog_size_max': clay.grog_size_max,
-        'url': clay.url
+        'url': clay.url,
+        'name': clay.get_clay_name(),
+        'pots': pots
     }
+
+
 
 
 def extract_glaze_from_object(glaze):

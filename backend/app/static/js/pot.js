@@ -98,13 +98,13 @@ $(document).ready(function() {
 
         // Get the index of the last glaze-field- element and populate the select
         // fields with updated glaze info in a loop
-        var lastGlazeLayerId = $('[id^="glaze-field-"]').last().attr('id');
-        var glazeLayerCount = parseInt(lastGlazeLayerId.split('-').pop(), 10);
-        let selectedChoices = [];
-        for (let index = 0; index <= glazeLayerCount; index++) {
-            var select = $('#glaze-field-' + index + ' select[name$="glaze"]');
-            selectedChoices.push(select.val());
-        }
+        // var lastGlazeLayerId = $('[id^="glaze-field-"]').last().attr('id');
+        // var glazeLayerCount = parseInt(lastGlazeLayerId.split('-').pop(), 10);
+        // let selectedChoices = [];
+        // for (let index = 0; index <= glazeLayerCount; index++) {
+        //     var select = $('#glaze-field-' + index + ' select[name$="glaze"]');
+        //     selectedChoices.push(select.val());
+        // }
 
         $.ajax({
             url: "/addglaze",
@@ -595,7 +595,7 @@ $(document).ready(function() {
         },
         created: function() {
             // Axios AJAX request
-            axios.get('/get_pots')
+            axios.get('/get_pots_old')
                 .then(response => {
                     // Assuming the server responds with a JSON array of pots
                     this.pots = response.data;

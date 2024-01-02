@@ -1,4 +1,5 @@
 import { API_URL } from '$lib/config';
+import { stringify } from 'querystring';
 
 export async function load({ fetch }) {
 
@@ -11,4 +12,11 @@ export async function load({ fetch }) {
 
     const clays = await response.json();
     return { clays };
+}
+
+
+export const actions = {
+    default: async (event) => {
+        console.log(event);
+    },
 }

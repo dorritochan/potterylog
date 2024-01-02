@@ -1,6 +1,7 @@
 # Utility functions
 
-from app import app
+from flask import current_app
+app = current_app
 from app.models import Clay, FiringProgram, Kiln, Glaze
 
 from wtforms import validators

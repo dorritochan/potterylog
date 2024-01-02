@@ -1,5 +1,96 @@
 <script>
+    import { API_URL } from '$lib/config';
+    import Modal from '../Modal.svelte';
+    import { onMount } from 'svelte';
+
 	export let data;
+    
+    let showModal = false;
+
+    let clayBrandList = [];
+    let filteredBrands = [];
+    let highlightedIndex = -1; // Index of the currently highlighted element in the list
+    let brandInput = '';
+    
+    onMount(async () => {
+        const response = await fetch(`${API_URL}/api/clay_brands`);
+        if (response.ok) {
+            clayBrandList = await response.json();
+        }
+    });
+    
+
+    function updateFilteredBrands() {
+        filteredBrands = clayBrandList.filter(brand => brand.toLowerCase().includes(brandInput.toLowerCase()));
+    }
+
+    function selectBrand(brand) {
+        brandInput = brand;
+        filteredBrands = [];
+        highlightedIndex = -1;
+    }
+
+    function handleKeydown(event) {
+        switch(event.key) {
+            case 'ArrowDown':
+                highlightedIndex = (highlightedIndex + 1) % filteredBrands.length;
+                break;
+            case 'ArrowUp':
+                highlightedIndex = (highlightedIndex - 1 + filteredBrands.length) % filteredBrands.length;
+                break;
+            case 'Enter':
+                if (highlightedIndex >= 0) {
+                    selectBrand(filteredBrands[highlightedIndex]);
+                }
+                break;
+        }
+    }
+
+    let nameId = '';
+    let color = '';
+    let tempMin = '';
+    let tempMax = '';
+    let grogPercent = '';
+    let grogSizeMax = '';
+    let url = '';
+    let errors = { brand: [], nameId: [], color: [], tempMin: [], tempMax: [], grogPercent: [], grogSizeMax: [], url: [] };
+
+    async function handleSubmit() {
+        const response = await fetch(`${API_URL}/api/add_clay`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                brand: brandInput, 
+                name_id: nameId, 
+                color, 
+                temp_min: tempMin, 
+                temp_max: tempMax, 
+                grog_percent: grogPercent,
+                grog_size_max: grogSizeMax, 
+                url 
+            })
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log(result.message);
+        } else {
+            console.log(response.errors);
+
+            // Client-side errors (e.g., 400 Bad Request)
+            if (response.status >= 400 && response.status < 500) {
+                console.error("Client error:", response.status);
+                const errorData = await response.json();
+                // Show error message to the user
+                console.error(errorData.message);
+                // Server-side errors (e.g., 500 Internal Server Error)
+            } else if (response.status >= 500) {
+                // Show generic error message to the user
+                console.error("Server error:", response.status);
+            }
+        }
+    }
+
 </script>
 
 <svelte:head>
@@ -9,8 +100,78 @@
 <h1 class="m-3">List of clays</h1>
 
 <div class="m-3">
-    <button id="add-new-clay" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-edit-clay" data-reload-page="true">&plus; Add a new clay</button>
+    <button on:click={() => showModal = true} id="add-new-clay" type="button" class="btn btn-primary">&plus; Add a new clay</button>
 </div>
+
+<Modal bind:showModal modalTitle="Add a new clay" submitText="Add clay" on:submit={handleSubmit}>
+
+    <form on:submit|preventDefault method='POST'>
+        <div class="form-group">
+            <label for="brand" class="p-1">Brand</label>
+            <input type="input" class="form-control input-search" bind:value={brandInput} on:input={updateFilteredBrands} on:click={updateFilteredBrands} on:focus={updateFilteredBrands} on:keydown={handleKeydown} autocomplete="off" id="brand" placeholder="e.g. Sibelco"/>
+            {#if filteredBrands.length > 0}
+                <ul class="input-search-list list-group">
+                    {#each filteredBrands as brand, index (brand)}
+                        <li class="list-group-item {index === highlightedIndex ? 'selected' : ''}" on:click={() => selectBrand(brand)}>{brand}</li>
+                    {/each}
+                </ul>
+            {/if}
+            {#each errors.brand as error}
+                <span style="color: red;">[{error}]</span>
+            {/each}
+        </div>
+        <div class="form-group">
+            <label for="nameId" class="p-1">Name or ID</label>
+            <input type="text" class="form-control" bind:value={nameId} on:keydown={handleKeydown} autocomplete="off" id="nameId" placeholder="e.g. WM 2502 B"/>
+            {#each errors.nameId as error}
+                <span style="color: red;">[{error}]</span>
+            {/each}
+        </div>
+        <div class="form-group">
+            <label for="color" class="p-1">Color</label>
+            <input type="text" class="form-control" bind:value={color} autocomplete="off" id="color" placeholder="e.g. Yellow with spots"/>
+            {#each errors.color as error}
+                <span style="color: red;">[{error}]</span>
+            {/each}
+        </div>
+        <div class="form-group">
+            <label for="tempMin" class="p-1">Min. temp.</label>
+            <input type="number" class="form-control" bind:value={tempMin} autocomplete="off" id="tempMin" placeholder="°C"/>
+            {#each errors.tempMin as error}
+                <span style="color: red;">[{error}]</span>
+            {/each}
+        </div>
+        <div class="form-group">
+            <label for="tempMax" class="p-1">Max. temp.</label>
+            <input type="number" class="form-control" bind:value={tempMax} autocomplete="off" id="tempMax" placeholder="°C"/>
+            {#each errors.tempMax as error}
+                <span style="color: red;">[{error}]</span>
+            {/each}
+        </div>
+        <div class="form-group">
+            <label for="grogPercent" class="p-1">Grog percentage</label>
+            <input type="number" class="form-control" bind:value={grogPercent} autocomplete="off" id="grogPercent" placeholder="%"/>
+            {#each errors.grogPercent as error}
+                <span style="color: red;">[{error}]</span>
+            {/each}
+        </div>
+        <div class="form-group">
+            <label for="grogSizeMax" class="p-1">Grog size</label>
+            <input type="number" class="form-control" bind:value={grogSizeMax} autocomplete="off" id="grogSizeMax" placeholder="mm"/>
+            {#each errors.grogSizeMax as error}
+                <span style="color: red;">[{error}]</span>
+            {/each}
+        </div>
+        <div class="form-group">
+            <label for="url" class="p-1">URL</label>
+            <input type="text" class="form-control" bind:value={url} autocomplete="off" id="url" placeholder="https://"/>
+            {#each errors.url as error}
+                <span style="color: red;">[{error}]</span>
+            {/each}
+        </div>
+    </form>
+
+</Modal>
 
 <table class="table table-striped table-hover-color table-hover">
     <thead>
@@ -66,3 +227,23 @@
 
 
 
+<style>
+    ::placeholder {
+        opacity: 0.5;
+    }
+    .input-search {
+        margin-bottom: 0;
+        position: relative;
+        z-index: 2;
+    }
+    .input-search-list {
+        margin-top: 0;
+        list-style-type: none;
+        z-index: 1;
+        position: absolute;
+        width: 100%;
+    }
+    .list-group-item:hover, .list-group-item.selected {
+        background-color: #d0d2d7;
+    }
+</style>

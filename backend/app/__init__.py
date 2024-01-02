@@ -16,19 +16,29 @@ convention = {
 
 metadata = MetaData(naming_convention=convention)
 
-def create_app():
+db = SQLAlchemy(metadata=metadata)
+migrate = Migrate(render_as_batch=True)
+login = LoginManager()
+
+def create_app(config_class=Config):
     app = Flask(__name__)
-    CORS(app)
-    app.config.from_object(Config)
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    app.config.from_object(config_class)
     
-    db = SQLAlchemy(app, metadata=metadata)
+    db.init_app(app)
+    migrate.init_app(app, db)
+    login.init_app(app)
     
-    migrate = Migrate(app, db, render_as_batch=True)
-    
-    login = LoginManager(app)
     login.login_view = 'login'
 
-    from .clay import clay
-    app.register_blueprint(clay)
+    # Import and register blueprints
+    from .pot.pot import pot as pot_blueprint
+    app.register_blueprint(pot_blueprint)
+    
+    from .clay.clay import clay as clay_blueprint
+    app.register_blueprint(clay_blueprint)
+    
+    from .glaze.glaze import glaze as glaze_blueprint
+    app.register_blueprint(glaze_blueprint)
     
     return app

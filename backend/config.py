@@ -15,3 +15,8 @@ class Config(object):
     UPLOAD_FOLDER = os.path.join(basedir, 'app', 'static', 'photos')
     
     ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'gif', 'png'}
+
+
+class TestConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'

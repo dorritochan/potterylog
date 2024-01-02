@@ -1,7 +1,13 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, current_app, request
+from wtforms import ValidationError
 
+app = current_app
+from app.models import Clay
+from app.schemas import ClaySchema
+from app import db
 
 clay = Blueprint('clay', __name__)
+
 
 @clay.route('/api/clays')
 # @login_required
@@ -32,5 +38,38 @@ def get_clay(clay_id):
         return jsonify({'message': 'Clay not found'}), 404
     
     
-from app.models import Clay
-from app.schemas import ClaySchema
+@clay.route('/api/add_clay', methods=['POST'])
+def add_clay():
+    
+    data = request.get_json()
+    print(data)
+    clay_schema = ClaySchema(session=db.session)
+    
+    try:
+        new_clay = clay_schema.load(data)
+        db.session.add(new_clay)
+        db.session.commit()
+    
+        return jsonify({'message': 'New clay added!'}), 201
+    
+    except ValidationError as e:
+        print(e.messages)
+        return jsonify({'errors': e.messages}), 400
+    
+
+@clay.route('/api/clay_brands')
+def clay_brands():
+    
+    brands = [clay.brand for clay in Clay.query.all()]
+    brands = list(dict.fromkeys(brands))
+    
+    return jsonify(brands)
+
+
+@clay.route('/api/clay_names/<clay_brand>')
+def clay_names(clay_brand):
+    
+    clay_names = [clay.name_id for clay in Clay.query.filter(Clay.brand == clay_brand)]
+    clay_names = list(dict.fromkeys(clay_names))
+    
+    return jsonify(clay_names)

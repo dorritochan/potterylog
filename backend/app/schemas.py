@@ -1,6 +1,6 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from marshmallow_sqlalchemy.fields import Nested
-from marshmallow import fields
+from marshmallow import fields, pre_load
 from app.models import Clay, Pot, Glaze, PotGlaze
 
 
@@ -76,13 +76,23 @@ class ClaySchema(SQLAlchemyAutoSchema):
     brand = auto_field()
     name_id = auto_field()
     color = auto_field()
-    temp_min = auto_field()
-    temp_max = auto_field()
-    grog_percent = auto_field()
-    grog_size_max = auto_field()
+    temp_min = fields.Integer(allow_none=True)
+    temp_max = fields.Integer(allow_none=True)
+    grog_percent = fields.Integer(allow_none=True)
+    grog_size_max = fields.Float(allow_none=True)
     url = auto_field()
     pots = fields.List(fields.Nested(PotSchema(only=('id', 'pot_name', 'primary_image'))))
     clay_name = fields.Method('get_clay_name')
+    
+    @pre_load
+    def handle_empty_strings(self, data, **kwargs):
+        possible_empty_num_fields = ['temp_min', 'temp_max', 'grog_percent', 'grog_size_max']
+        
+        for field in possible_empty_num_fields:
+            if data.get(field) == '':
+                data[field] = None
+        
+        return data
     
     def get_clay_name(self, obj):
         return obj.get_clay_name()

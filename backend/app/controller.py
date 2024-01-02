@@ -3,7 +3,7 @@ from datetime import datetime
 import os, uuid
 
 # Third-party imports
-from flask import render_template, flash, redirect, url_for, request, jsonify
+from flask import render_template, flash, redirect, url_for, request, jsonify, current_app, Blueprint
 from flask_login import current_user, login_user, logout_user, login_required
 from flask_cors import cross_origin
 from sqlalchemy.exc import DatabaseError
@@ -12,7 +12,9 @@ from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 
 # Local application imports
-from app import app, db
+from app import db
+
+app = current_app
 from app.forms import (
     LoginForm, RegistrationForm, AddPotForm, AddClayForm, AddGlazeForm,
     GlazeLayerForm, AddKilnForm, AddFiringProgramForm, FiringSegmentForm,
@@ -41,64 +43,7 @@ from app.utils import (
 UPLOAD_FOLDER = app.config['UPLOAD_FOLDER']
 
 
-@app.route('/api/pots')
-# @login_required
-def get_pots():
-    
-    pots = Pot.query.order_by(desc(Pot.id)).all()
-        
-    pots_schema = PotSchema(many=True, only=('id', 'primary_image', 'throw_date', 'vessel_type', 'clay_type', 'used_glazes'))
-    
-    return jsonify(pots_schema.dump(pots))
 
-
-@app.route('/api/pot/<int:pot_id>')
-def get_pot(pot_id):
-    
-    pot = Pot.query.get_or_404(pot_id)
-    
-    if pot:
-        pot_schema = PotSchema()
-        return jsonify(pot_schema.dump(pot))
-    
-    return jsonify({'message': f'Pot with id {pot_id} not found'}), 404
-
-
-
-    
-    
-@app.route('/api/glazes')
-# @login_required
-def get_glazes():
-    
-    glazes = Glaze.query.order_by(Glaze.brand, Glaze.brand_id).all()
-    glaze_schema = GlazeSchema(many=True)
-    
-    return jsonify(glaze_schema.dump(glazes))
-
-
-@app.route('/api/glaze/<int:glaze_id>')
-def get_glaze(glaze_id):
-    
-    glaze = Glaze.query.get_or_404(glaze_id)
-    if glaze:
-        glaze_schema = GlazeSchema()
-        return jsonify(glaze_schema.dump(glaze))
-    
-    return jsonify({'message': 'Glaze not found'}), 404
-    
-
-
-    
-
-@app.route('/')
-@app.route('/home')
-@app.route('/index')
-# @login_required
-def index():
-    
-    # Simply render the 'index.html' template
-    return render_template('index.html', title='Pottery log')
 
 
 @app.route('/login', methods=['GET', 'POST'])

@@ -1,4 +1,4 @@
-from app import db, app
+from app import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -6,6 +6,8 @@ from app import login
 from pytz import timezone
 from sqlalchemy import event
 import os
+from flask import current_app
+
 
 germany_timezone = timezone('Europe/Berlin')
 
@@ -111,7 +113,7 @@ def delete_image_files(mapper, connection, target):
     Remove the image file associated with the Image object before its record is deleted.
     """
     if target.filename:
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], target.filename)
+        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], target.filename)
         if os.path.exists(file_path):
             os.remove(file_path)
             

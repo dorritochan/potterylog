@@ -1,15 +1,58 @@
+from typing import Any
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from marshmallow_sqlalchemy.fields import Nested
-from marshmallow import fields, pre_load
+from marshmallow import fields, pre_load, validates, validate, ValidationError
 from app.models import Clay, Pot, Glaze, PotGlaze
+import re
+
+class CustomURLValidator:
+    def __init__(self, error=None):
+        self.error = error or 'Invalid URL.'
+        self.pattern = re.compile(
+            r'^(?:http[s]?://)?'  # optional http or https
+            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain
+            r'localhost|'  # localhost
+            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or IP
+            r'(?::\d+)?'  # optional port
+            r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+
+    def __call__(self, value):
+        if value is not None:
+            if not self.pattern.match(value):
+                raise ValidationError(self.error)
+
+            if not value.startswith(('http://', 'https://')):
+                return 'https://' + value
+        
+        return value
 
 
-class IntegerHandlingEmptyString(fields.Integer):
+class BaseHandlingEmptyString(fields.Field):
     def _deserialize(self, value, attr, data, **kwargs):
-        if value == '':
-            return None
+        if isinstance(value, str) and not value.strip():
+            if self.allow_none:
+                return None
+            else:
+                raise ValidationError('Cannot be empty.')
         return super()._deserialize(value, attr, data, **kwargs)
     
+class IntegerHandlingEmptyString(BaseHandlingEmptyString, fields.Integer):
+    pass
+
+class StringHandlingEmptystring(BaseHandlingEmptyString, fields.String):
+    pass
+
+class FloatHandlingEmptyString(BaseHandlingEmptyString, fields.Float):
+    pass
+
+def range_check_if_not_none(min=None, max=None):
+    range_validator = validate.Range(min=min, max=max)
+    
+    def validator(value):
+        if value is not None:
+            range_validator(value)
+            
+    return validator
 
 class PotSchema(SQLAlchemyAutoSchema):
     class Meta:
@@ -73,26 +116,17 @@ class ClaySchema(SQLAlchemyAutoSchema):
     
     # Define fields explicitly if needed
     id = auto_field()
-    brand = auto_field()
-    name_id = auto_field()
-    color = auto_field()
-    temp_min = fields.Integer(allow_none=True)
-    temp_max = fields.Integer(allow_none=True)
-    grog_percent = fields.Integer(allow_none=True)
-    grog_size_max = fields.Float(allow_none=True)
-    url = auto_field()
+    brand = StringHandlingEmptystring(allow_none=False, required=True)
+    name_id = StringHandlingEmptystring(allow_none=False, required=True)
+    color = StringHandlingEmptystring(allow_none=True)
+    temp_min = IntegerHandlingEmptyString(allow_none=True)
+    temp_max = IntegerHandlingEmptyString(allow_none=True)
+    grog_percent = IntegerHandlingEmptyString(allow_none=True, validate=range_check_if_not_none(min=0,max=100))
+    grog_size_max = FloatHandlingEmptyString(allow_none=True, validate=range_check_if_not_none(min=0.00, max=10.00))
+    url = StringHandlingEmptystring(validate=CustomURLValidator(), allow_none=True)
     pots = fields.List(fields.Nested(PotSchema(only=('id', 'pot_name', 'primary_image'))))
     clay_name = fields.Method('get_clay_name')
     
-    @pre_load
-    def handle_empty_strings(self, data, **kwargs):
-        possible_empty_num_fields = ['temp_min', 'temp_max', 'grog_percent', 'grog_size_max']
-        
-        for field in possible_empty_num_fields:
-            if data.get(field) == '':
-                data[field] = None
-        
-        return data
     
     def get_clay_name(self, obj):
         return obj.get_clay_name()

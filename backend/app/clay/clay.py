@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, current_app, request
-from wtforms import ValidationError
+from marshmallow import ValidationError
 
 app = current_app
 from app.models import Clay
@@ -53,7 +53,7 @@ def add_clay():
         return jsonify({'message': 'New clay added!'}), 201
     
     except ValidationError as e:
-        print(e.messages)
+        
         return jsonify({'errors': e.messages}), 400
     
 

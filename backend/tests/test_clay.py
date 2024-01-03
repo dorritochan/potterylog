@@ -31,19 +31,33 @@ class TestClayRoutes(TestCase):
             'url': 'https://brand.com/123-PC_new'
         })
         self.assertEqual(response.status_code, 201)
+        print(response.status_code)
         self.assertIn('New clay added!', response.json['message'])
         
         new_clay = Clay.query.filter_by(brand='Test brand', name_id='123-PC New').first()
         self.assertIsNotNone(new_clay)
         
-    def test_add_clay_invalid_data(self):
+    def test_add_clay_invalid_data_color(self):
         # Test with invalid data
         response = self.client.post('/api/add_clay', json={
-            'brand': 'Test brand',
-            'name_id': 'DFG-456',
-            'color': '123',
-            'temp_min': 'foo'
+            'brand': '',
+            'name_id': '',
+            'color': 123,
+            'temp_min': 'foo',
+            'temp_max': 'bar',
+            'grog_percent': 121,
+            'grog_size_max': 11.00,
+            'url': 'google'
         })
+        data = response.get_json()
+        print(data)
         self.assertEqual(response.status_code, 400)
-        # self.assertIn('errors', data)
-        # self.assertIn('color', response.json['errors'])
+        self.assertIn('errors', data)
+        self.assertIn('brand', response.json['errors'])
+        self.assertIn('name_id', response.json['errors'])
+        self.assertIn('color', response.json['errors'])
+        self.assertIn('temp_min', response.json['errors'])
+        self.assertIn('temp_max', response.json['errors'])
+        self.assertIn('grog_percent', response.json['errors'])
+        self.assertIn('grog_size_max', response.json['errors'])
+        self.assertIn('url', response.json['errors'])

@@ -17,6 +17,7 @@ export async function load({ fetch }) {
 
 export const actions = {
     default: async (event) => {
+        console.log('Logging the server code...');
         console.log(event);
     },
 }

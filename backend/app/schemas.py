@@ -33,7 +33,7 @@ class BaseHandlingEmptyString(fields.Field):
             if self.allow_none:
                 return None
             else:
-                raise ValidationError('Cannot be empty.')
+                raise ValidationError('Cannot be empty')
         return super()._deserialize(value, attr, data, **kwargs)
     
 class IntegerHandlingEmptyString(BaseHandlingEmptyString, fields.Integer):

@@ -7,10 +7,21 @@
     
     let showModal = false;
 
+    let brand = '';
     let clayBrandList = [];
     let filteredBrands = [];
     let highlightedIndex = -1; // Index of the currently highlighted element in the list
-    let brand = '';
+    let name_id = '';
+    let clayNamesList = [];
+    let filteredClayNames = [];
+    let color = '';
+    let temp_min = '';
+    let temp_max = '';
+    let grog_percent = '';
+    let grog_size_max = '';
+    let url = '';
+    let encodedBrand = encodeURIComponent(brand);
+    let encodedName = encodeURIComponent(name_id);
     
     onMount(async () => {
         const response = await fetch(`${API_URL}/api/clay_brands`);
@@ -21,9 +32,19 @@
     
 
     let brandInput;
-    function handleClickOutsideBrandInput(event) {
+    let nameInput;
+    // Close the dropdowns on brand and name when the focus/click is not on the 
+    // respective input
+    function handleClickOutsideInput(event) {
         if (!brandInput.contains(event.target)) {
-            closeBrandList();
+            if (!nameInput.contains(event.target)) {
+                closeBrandList();
+                closeNamesList();
+            } else {
+                closeBrandList();
+            }
+        } else {
+            closeNamesList();
         }
     }
 
@@ -31,9 +52,16 @@
         filteredBrands = clayBrandList.filter(brandFromList => brandFromList.toLowerCase().includes(brand.toLowerCase()));
     }
 
-    function selectBrand(brandItem) {
+    async function selectBrand(brandItem) {
         brand = brandItem;
         closeBrandList();
+
+        encodedBrand = encodeURIComponent(brand);
+
+        const response = await fetch(`${API_URL}/api/clay_names/${encodedBrand}`);
+        if (response.ok) {
+            clayNamesList = await response.json();
+        }
     }
 
     function closeBrandList() {
@@ -41,33 +69,96 @@
         highlightedIndex = -1;
     }
 
-    function handleKeydown(event) {
-        switch(event.key) {
-            case 'ArrowDown':
-                highlightedIndex = (highlightedIndex + 1) % filteredBrands.length;
-                break;
-            case 'ArrowUp':
-                highlightedIndex = (highlightedIndex - 1 + filteredBrands.length) % filteredBrands.length;
-                break;
-            case 'Enter':
-                if (highlightedIndex >= 0) {
-                    selectBrand(filteredBrands[highlightedIndex]);
-                }
-                break;
-            case 'Tab':
-                closeBrandList();
-                break;
+    function updateFilteredNames() {
+        if (brand != '') {
+            filteredClayNames = clayNamesList.filter(nameFromList => nameFromList.toLowerCase().includes(name_id.toLowerCase()));
+        } else {
+            filteredClayNames = [];
+        }
+    }
+    
+    async function selectClayName(nameItem) {
+        name_id = nameItem;
+        closeNamesList();
+
+        encodedBrand = encodeURIComponent(brand);
+        encodedName = encodeURIComponent(name_id);
+
+        const response = await fetch(`${API_URL}/api/clay?brand=${encodedBrand}&name_id=${encodedName}`);
+
+        if (response.ok) {
+            let data = await response.json();
+            color = data.color;
+            temp_min = data.temp_min;
+            temp_max = data.temp_max;
+            grog_percent = data.grog_percent;
+            grog_size_max = data.grog_size_max;
+            url = data.url;
         }
     }
 
-    let name_id = '';
-    let color = '';
-    let temp_min = '';
-    let temp_max = '';
-    let grog_percent = '';
-    let grog_size_max = '';
-    let url = '';
+    function closeNamesList() {
+        filteredClayNames = [];
+        highlightedIndex = -1;
+    }
+
+    let brandState = {
+        filteredItems: filteredBrands,
+        highlightedIndex: -1,
+        selectItem: selectBrand
+    }
+
+    let nameState = {
+        filteredItems: filteredClayNames,
+        highlightedIndex: -1,
+        selectItem: selectClayName
+    }
+
+    // function handleKeydown(event, state) {
+    //     switch(event.key) {
+    //         case 'ArrowDown':
+    //             console.log('we went down');
+    //             console.log(state.highlightedIndex);
+    //             console.log(state.filteredItems);
+    //             console.log(state.filteredItems.length);
+    //             state.highlightedIndex = (state.highlightedIndex + 1) % state.filteredItems.length;
+    //             console.log(state.highlightedIndex);
+    //             break;
+    //         case 'ArrowUp':
+    //             state.highlightedIndex = (state.highlightedIndex - 1 + state.filteredItems.length) % state.filteredItems.length;
+    //             break;
+    //         case 'Enter':
+    //             if (state.highlightedIndex >= 0) {
+    //                 state.selectItem(state.filteredItems[state.highlightedIndex]);
+    //             }
+    //             break;
+    //         case 'Tab':
+    //             closeBrandList();
+    //             break;
+    //     }
+    // }
+
+    
     let errors = { brand: [], name_id: [], color: [], temp_min: [], temp_max: [], grog_percent: [], grog_size_max: [], url: [] };
+
+    function removeErrorMessage(fieldKey) {
+        errors[fieldKey] = [];
+    }
+
+    function resetValuesForm() {
+        brand = '';
+        name_id = '';
+        color = '';
+        temp_min = '';
+        temp_max = '';
+        grog_percent = '';
+        grog_size_max = '';
+        url = '';
+        Object.keys(errors).forEach(key => {
+            removeErrorMessage(key);
+        });
+        errors = { ...errors };
+    }
 
     async function handleSubmit() {
         const response = await fetch(`${API_URL}/api/add_clay`, {
@@ -83,17 +174,35 @@
             console.log(result.message);
         } else {
             console.log(response.errors);
+            const errorData = await response.json();
 
             // Client-side errors (e.g., 400 Bad Request)
             if (response.status >= 400 && response.status < 500) {
                 console.error("Client error:", response.status);
-                const errorData = await response.json();
                 // Show error message to the user
-                console.error(errorData.errors);
+                console.error(errorData.message);
+                
                 // Server-side errors (e.g., 500 Internal Server Error)
             } else if (response.status >= 500) {
                 // Show generic error message to the user
                 console.error("Server error:", response.status);
+            }
+            
+            // Set the respective errors in the errors dict
+            let errorsMessage = errorData.message;
+
+            let firstError = '';
+            Object.keys(errors).forEach(key => {
+                    if(errorsMessage[key]) {
+                        errors[key] = errorsMessage[key];
+                        if (firstError == '') {
+                            firstError = key;
+                        };
+                    }
+                });
+            console.log(firstError);
+            if (firstError == 'brand') {
+                brandInput.focus();
             }
         }
     }
@@ -111,12 +220,22 @@
     <button on:click={() => showModal = true} id="add-new-clay" type="button" class="btn btn-primary">&plus; Add a new clay</button>
 </div>
 
-<Modal bind:showModal modalTitle="Add a new clay" submitText="Add clay" on:submit={handleSubmit} on:click={handleClickOutsideBrandInput}>
+<Modal bind:showModal modalTitle="Add a new clay" submitText="Add clay" on:submit={handleSubmit} on:resetValues={resetValuesForm} on:click={handleClickOutsideInput} on:focus={handleClickOutsideInput}>
 
     <form on:submit|preventDefault method='POST'>
-        <div class="form-group" bind:this={brandInput}>
-            <label for="brand" class="p-1">Brand</label>
-            <input type="input" class="form-control input-search" bind:value={brand} on:input={updateFilteredBrands} on:click={updateFilteredBrands} on:focus={updateFilteredBrands} on:keydown={handleKeydown} autocomplete="off" id="brand" placeholder="e.g. Sibelco"/>
+        <div class="form-group">
+            <div class="label-container">
+                <label for="brand" class="p-1">Brand</label>
+                <div class="invisible-container"></div>
+            </div>
+            <input type="search" name="brand" class="form-control input-search" autocomplete="off" id="brand" placeholder="e.g. Sibelco"
+                bind:this={brandInput} 
+                bind:value={brand} 
+                on:input={updateFilteredBrands} 
+                on:input={removeErrorMessage('brand')} 
+                on:click={updateFilteredBrands} 
+                on:focus={updateFilteredBrands} 
+                />
             {#if filteredBrands.length > 0}
                 <ul class="input-search-list list-group">
                     {#each filteredBrands as brandItem, index (brandItem)}
@@ -124,58 +243,156 @@
                     {/each}
                 </ul>
             {/if}
-            {#each errors.brand as error}
-                <span style="color: red;">[{error}]</span>
-            {/each}
+            <div class="error-message">
+                <small>
+                    {#each errors.brand as error}
+                    {error}
+                    {/each}
+                </small>
+            </div>
         </div>
         <div class="form-group">
-            <label for="name_id" class="p-1">Name or ID</label>
-            <input type="text" class="form-control" bind:value={name_id} on:keydown={handleKeydown} autocomplete="off" id="name_id" placeholder="e.g. WM 2502 B"/>
-            {#each errors.name_id as error}
-                <span style="color: red;">[{error}]</span>
-            {/each}
+            <div class="label-container">
+                <label for="name_id" class="p-1">Name or ID</label>
+                <div class="invisible-container"></div>
+            </div>
+            <input type="search" name="name_id" class="form-control" autocomplete="off" id="name_id" placeholder="e.g. WM 2502 B"
+            bind:this={nameInput}
+            bind:value={name_id}
+            on:input={removeErrorMessage('name_id')}
+            on:input={updateFilteredNames}
+            on:focus={updateFilteredNames}/>
+            {#if filteredClayNames.length > 0}
+                <ul class="input-search-list list-group">
+                    {#each filteredClayNames as nameItem, index (nameItem)}
+                        <li class="list-group-item {index === highlightedIndex ? 'selected' : ''}" on:click={() => selectClayName(nameItem)}>{nameItem}</li>
+                    {/each}
+                </ul>
+            {/if}
+            <div class="error-message">
+                <small>
+                    {#each errors.name_id as error}
+                    {error}
+                    {/each}
+                </small>
+            </div>
         </div>
         <div class="form-group">
-            <label for="color" class="p-1">Color</label>
-            <input type="text" class="form-control" bind:value={color} autocomplete="off" id="color" placeholder="e.g. Yellow with spots"/>
-            {#each errors.color as error}
-                <span style="color: red;">[{error}]</span>
-            {/each}
+            <div class="label-container">
+                <label for="color" class="p-1">Color</label>
+                <div class="invisible-container"></div>
+            </div>
+            <input type="search" name="color" class="form-control" bind:value={color} on:input={removeErrorMessage('color')} autocomplete="off" id="color" placeholder="e.g. Yellow with spots"/>
+            <div class="error-message">
+                <small>
+                    {#each errors.color as error}
+                    {error}
+                    {/each}
+                </small>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <div class="form-group col-5">
+                <div class="label-container">
+                    <label for="temp_min" class="p-1">Min. temp.</label>
+                    <div class="invisible-container"></div>
+                </div>
+                <div class="input-group">
+                    <input type="number" name="temp_min" class="form-control" autocomplete="off"
+                        bind:value={temp_min} 
+                        on:input={removeErrorMessage('temp_min')} />
+                    <div class="input-group-append">
+                        <span class="input-group-text" id="basic-addon1">°C</span>
+                    </div>
+                </div>
+                <div class="error-message">
+                    <small>
+                        {#each errors.temp_min as error}
+                        {error}
+                        {/each}
+                    </small>
+                </div>
+            </div>
+            <div class="form-group col-5">
+                <div class="label-container">
+                    <label for="temp_max" class="p-1">Max. temp.</label>
+                    <div class="invisible-container"></div>
+                </div>
+                <div class="input-group">
+                    <input type="number" name="temp_max" class="form-control" autocomplete="off"
+                    bind:value={temp_max} 
+                    on:input={removeErrorMessage('temp_max')}/>
+                    <div class="input-group-append">
+                        <span class="input-group-text" id="basic-addon1">°C</span>
+                    </div>
+                </div>
+                <div class="error-message">
+                    <small>
+                        {#each errors.temp_max as error}
+                        {error}
+                        {/each}
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <div class="form-group col-5">
+                <div class="label-container">
+                    <label for="grog_percent" class="p-1">Grog percentage</label>
+                    <div class="invisible-container"></div>
+                </div>
+                <div class="input-group">
+                    <input type="number" name="grog_percent" class="form-control" autocomplete="off" 
+                    bind:value={grog_percent} 
+                    on:input={removeErrorMessage('grog_percent')} />
+                    <div class="input-group-append">
+                        <span class="input-group-text" id="basic-addon1">%</span>
+                    </div>
+                </div>
+                <div class="error-message">
+                    <small>
+                        {#each errors.grog_percent as error}
+                        {error}
+                        {/each}
+                    </small>
+                </div>
+            </div>
+            <div class="form-group col-5">
+                <div class="label-container">
+                    <label for="grog_size_max" class="p-1">Grog size</label>
+                    <div class="invisible-container"></div>
+                </div>
+                <div class="input-group">
+                    <input type="number" name="grog_size_max" class="form-control" autocomplete="off"
+                    bind:value={grog_size_max} 
+                    on:input={removeErrorMessage('grog_size_max')} />
+                    <div class="input-group-append">
+                        <span class="input-group-text" id="basic-addon1">mm</span>
+                    </div>
+                </div>
+
+                <div class="error-message">
+                    <small>
+                        {#each errors.grog_size_max as error}
+                        {error}
+                        {/each}
+                    </small>
+                </div>
+            </div>
         </div>
         <div class="form-group">
-            <label for="temp_min" class="p-1">Min. temp.</label>
-            <input type="number" class="form-control" bind:value={temp_min} autocomplete="off" id="temp_min" placeholder="°C"/>
-            {#each errors.temp_min as error}
-                <span style="color: red;">[{error}]</span>
-            {/each}
-        </div>
-        <div class="form-group">
-            <label for="temp_max" class="p-1">Max. temp.</label>
-            <input type="number" class="form-control" bind:value={temp_max} autocomplete="off" id="temp_max" placeholder="°C"/>
-            {#each errors.temp_max as error}
-                <span style="color: red;">[{error}]</span>
-            {/each}
-        </div>
-        <div class="form-group">
-            <label for="grog_percent" class="p-1">Grog percentage</label>
-            <input type="number" class="form-control" bind:value={grog_percent} autocomplete="off" id="grog_percent" placeholder="%"/>
-            {#each errors.grog_percent as error}
-                <span style="color: red;">[{error}]</span>
-            {/each}
-        </div>
-        <div class="form-group">
-            <label for="grog_size_max" class="p-1">Grog size</label>
-            <input type="number" class="form-control" bind:value={grog_size_max} autocomplete="off" id="grog_size_max" placeholder="mm"/>
-            {#each errors.grog_size_max as error}
-                <span style="color: red;">[{error}]</span>
-            {/each}
-        </div>
-        <div class="form-group">
-            <label for="url" class="p-1">URL</label>
-            <input type="text" class="form-control" bind:value={url} autocomplete="off" id="url" placeholder="https://"/>
-            {#each errors.url as error}
-                <span style="color: red;">[{error}]</span>
-            {/each}
+            <div class="label-container">
+                <label for="url" class="p-1">URL</label>
+                <div class="invisible-container"></div>
+            </div>
+            <input type="search" name="url" class="form-control" bind:value={url} on:input={removeErrorMessage('url')} autocomplete="off" id="url" placeholder="https://"/>
+            <div class="error-message">
+                <small>
+                    {#each errors.url as error}
+                    {error}
+                    {/each}
+                </small>
+            </div>
         </div>
     </form>
 
@@ -242,16 +459,48 @@
     .input-search {
         margin-bottom: 0;
         position: relative;
-        z-index: 2;
+        z-index: 3;
     }
     .input-search-list {
         margin-top: 0;
         list-style-type: none;
-        z-index: 1;
+        z-index: 2;
         position: absolute;
         width: 100%;
+        box-sizing: border-box; 
+        margin: 0;
+        padding: 0;
     }
     .list-group-item:hover, .list-group-item.selected {
         background-color: #d0d2d7;
     }
+    input {
+        margin-bottom: 0;
+    }
+
+    small {
+        font-style: italic;
+        color: red;
+        min-height: 15px;
+        margin: 0;
+        padding-left: 3px;
+    }
+    .error-message small {
+        display: block;
+    }
+    .form-group {
+        position: relative;
+    }
+    .label-container {
+        position: relative;
+    }
+    .invisible-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: transparent; /* Making it invisible */
+        z-index: 1; /* To ensure it's above the label */
+    }  
 </style>

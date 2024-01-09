@@ -12,8 +12,12 @@
 
     $: if (showModal && dialog) dialog.showModal();
 
-    function onButtonClick(){
+    function onSubmitButtonClick(){
         dispatch('submit');
+    }
+
+    function onResetButtonClick(){
+        dispatch('resetValues');
     }
 
 </script>
@@ -25,9 +29,8 @@
     on:click|self={() => dialog.close()}
 >
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div on:click|stopPropagation class="">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content p-2">
+        <div class="modal-dialog" role="document" on:click|stopPropagation>
+            <div class="modal-content">
                 <!-- svelte-ignore a11y-autofocus -->
                 <div class="modal-header" autofocus>
                     <h5 class="modal-title">
@@ -38,22 +41,28 @@
                     </button>
                 </div>
                 <br>
-                <div class="modal-body">
+                <div class="modal-body p-2">
                     <slot />
                 </div>
                 <br>
-                <div class="modal-footer align-baseline">
-                    <div class="w-100">
-                        <Button type="submit" on:click={onButtonClick}>
+                <div>
+                    <div class="d-flex justify-content-between">
+                        <Button class="standard-btn" type="submit" on:click={onSubmitButtonClick} color='primary'>
                             { submitText }
                         </Button>
-                        <button on:click={() => dialog.close()} class="btn btn-secondary">Cancel</button>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <Button class="standard-btn" type="secondary" outline on:click={onResetButtonClick} >
+                            Reset values
+                        </Button>
+                        <Button class="standard-btn" type="secondary" on:click={() => dialog.close()}>
+                            Cancel
+                        </Button>
                     </div>
                     <slot name="delete_button" />
                 </div>
             </div>
         </div>
-    </div>
 </dialog>
 
 

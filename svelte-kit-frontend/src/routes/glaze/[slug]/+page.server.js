@@ -2,7 +2,7 @@ import { API_URL } from '$lib/config.js';
 
 export async function load({ fetch, params }){
 
-    let glaze_id = params.id;
+    let glaze_id = params.slug;
     const response = await fetch(`${API_URL}/api/glaze/${glaze_id}`);
 
     if (response.ok) {

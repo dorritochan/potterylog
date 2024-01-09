@@ -106,3 +106,6 @@ a.link-image-label {
     opacity: 1;         /* Makes icon fully opaque when column is hovered */
 }
 
+.standard-btn {
+    min-width: 15em;
+}

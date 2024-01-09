@@ -2,7 +2,7 @@ import { API_URL } from "$lib/config";
 
 export async function load({ fetch, params }) {
 
-    let pot_id = params.id;
+    let pot_id = params.slug;
 
     const res = await fetch(`${API_URL}/api/pot/${pot_id}`)
 

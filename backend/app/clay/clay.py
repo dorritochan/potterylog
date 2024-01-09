@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, current_app, request
 from marshmallow import ValidationError
+from urllib.parse import unquote
 
 app = current_app
 from app.models import Clay
@@ -15,8 +16,15 @@ def get_clays():
     
     clays = Clay.query.order_by(Clay.brand, Clay.name_id).all()
     clay_schema = ClaySchema(many=True)
+    try:
+        clay_dict = clay_schema.dump(clays)
+        return jsonify(clay_dict)
+    except Exception as e:
+        print(e)
+        return jsonify({
+            'message': 'An error occurred' 
+        }), 500
     
-    return jsonify(clay_schema.dump(clays))
 
 
 @clay.route('/api/clay/<int:clay_id>')
@@ -29,8 +37,7 @@ def get_clay(clay_id):
         clay_id (int): The ID of a clay.
 
     """
-    clay = Clay.query.get_or_404(clay_id)
-    
+    clay = Clay.query.get(clay_id)
     if clay:
         clay_schema = ClaySchema()
         return jsonify(clay_schema.dump(clay))
@@ -53,8 +60,11 @@ def add_clay():
         return jsonify({'message': 'New clay added!'}), 201
     
     except ValidationError as e:
-        
-        return jsonify({'errors': e.messages}), 400
+        print(e)
+        return jsonify({'message': e.messages}), 400
+    except Exception as e:
+        print(e)
+        return jsonify({'message': 'An error occurred'}), 500
     
 
 @clay.route('/api/clay_brands')
@@ -73,3 +83,18 @@ def clay_names(clay_brand):
     clay_names = list(dict.fromkeys(clay_names))
     
     return jsonify(clay_names)
+
+
+@clay.route('/api/clay')
+def get_clay_from_brand_id():
+    
+    clay_brand = request.args.get('brand')
+    clay_name_id = request.args.get('name_id')
+
+    clay = Clay.query.filter(Clay.brand==clay_brand, Clay.name_id==clay_name_id).first()
+    
+    if clay:
+        clay_schema = ClaySchema()
+        return jsonify(clay_schema.dump(clay))
+    else:
+        return jsonify({'message': 'Clay not found'}), 404

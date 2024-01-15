@@ -1,7 +1,7 @@
 from typing import Any
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from marshmallow_sqlalchemy.fields import Nested
-from marshmallow import fields, pre_load, validates, validate, ValidationError
+from marshmallow import fields, validate, ValidationError, validates_schema
 from app.models import Clay, Pot, Glaze, PotGlaze
 import re
 
@@ -127,9 +127,17 @@ class ClaySchema(SQLAlchemyAutoSchema):
     pots = fields.List(fields.Nested(PotSchema(only=('id', 'pot_name', 'primary_image'))))
     clay_name = fields.Method('get_clay_name')
     
-    
     def get_clay_name(self, obj):
         return obj.get_clay_name()
+    
+    @validates_schema
+    def validate_existence(self, data, **kwargs):
+        brand = data.get('brand')
+        name_id = data.get('name_id')
+        
+        existing_clay = Clay.query.filter_by(brand=brand, name_id=name_id).first()
+        if existing_clay:
+            raise ValidationError('A clay with this brand and ID already exists.', fields=['brand', 'name_id'])
     
 
 class GlazeSchema(SQLAlchemyAutoSchema):

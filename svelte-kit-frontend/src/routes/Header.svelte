@@ -16,15 +16,18 @@
     }
 </script>
 
+
 <Navbar color="light" light expand="md">
     <NavbarBrand href="/">
-        <div>
+        <div class="m-2">
             <img src="/logo.png" alt="Logo" style="width: 2rem; height: 2rem;">
             <span>Pottery log</span><br>
             <span class="small-text">dorritochan pottery</span>
         </div>
     </NavbarBrand>
+
     <NavbarToggler on:click={() => (isOpen = !isOpen)} />
+
     <Collapse {isOpen} navbar expand="md" on:update={handleUpdate}>
         <Nav navbar>
             <NavItem>
@@ -44,8 +47,15 @@
             </NavItem>
             <NavItem>
                 <Navlink href="/commissions">Commissions</Navlink>
-            </NavItem> -->
+            </NavItem>-->
         </Nav>
     </Collapse>
 </Navbar>
 
+
+<style>
+    .small-text {
+        font-size: 15px;
+        color: rgb(176, 174, 174);
+    }
+</style>

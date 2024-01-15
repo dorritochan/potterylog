@@ -4,13 +4,13 @@
 
     const dispatch = createEventDispatcher();
 
-    export let showModal; // boolean
+    export let showAddModal; // boolean
     export let modalTitle = 'Modal title';
     export let submitText = 'Submit text';
 
-    let dialog; // HTMLDialogElement
+    export let dialog; // HTMLDialogElement
 
-    $: if (showModal && dialog) dialog.showModal();
+    $: if (showAddModal && dialog) dialog.showModal();
 
     function onSubmitButtonClick(){
         dispatch('submit');
@@ -25,37 +25,37 @@
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 <dialog
     bind:this={dialog}
-    on:close={() => showModal = false}
+    on:close={() => showAddModal = false}
     on:click|self={() => dialog.close()}
 >
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div class="modal-dialog" role="document" on:click|stopPropagation>
-            <div class="modal-content">
+        <div class="modal-dialog scroll-container" role="document" on:click|stopPropagation>
+            <div class="modal-content p-2">
                 <!-- svelte-ignore a11y-autofocus -->
                 <div class="modal-header" autofocus>
-                    <h5 class="modal-title">
+                    <h3 class="modal-title">
                         { modalTitle }
-                    </h5>
-                    <button on:click={() => dialog.close()} type="button" class="btn close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                    </h3>
+                    <button on:click={() => dialog.close()} type="button" class="btn btn-outline-secondary">
+                        <span aria-hidden="true">&minus;</span>
                     </button>
                 </div>
                 <br>
-                <div class="modal-body p-2">
+                <div class="modal-body">
                     <slot />
                 </div>
                 <br>
-                <div>
-                    <div class="d-flex justify-content-between">
-                        <Button class="standard-btn" type="submit" on:click={onSubmitButtonClick} color='primary'>
+                <div class="container">
+                    <div class="row justify-content-between">
+                        <Button class="standard-btn primary col-12 col-md-4 p-2 p-md-2" type="submit" on:click={onSubmitButtonClick} color='primary'>
                             { submitText }
                         </Button>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <Button class="standard-btn" type="secondary" outline on:click={onResetButtonClick} >
+                        <Button class="standard-btn col-12 col-md-4 p-2 p-md-2" type="secondary" outline on:click={onResetButtonClick} >
                             Reset values
                         </Button>
-                        <Button class="standard-btn" type="secondary" on:click={() => dialog.close()}>
+                    </div>
+                    <div class="row justify-content-end mt-3 mb-3">
+                        <Button class="standard-btn secondary col-12 col-md-4 p-2 p-md-2" type="secondary" on:click={() => dialog.close()}>
                             Cancel
                         </Button>
                     </div>
@@ -69,20 +69,26 @@
 
 <style>
     dialog {
-		max-width: 52em;
+        width: 90%;
+		max-width: 54em;
 		border-radius: 0.6em;
 		border: none;
-		padding: 0;
+        margin: auto; /* Center the modal */
+        box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        display: none;
 	}
     dialog::backdrop {
 		background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(2px);
 	}
 	dialog > div {
 		padding: 1em;
         width: 50em;
+        display: flex;
 	}
 	dialog[open] {
 		animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        display: flex;
 	}
 	@keyframes zoom {
 		from {
@@ -114,4 +120,24 @@
 			opacity: 3;
 		}
 	}
+    /* Custom scrollbar styles */
+    dialog::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    dialog::-webkit-scrollbar-thumb {
+        background: #d4d4d4;
+        border-radius: 10px;
+        border: 2px solid white;
+    }
+
+    dialog::-webkit-scrollbar-thumb:hover {
+        background: #7caef880;
+    }
+    :global(.standard-btn.primary) {
+        box-shadow: 0px 6px 10px -5px #0d6efd;
+    }
+    :global(.standard-btn.secondary) {
+        box-shadow: 0px 6px 10px -5px #666;
+    }
 </style>

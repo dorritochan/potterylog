@@ -1,15 +1,24 @@
+:root {
+    --main-btn-color: rgb(229, 135, 138); /* Define a variable */
+}
+
 html, body {
 	font-family: 'Quicksand', sans-serif;
 	position: relative;
-	width: 100%;
-	height: 100%;
+	margin: 0; 
+    padding: 0; 
+    width: 100%;
+    height: 100%;
+    background-image: url('./IMG_1354.JPG');
+    background-size: 100%;
+    overflow-x: hidden !important;
 }
 
 body {
 	margin: 0;
     display: flex;
     flex-direction: column; /* Stack children vertically */
-    min-height: 100vh; /* Minimum height of viewport */
+    min-height: 100vh; /* Minimum height of viewport  */
 }
 
 .img-small {
@@ -17,22 +26,11 @@ body {
     max-height: 200px;
 }
 
-.small-text {
-    font-size: 15px;
-    color: rgb(176, 174, 174);
-}
-
-
-label {
-	display: block;
-}
-
 input, button, select, textarea {
 	font-family: inherit;
 	font-size: inherit;
 	-webkit-padding: 0.4em 0;
 	padding: 0.4em;
-	margin: 0 0 0.5em 0;
 	box-sizing: border-box;
 	border: 1px solid #ccc;
 	border-radius: 2px;
@@ -42,39 +40,28 @@ input:disabled {
 	color: #ccc;
 }
 
-button {
-	color: #333;
-	background-color: #f4f4f4;
-	outline: none;
+.btn-primary {
+	background-color: var(--main-btn-color);
 }
 
-button:disabled {
-	color: #999;
-}
-
-button:not(:disabled):active {
-	background-color: #ddd;
-}
-
-button:focus {
-	border-color: #666;
-}
-
-a.hover-border-link{
-    color: #0d6efd;
+.hover-border-link{
+    color: var(--main-btn-color);
+    background-color: transparent;
+    border-color: transparent;
     text-decoration: none;
     padding: 8px 13px;    /* Add some padding for button-like shape */
     border: 2px solid transparent;          /* No border by default */
     transition: all 0.1s;  /* Smooth transition effect */
 }
-a.hover-border-link:hover {
-    border: 2px solid #0d6efd; /* Add border on hover */
-    color: #0d6efd;
+.hover-border-link:hover{
+    border: 2px solid var(--main-btn-color); /* Add border on hover */
+    color: var(--main-btn-color);
     background-color: transparent; /* Ensure there's no fill */
     border-radius: 0.375rem;
     cursor: pointer;
 }
-a.hover-border-link:active {
+
+.hover-border-link:active {
     font-weight: bold;
 }
 
@@ -82,8 +69,26 @@ td {
     vertical-align: middle;
 }
 
+tbody, td, tfoot, th, thead, tr {
+    border-style: none;
+}
+
 .table.table-striped td:nth-child(1), .table.table-striped th:nth-child(1) {
     padding-left: 22px; /* Adjust this value to your preference */
+}
+
+.table-striped>tbody>tr:nth-of-type(odd)>* {
+    --bs-table-bg-type: hsla(177, 66%, 59%, 0.207);
+}
+
+table {
+    --bs-table-hover-bg: #e8a77c9f;
+    border-radius: 0.375rem;
+    background-color: rgba(255, 255, 255, 0.33);
+}
+
+.table-container {
+    border-radius: 10px; /* Adjust the border radius as needed */
 }
 
 a.link-image-label {
@@ -108,4 +113,19 @@ a.link-image-label {
 
 .standard-btn {
     min-width: 15em;
+}
+input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    height: 1em;
+    width: 1em;
+    border-radius: 50em;
+    background: url('./xmark-solid.svg') no-repeat 50% 50%;
+    background-size: contain;
+    opacity: 0;
+    pointer-events: none;
+}
+
+input[type="search"]:focus::-webkit-search-cancel-button {
+    opacity: .3;
+    pointer-events: all;
 }

@@ -11,6 +11,7 @@
     export let dialog; // HTMLDialogElement
 
     $: if (showAddModal && dialog) dialog.showModal();
+    $: if (!showAddModal && dialog) dialog.close();
 
     function onSubmitButtonClick(){
         dispatch('submit');
@@ -26,7 +27,6 @@
 <dialog
     bind:this={dialog}
     on:close={() => showAddModal = false}
-    on:click|self={() => dialog.close()}
 >
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="modal-dialog scroll-container" role="document" on:click|stopPropagation>
@@ -58,8 +58,8 @@
                         <Button class="standard-btn secondary col-12 col-md-4 p-2 p-md-2" type="secondary" on:click={() => dialog.close()}>
                             Cancel
                         </Button>
+                        <slot name="delete_button" />
                     </div>
-                    <slot name="delete_button" />
                 </div>
             </div>
         </div>
@@ -76,6 +76,9 @@
         margin: auto; /* Center the modal */
         box-sizing: border-box; /* Include padding and border in the element's total width and height */
         display: none;
+        background-color: rgba(255, 255, 255, 0.743);
+        -webkit-backdrop-filter: blur(5px);
+        backdrop-filter: blur(5px);
 	}
     dialog::backdrop {
 		background: rgba(0, 0, 0, 0.3);
@@ -98,9 +101,9 @@
 			transform: scale(1);
 		}
 	}
-    dialog.closing {
+    /* dialog.closing {
         animation: zoomout 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
+    } */
     @keyframes zoomout {
 		from {
 			transform: scale(1);

@@ -8,7 +8,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12 text-center">
-                    <p>Copyright IT Beratung Dora Varga © 2023</p>
+                    <p>Copyright IT Beratung Dora Varga © 2024</p>
                 </div>
             </div>
         </div>
@@ -17,17 +17,23 @@
 
 <style>
     footer {
-        background-color: #f8f9fa;
+        background-color: transparent;
         border-top: 1px solid #dee2e6;
         text-align: center;
+        margin-top: auto;
+        -webkit-backdrop-filter: blur(5px);
+        backdrop-filter: blur(5px);
     }
     footer a {
         margin: 0 10px;
-        color: #b2b2b2;
+        color: white;
         font-size: 24px;
         transition: color 0.3s;
     }
     footer a:hover {
-        color: #0d6efd;
+        color: var(--main-color);
+    }
+    .footer-copyright{
+        color: white;
     }
 </style>

@@ -1,5 +1,10 @@
 :root {
-    --main-btn-color: rgb(229, 135, 138); /* Define a variable */
+    /* --main-color: #0d6efd;  */
+    --main-color: rgb(0, 128, 83);
+
+    --sec-color: white;
+
+    --ter-color: rgb(145, 49, 118);
 }
 
 html, body {
@@ -8,10 +13,7 @@ html, body {
 	margin: 0; 
     padding: 0; 
     width: 100%;
-    height: 100%;
-    background-image: url('./IMG_1354.JPG');
-    background-size: 100%;
-    overflow-x: hidden !important;
+
 }
 
 body {
@@ -19,6 +21,25 @@ body {
     display: flex;
     flex-direction: column; /* Stack children vertically */
     min-height: 100vh; /* Minimum height of viewport  */
+    background-image: url('./IMG_1354.JPG');
+    background-size: 100%;
+    background-position: center;
+    background-attachment: fixed;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.page-title{
+    color: white;
+    display: flex;
+    justify-content: center;
+}   
+
+.page-title > h1 {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    margin: 0;
+    display: inline;
 }
 
 .img-small {
@@ -45,7 +66,7 @@ input:disabled {
 }
 
 .hover-border-link{
-    color: var(--main-btn-color);
+    color: white;
     background-color: transparent;
     border-color: transparent;
     text-decoration: none;
@@ -54,8 +75,8 @@ input:disabled {
     transition: all 0.1s;  /* Smooth transition effect */
 }
 .hover-border-link:hover{
-    border: 2px solid var(--main-btn-color); /* Add border on hover */
-    color: var(--main-btn-color);
+    border: 2px solid var(--ter-color); /* Add border on hover */
+    color: var(--ter-color);
     background-color: transparent; /* Ensure there's no fill */
     border-radius: 0.375rem;
     cursor: pointer;
@@ -70,25 +91,37 @@ td {
 }
 
 tbody, td, tfoot, th, thead, tr {
-    border-style: none;
+    border: 0.1px rgba(255, 255, 255, 0.366) solid;
 }
 
 .table.table-striped td:nth-child(1), .table.table-striped th:nth-child(1) {
     padding-left: 22px; /* Adjust this value to your preference */
 }
 
-.table-striped>tbody>tr:nth-of-type(odd)>* {
-    --bs-table-bg-type: hsla(177, 66%, 59%, 0.207);
-}
-
 table {
-    --bs-table-hover-bg: #e8a77c9f;
-    border-radius: 0.375rem;
-    background-color: rgba(255, 255, 255, 0.33);
+    border-radius: 0.375rem; 
+    background-color: rgba(0, 128, 83, 0.415);
+    color: white;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    text-shadow: 1px 1px 2px var(--main-color);
+}
+table th, td {
+    padding: 1em;
 }
 
 .table-container {
-    border-radius: 10px; /* Adjust the border radius as needed */
+    padding: 20px;
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+table tr:hover{
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    background-color: rgba(145, 49, 118, 0.467);
 }
 
 a.link-image-label {
@@ -114,6 +147,8 @@ a.link-image-label {
 .standard-btn {
     min-width: 15em;
 }
+
+
 input[type="search"]::-webkit-search-cancel-button {
     -webkit-appearance: none;
     height: 1em;
@@ -128,4 +163,14 @@ input[type="search"]::-webkit-search-cancel-button {
 input[type="search"]:focus::-webkit-search-cancel-button {
     opacity: .3;
     pointer-events: all;
+}
+
+input {
+    margin-bottom: 0;
+    box-shadow: 1px 6px 10px -10px #666;
+}
+
+
+a {
+    text-decoration: none;
 }

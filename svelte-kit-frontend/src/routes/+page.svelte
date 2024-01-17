@@ -2,8 +2,8 @@
     export let data;
     import { API_URL } from '$lib/config';
     import defaultImage from '$lib/images/default_mug.jpg';
-    import Footer from './Footer.svelte';
-
+    import ButtonTransparent from './ButtonTransparent.svelte';
+    
     console.log(data.pots);
 
     let pots = data.pots;
@@ -72,12 +72,16 @@
 
     }
 
+    function handleClickAddPot(){
+
+    }
+
 </script>
 
 
 <h1 class="m-3">Pots</h1>
 <div class="m-3">
-    <a class="btn btn-primary" type="button">&plus; Add a new pot</a>
+    <ButtonTransparent handleOnClick={handleClickAddPot} buttonText={'&plus; Add a new pot'}/>
 </div>
 
 <table class="table table-striped table-hover-color table-hover">

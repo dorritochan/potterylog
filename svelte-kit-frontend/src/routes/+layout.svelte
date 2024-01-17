@@ -6,7 +6,14 @@
 </script>
 
 <Header />
-<slot />
+<slot class="wrapper" />
 <Footer />
 
 
+<style>
+    .wrapper{
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+</style>

@@ -8,6 +8,10 @@
     export let modalTitle = 'Modal title';
     export let submitText = 'Submit text';
 
+    export let editMode;
+    export let deleteBtnLabel;
+    export let handleDelete;
+
     export let dialog; // HTMLDialogElement
 
     $: if (showAddModal && dialog) dialog.showModal();
@@ -54,11 +58,17 @@
                             Reset values
                         </Button>
                     </div>
+                    {#if editMode}
+                    <div class="row justify-content-end mt-3 mb-3">
+                        <Button class="standard-btn col-12 col-md-4 p-2 p-md-2" outline color="danger" on:click={handleDelete}>
+                            {deleteBtnLabel}
+                        </Button>
+                    </div>
+                    {/if}
                     <div class="row justify-content-end mt-3 mb-3">
                         <Button class="standard-btn secondary col-12 col-md-4 p-2 p-md-2" type="secondary" on:click={() => dialog.close()}>
                             Cancel
                         </Button>
-                        <slot name="delete_button" />
                     </div>
                 </div>
             </div>

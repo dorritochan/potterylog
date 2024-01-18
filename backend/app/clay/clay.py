@@ -98,3 +98,47 @@ def get_clay_from_brand_id():
         return jsonify(clay_schema.dump(clay))
     else:
         return jsonify({'message': 'Clay not found'}), 404
+    
+    
+@clay.route('/api/update_clay/<int:clay_id>', methods=['PUT'])
+def update_clay(clay_id):
+    
+    data = request.get_json()
+    print(data)
+    old_clay = Clay.query.get(clay_id)
+    
+    if old_clay:
+        try:
+            clay_schema = ClaySchema(session=db.session)
+            updated_clay = clay_schema.load(data, partial=True)
+            print('temp_min')
+            print(updated_clay.temp_min)
+            old_clay = updated_clay
+            print(old_clay.temp_min)
+            db.session.commit()
+            return jsonify({'message': 'Clay has been updated!'}), 201
+        
+        except ValidationError as e:
+            print(e)
+            return jsonify({'message': e.messages}), 400
+            
+        except Exception as e:
+            print(e)
+            return jsonify({'message': e}), 500
+            
+    else:
+        return jsonify({'message': 'Clay not found.'}), 404
+        
+        
+@clay.route('/api/delete_clay/<int:clay_id>', methods=['DELETE'])
+def delete_clay(clay_id):
+    
+    clay = Clay.query.get(clay_id)
+    
+    if clay:
+        db.session.delete(clay)
+        db.session.commit()
+        return jsonify({'message': 'The clay has been deleted.'}), 201  
+    else:      
+        return jsonify({'message': 'Clay not found.'}), 404
+        

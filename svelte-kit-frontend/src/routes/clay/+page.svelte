@@ -7,6 +7,7 @@
     import ErrorMessageInput from '../ErrorMessageInput.svelte';
     import LabelInput from '../LabelInput.svelte';
     import InputWithSearch from '../InputWithSearch.svelte';
+    import InputDisabled from '../InputDisabled.svelte';
     import { onMount } from 'svelte';
     import ButtonTransparent from '../ButtonTransparent.svelte';
     import { error } from '@sveltejs/kit';
@@ -16,7 +17,6 @@
 	export let data;
     
     let showAddModal = false;
-    let showEditModal = false;
     let dialog;
 
     let _schema = '';
@@ -36,8 +36,6 @@
     let encodedBrand = encodeURIComponent(brand);
     let encodedName = encodeURIComponent(name_id);
 
-    let editClayId = '';
-
     $: if(!showAddModal) {
         Object.keys(errors).forEach(key => {
             removeErrorMessage(key);
@@ -45,10 +43,8 @@
     }
     
     onMount(async () => {
-        const response = await fetch(`${API_URL}/api/clay_brands`);
-        if (response.ok) {
-            clayBrandList = await response.json();
-        }
+
+        clayBrandList = await getBrandList();
     });
     
 
@@ -67,6 +63,15 @@
         } else {
             closeNamesList();
         }
+    }
+
+    async function getBrandList() {
+        const response = await fetch(`${API_URL}/api/clay_brands`);
+        if (response.ok) {
+            const brandList = await response.json();
+            return brandList;
+        }
+
     }
 
     function updateFilteredBrands() {
@@ -183,14 +188,42 @@
         errors = { ...errors };
     }
 
-    async function handleSubmit() {
-        const response = await fetch(`${API_URL}/api/add_clay`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                brand, name_id, color, temp_min, temp_max, grog_percent, grog_size_max, url 
+    async function fetchClayList() {
+
+        const response = await fetch(`${API_URL}/api/clays`);
+
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.log(`errorBody.message: ${errorBody.message}`);
+
+            throw error(response.status, {
+                message: errorBody.message
             })
-        });
+        }
+
+        const clays = await response.json();
+        return clays;
+    }
+
+    async function handleSubmit() {
+        let response;
+        if (!editMode){
+            response = await fetch(`${API_URL}/api/add_clay`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    brand, name_id, color, temp_min, temp_max, grog_percent, grog_size_max, url 
+                })
+            });
+        } else {
+            response = await fetch(`${API_URL}/api/update_clay/${clayId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    color, temp_min, temp_max, grog_percent, grog_size_max, url 
+                })
+            });
+        }
 
         if (response.ok) {
             const result = await response.json();
@@ -198,19 +231,7 @@
             resetValuesForm();
             showAddModal = false;
             
-            const response_get_clays = await fetch(`${API_URL}/api/clays`);
-            if (!response_get_clays.ok) {
-                const errorBody = await response_get_clays.json();
-                console.log(`errorBody.message: ${errorBody.message}`);
-
-                throw error(response_get_clays.status, {
-                    message: errorBody.message
-                })
-            }
-
-            data.clays = await response_get_clays.json();
-            console.log('data');
-            console.log(data);
+            data.clays = await fetchClayList();
 
         } else {
             console.log(response.errors);
@@ -305,16 +326,17 @@
 
     $: if (!showAddModal && dialog) {
         resetValuesForm();
-        editingClay = false;
+        editMode = false;
     }
 
-    let editingClay = false;
+    let editMode = false;
+    let clayId;
 
     async function handleEditClick(clayIdEvent) {
 
-        editingClay = true;
+        editMode = true;
 
-        const clayId = clayIdEvent.detail;
+        clayId = clayIdEvent.detail;
 
         console.log("Edit button clicked for clay ID:", clayId);
 
@@ -332,6 +354,24 @@
             url = data.url;
         }
     }
+
+    async function deleteClay(){
+        const response = await fetch(`${API_URL}/api/delete_clay/${clayId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            const errorMessage = await response.json()
+            _schema = errorMessage.message;
+            console.log(`Error: ${_schema}`);
+        } else {
+            data.clays = await fetchClayList();
+            showAddModal = false;
+            clayBrandList = await getBrandList();
+        }
+    }
+
 </script>
 
 <svelte:head>
@@ -352,12 +392,15 @@
 <Modal 
     bind:showAddModal 
     bind:dialog 
-    modalTitle="{showEditModal ? 'Edit clay' : 'Add a new clay'}" 
-    submitText="{showEditModal ? 'Update clay' : 'Add clay'}" 
+    modalTitle="{editMode ? 'Edit clay' : 'Add a new clay'}" 
+    submitText="{editMode ? 'Update clay' : 'Add clay'}" 
     on:submit={handleSubmit} 
     on:resetValues={resetValuesForm} 
     on:click={handleClickOutsideInput} 
     on:focus={handleClickOutsideInput}
+    {editMode}
+    deleteBtnLabel={'Delete clay'}
+    handleDelete={deleteClay}
 >
 
     <form on:submit|preventDefault method='POST'>
@@ -367,10 +410,14 @@
                 <div class="form-group" bind:this={brandGroup}>
                     <LabelInput labelFor={brand} label={'Brand'}/>
                     <div bind:this={brandInput}>
-                        <InputWithSearch name={'brand'} placeholder={'e.g. Sibelco'} bind:value={brand} 
-                            removeErrorMessage={removeErrorMessage} updateFilteredItems={updateFilteredBrands} errorKeys={['brand', '_schema']}
-                            state={brandState} filteredItems={filteredBrands} highlightedIndex={highlightedIndex} selectItem={selectBrand} handleKeydown={handleKeydown}
-                        />
+                        {#if editMode}
+                        <InputDisabled name={'brand'} bind:value={brand} className={'form-control'}/>
+                        {:else}
+                            <InputWithSearch name={'brand'} placeholder={'e.g. Sibelco'} bind:value={brand} 
+                                removeErrorMessage={removeErrorMessage} updateFilteredItems={updateFilteredBrands} errorKeys={['brand', '_schema']}
+                                state={brandState} filteredItems={filteredBrands} highlightedIndex={highlightedIndex} selectItem={selectBrand} handleKeydown={handleKeydown}
+                            />
+                        {/if}
                     </div>
                     <ErrorMessageInput errors={errors.brand}/>
                 </div>
@@ -379,10 +426,14 @@
                 <div class="form-group" bind:this={nameGroup}>
                     <LabelInput labelFor={name_id} label={'Name or ID'}/>
                     <div bind:this={nameInput}>
-                        <InputWithSearch name={'name_id'} placeholder={'e.g. WM 2502 B'} bind:value={name_id} 
-                            removeErrorMessage={removeErrorMessage} updateFilteredItems={updateFilteredNames} errorKeys={['name_id', '_schema']}
-                            state={nameState} filteredItems={filteredClayNames} highlightedIndex={highlightedIndex} selectItem={selectClayName} handleKeydown={handleKeydown}
-                        />
+                        {#if editMode}
+                        <InputDisabled name={'name_id'} bind:value={name_id} className={'form-control'}/>
+                        {:else}
+                            <InputWithSearch name={'name_id'} placeholder={'e.g. WM 2502 B'} bind:value={name_id} 
+                                removeErrorMessage={removeErrorMessage} updateFilteredItems={updateFilteredNames} errorKeys={['name_id', '_schema']}
+                                state={nameState} filteredItems={filteredClayNames} highlightedIndex={highlightedIndex} selectItem={selectClayName} handleKeydown={handleKeydown}
+                            />
+                        {/if}   
                     </div>
                     <ErrorMessageInput errors={errors.name_id}/>
                 </div>
@@ -390,47 +441,43 @@
             <div class="row">
                 <div class="form-group" bind:this={colorGroup}>
                     <LabelInput labelFor={color} label={'Color'}/>
-                    <InputSearch name={'color'} className={'form-control'} placeholder={'e.g. Yellow with spots'} value={color} errorKey={'color'} removeErrorMessage={removeErrorMessage}/>
+                    <InputSearch name={'color'} className={'form-control'} placeholder={'e.g. Yellow with spots'} bind:value={color} errorKey={'color'} removeErrorMessage={removeErrorMessage}/>
                     <ErrorMessageInput errors={errors.color}/>
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-12 col-md-6 p-2 p-md-2" bind:this={tempMinGroup}>
                     <LabelInput labelFor={temp_min} label={'Min. temp.'}/>
-                    <InputNumber name={'temp_min'} className={'form-control'} placeholder={''} value={temp_min} errorKey={'temp_min'} removeErrorMessage={removeErrorMessage} addOn={'°C'}/>
+                    <InputNumber name={'temp_min'} className={'form-control'} placeholder={''} bind:value={temp_min} errorKey={'temp_min'} removeErrorMessage={removeErrorMessage} addOn={'°C'}/>
                     <ErrorMessageInput errors={errors.temp_min}/>
                 </div>
                 <div class="form-group col-12 col-md-6 p-2 p-md-2" bind:this={tempMaxGroup}>
                     <LabelInput labelFor={temp_max} label={'Max. temp.'}/>
-                    <InputNumber name={'temp_max'} className={'form-control'} placeholder={''} value={temp_max} errorKey={'temp_max'} removeErrorMessage={removeErrorMessage} addOn={'°C'}/>
+                    <InputNumber name={'temp_max'} className={'form-control'} placeholder={''} bind:value={temp_max} errorKey={'temp_max'} removeErrorMessage={removeErrorMessage} addOn={'°C'}/>
                     <ErrorMessageInput errors={errors.temp_max}/>
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-12 col-md-6 p-2 p-md-2" bind:this={grogPercentGroup}>
                     <LabelInput labelFor={grog_percent} label={'Grog percentage'}/>
-                    <InputNumber name={'grog_percent'} className={'form-control'} placeholder={''} value={grog_percent} errorKey={'grog_percent'} removeErrorMessage={removeErrorMessage} addOn={'%'}/>
+                    <InputNumber name={'grog_percent'} className={'form-control'} placeholder={''} bind:value={grog_percent} errorKey={'grog_percent'} removeErrorMessage={removeErrorMessage} addOn={'%'}/>
                     <ErrorMessageInput errors={errors.grog_percent}/>
                 </div>
                 <div class="form-group col-12 col-md-6 p-2 p-md-2" bind:this={grogSizeMaxGroup}>
                     <LabelInput labelFor={grog_size_max} label={'Grog size'}/>
-                    <InputNumber name={'grog_size_max'} className={'form-control'} placeholder={''} value={grog_size_max} errorKey={'grog_size_max'} removeErrorMessage={removeErrorMessage} addOn={'mm'}/>
+                    <InputNumber name={'grog_size_max'} className={'form-control'} placeholder={''} bind:value={grog_size_max} errorKey={'grog_size_max'} removeErrorMessage={removeErrorMessage} addOn={'mm'}/>
                     <ErrorMessageInput errors={errors.grog_percent}/>
                 </div>
             </div>
             <div class="row">
                 <div class="form-group" bind:this={urlGroup}>
                     <LabelInput labelFor={url} label={'URL'}/>
-                    <InputSearch name={'url'} className={'form-control'} placeholder={'https://'} value={url} errorKey={'url'} removeErrorMessage={removeErrorMessage}/>
+                    <InputSearch name={'url'} className={'form-control'} placeholder={'https://'} bind:value={url} errorKey={'url'} removeErrorMessage={removeErrorMessage}/>
                     <ErrorMessageInput errors={errors.url}/>
                 </div>
             </div>
         </div>
     </form>
-
-    <button slot='delete_button'>Delete clay</button>
-    <!-- {#if editingClay}
-    {/if} -->
 
 </Modal>
 

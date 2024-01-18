@@ -14,7 +14,7 @@
 <style>
     small {
         font-style: bold;
-        color: var(--main-btn-color);
+        color: var(--ter-color);
         min-height: 15px;
         margin: 0;
         padding-left: 3px;

@@ -11,7 +11,6 @@ clay = Blueprint('clay', __name__)
 
 
 @clay.route('/api/clays')
-# @login_required
 def get_clays():
     
     clays = Clay.query.order_by(Clay.brand, Clay.name_id).all()
@@ -28,7 +27,6 @@ def get_clays():
 
 
 @clay.route('/api/clay/<int:clay_id>')
-# @login_required
 def get_clay(clay_id):
     """
     Show the details of a clay.
@@ -106,15 +104,11 @@ def update_clay(clay_id):
     data = request.get_json()
     print(data)
     old_clay = Clay.query.get(clay_id)
+    clay_schema = ClaySchema(session=db.session, context={'is_update':True})
     
     if old_clay:
         try:
-            clay_schema = ClaySchema(session=db.session)
-            updated_clay = clay_schema.load(data, partial=True)
-            print('temp_min')
-            print(updated_clay.temp_min)
-            old_clay = updated_clay
-            print(old_clay.temp_min)
+            clay_schema.load(data, instance=old_clay, partial=True)
             db.session.commit()
             return jsonify({'message': 'Clay has been updated!'}), 201
         

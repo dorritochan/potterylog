@@ -132,12 +132,17 @@ class ClaySchema(SQLAlchemyAutoSchema):
     
     @validates_schema
     def validate_existence(self, data, **kwargs):
-        brand = data.get('brand')
-        name_id = data.get('name_id')
         
-        existing_clay = Clay.query.filter_by(brand=brand, name_id=name_id).first()
-        if existing_clay:
-            raise ValidationError('A clay with this brand and ID already exists.', fields=['brand', 'name_id'])
+        is_update = self.context.get('is_update', False)
+        print(is_update)
+        
+        if not is_update:
+            brand = data.get('brand')
+            name_id = data.get('name_id')
+            
+            existing_clay = Clay.query.filter_by(brand=brand, name_id=name_id).first()
+            if existing_clay:
+                raise ValidationError('A clay with this brand and ID already exists.', fields=['brand', 'name_id'])
     
 
 class GlazeSchema(SQLAlchemyAutoSchema):
@@ -148,18 +153,32 @@ class GlazeSchema(SQLAlchemyAutoSchema):
         
     id = auto_field()
     glaze_name = fields.Method('get_glaze_name')
-    brand = auto_field()
-    name = auto_field()
-    brand_id = fields.Str()
-    color = auto_field()
-    temp_min = auto_field()
-    temp_max = auto_field()
-    cone = auto_field()
-    glaze_url = auto_field()
+    brand = StringHandlingEmptystring(allow_none=False, required=True)
+    name = StringHandlingEmptystring(allow_none=False)
+    brand_id = StringHandlingEmptystring(allow_none=False)
+    color = StringHandlingEmptystring(allow_none=True)
+    temp_min = IntegerHandlingEmptyString(allow_none=True)
+    temp_max = IntegerHandlingEmptyString(allow_none=True)
+    cone = StringHandlingEmptystring(allow_none=True)
+    glaze_url = StringHandlingEmptystring(validate=CustomURLValidator(), allow_none=True)
     glazed_pots = fields.Nested(lambda: PotGlazeSchema(only=('pot', 'number_of_layers', 'display_order')), many=True)
 
     def get_glaze_name(self, obj):
         return obj.get_glaze_name()
+    
+    @validates_schema
+    def validate_existence(self, data, **kwargs):
+        
+        is_update = self.context.get('is_update', False)
+        print(is_update)
+        
+        if not is_update:
+            brand = data.get('brand')
+            name = data.get('name')
+            
+            existing_glaze = Glaze.query.filter_by(brand=brand, name=name).first()
+            if existing_glaze:
+                raise ValidationError('A glaze with this brand and name already exists.', fields=['brand', 'name'])
     
     
 class PotGlazeSchema(SQLAlchemyAutoSchema):

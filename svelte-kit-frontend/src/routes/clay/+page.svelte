@@ -11,82 +11,114 @@
     import { onMount } from 'svelte';
     import ButtonTransparent from '../ButtonTransparent.svelte';
     import { error } from '@sveltejs/kit';
-
-
-    // the clay data for the table
+    
+    
+    // The clay data for the table
 	export let data;
     
+    onMount(async () => {
+        dbBrandList = await getBrandList();
+    });
+
+    // A boolean variable: if true, the modal shows
     let showAddModal = false;
     let dialog;
 
+    // State variables for form inputs
     let _schema = '';
     let brand = '';
-    let clayBrandList = [];
-    let filteredBrands = [];
-    let highlightedIndex = -1; // Index of the currently highlighted element in the list
     let name_id = '';
-    let clayNamesList = [];
-    let filteredClayNames = [];
     let color = '';
     let temp_min = '';
     let temp_max = '';
     let grog_percent = '';
     let grog_size_max = '';
     let url = '';
-    let encodedBrand = encodeURIComponent(brand);
-    let encodedName = encodeURIComponent(name_id);
 
-    $: if(!showAddModal) {
-        Object.keys(errors).forEach(key => {
-            removeErrorMessage(key);
-        });
-    }
-    
-    onMount(async () => {
+    // The list of error messages
+    let errors = { _schema: [], brand: [], name_id: [], color: [], temp_min: [], temp_max: [], grog_percent: [], grog_size_max: [], url: [] };
 
-        clayBrandList = await getBrandList();
-    });
-    
+    // List of form groups needed for binding for showing the errors
+    let schemaGroup;
+    let brandGroup;
+    let nameGroup;
+    let colorGroup;
+    let tempMinGroup;
+    let tempMaxGroup;
+    let grogPercentGroup;
+    let grogSizeMaxGroup;
+    let urlGroup;
 
+    // Variables for binding with the respective inputs and managing
+    // the clicks outside of them
     let brandInput;
     let nameInput;
+
+    // The whole list of brands from the DB
+    let dbBrandList = [];
+    // Filter the brands on input and save them in a list
+    let filteredBrands = [];
+    // Index of the currently highlighted element in the list: for brand and name_id inputs
+    let highlightedIndex = -1;
+    // The whole list of names, based on the chosen brand
+    let dbNamesList = [];
+    // Filter the names on input and save them in a list
+    let filteredNames = [];
+    // Boolean: if true, the edit mode is turned on for the modal
+    let editMode = false;
+    // The clay ID passed from the table needed for editing
+    let clayId;
+    // Encoding of values for passing in URL
+    $: encodedBrand = encodeURIComponent(brand);
+    $: encodedName = encodeURIComponent(name_id);
+    
+
+    $: if (!showAddModal && dialog) {
+        resetValuesForm();
+        editMode = false;
+    }
+
+    // The states for handling keydowns
+    $: brandState = {
+        filteredItems: filteredBrands,
+        highlightedIndex,
+        selectItem: selectBrand
+    }
+
+    $: nameState = {
+        filteredItems: filteredNames,
+        highlightedIndex,
+        selectItem: selectName
+    }
+
+    function openModal(){
+        showAddModal = true;
+    }
+
     // Close the dropdowns on brand and name when the focus/click is not on the 
     // respective input
     function handleClickOutsideInput(event) {
-        if (!brandInput.contains(event.target)) {
-            if (!nameInput.contains(event.target)) {
-                closeBrandList();
-                closeNamesList();
-            } else {
-                closeBrandList();
-            }
-        } else {
+        const isOutsideBrandInput = !brandInput.contains(event.target);
+        const isOutsideNameInput = !nameInput.contains(event.target);
+        if (isOutsideBrandInput && isOutsideNameInput) {
+            closeBrandList();
+            closeNamesList();
+        } else if (isOutsideBrandInput) {
+            closeBrandList();
+        } else if (isOutsideNameInput) {
             closeNamesList();
         }
     }
-
-    async function getBrandList() {
-        const response = await fetch(`${API_URL}/api/clay_brands`);
-        if (response.ok) {
-            const brandList = await response.json();
-            return brandList;
-        }
-
-    }
-
+    
     function updateFilteredBrands() {
-        filteredBrands = clayBrandList.filter(brandFromList => brandFromList.toLowerCase().includes(brand.toLowerCase()));
+        filteredBrands = dbBrandList.filter(brandFromList => brandFromList.toLowerCase().includes(brand.toLowerCase()));
     }
 
-    async function selectBrand(brandItem) {
-        brand = brandItem;
-        closeBrandList();
-
-        encodedBrand = encodeURIComponent(brand);
-
-        const response = await fetch(`${API_URL}/api/clay_names/${encodedBrand}`);
-        if (response.ok) {
-            clayNamesList = await response.json();
+    function updateFilteredNames() {
+        if (brand != '') {
+            filteredNames = dbNamesList.filter(nameFromList => nameFromList.toLowerCase().includes(name_id.toLowerCase()));
+        } else {
+            filteredNames = [];
         }
     }
 
@@ -95,52 +127,10 @@
         highlightedIndex = -1;
     }
 
-    function updateFilteredNames() {
-        if (brand != '') {
-            filteredClayNames = clayNamesList.filter(nameFromList => nameFromList.toLowerCase().includes(name_id.toLowerCase()));
-        } else {
-            filteredClayNames = [];
-        }
-    }
-    
-    async function selectClayName(nameItem) {
-        name_id = nameItem;
-        closeNamesList();
-
-        encodedBrand = encodeURIComponent(brand);
-        encodedName = encodeURIComponent(name_id);
-
-        const response = await fetch(`${API_URL}/api/clay?brand=${encodedBrand}&name_id=${encodedName}`);
-
-        if (response.ok) {
-            let data = await response.json();
-            color = data.color;
-            temp_min = data.temp_min;
-            temp_max = data.temp_max;
-            grog_percent = data.grog_percent;
-            grog_size_max = data.grog_size_max;
-            url = data.url;
-        }
-    }
-
     function closeNamesList() {
-        filteredClayNames = [];
+        filteredNames = [];
         highlightedIndex = -1;
     }
-
-    $: brandState = {
-        filteredItems: filteredBrands,
-        highlightedIndex,
-        selectItem: selectBrand
-    }
-
-    $: nameState = {
-        filteredItems: filteredClayNames,
-        highlightedIndex,
-        selectItem: selectClayName
-    }
-
-
 
     function handleKeydown(event, state) {
         switch(event.key) {
@@ -165,17 +155,16 @@
         }
     }
 
-    
-    let errors = { _schema: [], brand: [], name_id: [], color: [], temp_min: [], temp_max: [], grog_percent: [], grog_size_max: [], url: [] };
-
     function removeErrorMessage(fieldKey) {
         errors[fieldKey] = [];
     }
 
     function resetValuesForm() {
         _schema = '';
-        brand = '';
-        name_id = '';
+        if (!editMode) {
+            brand = '';
+            name_id = '';
+        }
         color = '';
         temp_min = '';
         temp_max = '';
@@ -187,7 +176,54 @@
         });
         errors = { ...errors };
     }
+    
+    function focusOnError(firstError) {
+        let target;
+        switch(firstError) {
+            case '_schema':
+                target = schemaGroup;
+                break;
+            case 'brand':
+                target = brandGroup;
+                break;
+            case 'name_id':
+                target = nameGroup;
+                break;
+            case 'color':
+                target = colorGroup;
+                break;
+            case 'temp_min':
+                target = tempMinGroup;
+                break;
+            case 'temp_max':
+                target = tempMaxGroup;
+                break;
+            case 'grog_percentage':
+                target = grogPercentGroup;
+                break;
+            case 'grog_size_max':
+                target = grogSizeMaxGroup;
+                break;
+            case 'url':
+                target = urlGroup;
+                break;
+        }
 
+        if(dialog && target) {
+
+            const modalRect = dialog.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+
+            // Calculate relative position of the target element within the modal
+            const relativeTop = targetRect.top - modalRect.top;
+
+            // Scroll to the element
+            dialog.scrollTop = dialog.scrollTop + relativeTop;
+
+        }
+    }
+
+    // Fetching the list of clays after deleting, adding, updating
     async function fetchClayList() {
 
         const response = await fetch(`${API_URL}/api/clays`);
@@ -205,6 +241,47 @@
         return clays;
     }
 
+    // Fetch the list of brands on click on brand input
+    async function getBrandList() {
+        const response = await fetch(`${API_URL}/api/clay_brands`);
+        if (response.ok) {
+            const brandList = await response.json();
+            return brandList;
+        }
+    }
+
+    async function selectBrand(brandItem) {
+        brand = brandItem;
+        closeBrandList();
+
+        encodedBrand = encodeURIComponent(brand);
+
+        const response = await fetch(`${API_URL}/api/clay_names/${encodedBrand}`);
+        if (response.ok) {
+            dbNamesList = await response.json();
+        }
+    }
+
+    async function selectName(nameItem) {
+        name_id = nameItem;
+        closeNamesList();
+
+        encodedBrand = encodeURIComponent(brand);
+        encodedName = encodeURIComponent(name_id);
+
+        const response = await fetch(`${API_URL}/api/clay?brand=${encodedBrand}&name_id=${encodedName}`);
+
+        if (response.ok) {
+            let data = await response.json();
+            color = data.color;
+            temp_min = data.temp_min;
+            temp_max = data.temp_max;
+            grog_percent = data.grog_percent;
+            grog_size_max = data.grog_size_max;
+            url = data.url;
+        }
+    }
+    
     async function handleSubmit() {
         let response;
         if (!editMode){
@@ -220,7 +297,7 @@
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    color, temp_min, temp_max, grog_percent, grog_size_max, url 
+                    brand, name_id, color, temp_min, temp_max, grog_percent, grog_size_max, url 
                 })
             });
         }
@@ -266,78 +343,10 @@
         }
     }
 
-    let schemaGroup;
-    let brandGroup;
-    let nameGroup;
-    let colorGroup;
-    let tempMinGroup;
-    let tempMaxGroup;
-    let grogPercentGroup;
-    let grogSizeMaxGroup;
-    let urlGroup;
-    function focusOnError(firstError) {
-        let target;
-        switch(firstError) {
-            case '_schema':
-                target = schemaGroup;
-                break;
-            case 'brand':
-                target = brandGroup;
-                break;
-            case 'name_id':
-                target = nameGroup;
-                break;
-            case 'color':
-                target = colorGroup;
-                break;
-            case 'temp_min':
-                target = tempMinGroup;
-                break;
-            case 'temp_max':
-                target = tempMaxGroup;
-                break;
-            case 'grog_percentage':
-                target = grogPercentGroup;
-                break;
-            case 'grog_size_max':
-                target = grogSizeMaxGroup;
-                break;
-            case 'url':
-                target = urlGroup;
-                break;
-        }
-        if(dialog && target) {
-
-            const modalRect = dialog.getBoundingClientRect();
-            const targetRect = target.getBoundingClientRect();
-
-            // Calculate relative position of the target element within the modal
-            const relativeTop = targetRect.top - modalRect.top;
-
-            // Scroll to the element
-            dialog.scrollTop = dialog.scrollTop + relativeTop;
-
-        }
-    }
-
-    function openModal(){
-        showAddModal = true;
-    }
-
-    $: if (!showAddModal && dialog) {
-        resetValuesForm();
-        editMode = false;
-    }
-
-    let editMode = false;
-    let clayId;
-
     async function handleEditClick(clayIdEvent) {
 
         editMode = true;
-
         clayId = clayIdEvent.detail;
-
         console.log("Edit button clicked for clay ID:", clayId);
 
         const response = await fetch(`${API_URL}/api/clay/${clayId}`);
@@ -368,7 +377,7 @@
         } else {
             data.clays = await fetchClayList();
             showAddModal = false;
-            clayBrandList = await getBrandList();
+            dbBrandList = await getBrandList();
         }
     }
 
@@ -431,7 +440,7 @@
                         {:else}
                             <InputWithSearch name={'name_id'} placeholder={'e.g. WM 2502 B'} bind:value={name_id} 
                                 removeErrorMessage={removeErrorMessage} updateFilteredItems={updateFilteredNames} errorKeys={['name_id', '_schema']}
-                                state={nameState} filteredItems={filteredClayNames} highlightedIndex={highlightedIndex} selectItem={selectClayName} handleKeydown={handleKeydown}
+                                state={nameState} filteredItems={filteredNames} highlightedIndex={highlightedIndex} selectItem={selectName} handleKeydown={handleKeydown}
                             />
                         {/if}   
                     </div>

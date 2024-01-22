@@ -8,13 +8,16 @@
         handleOnClickEdit();
         dispatch('edit', glazeIdEvent);
     }
+    export let showPotColumn;
 </script>
 
 <div class="table-container">
-    <table class="">
+    <table>
         <thead>
             <tr>
+                {#if showPotColumn}
                 <th>View pots</th>
+                {/if}
                 <th>Brand</th>
                 <th>ID</th>
                 <th>Name</th>
@@ -29,6 +32,7 @@
         <tbody>
             {#each data as glaze}
             <tr>
+                {#if showPotColumn}
                 <td>
                     <a href="glaze/{ glaze.id }" class="hover-border-link">
                         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-cup" viewBox="0 0 16 16">
@@ -36,6 +40,7 @@
                         </svg>
                     </a>
                 </td>
+                {/if}
                 <td>{ glaze.brand || '' }</td>
                 <td>{ glaze.brand_id || '' }</td>
                 <td>{ glaze.name || '' }</td>

@@ -127,7 +127,7 @@ table tr:hover{
 a.link-image-label {
     text-decoration: none;
     cursor: pointer;
-    color: black;
+    color: var(--sec-color);
 }
 
 .sorting-column {
@@ -173,4 +173,9 @@ input {
 
 a {
     text-decoration: none;
+}
+
+.img-thumbnail{
+    border: none;
+    padding: 0;
 }

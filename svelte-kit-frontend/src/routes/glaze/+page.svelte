@@ -10,7 +10,7 @@
     import InputDisabled from '../InputDisabled.svelte';
     import { onMount } from 'svelte';
     import ButtonTransparent from '../ButtonTransparent.svelte';
-    import { error } from '@sveltejs/kit';
+    import { _fetchGlazeList, _deleteGlaze, _fetchBrandList, _selectBrand } from './+page';
     
     
     // The glaze data for the table
@@ -21,7 +21,7 @@
     console.log(data.glazes);
     
     onMount(async () => {
-        dbBrandList = await getBrandList();
+        dbBrandList = await _fetchBrandList(API_URL);
     });
 
     // A boolean variable: if true, the modal shows
@@ -58,6 +58,7 @@
     let brandInput;
     let nameInput;
     let idInput;
+    let coneInput;
 
     // The whole list of brands from the DB
     let dbBrandList = [];
@@ -73,6 +74,12 @@
     let dbNamesList = [];
     // Filter the names on input and save them in a list
     let filteredNames = [];
+    // The list of all the possible cone numbers
+    let dbConesList = ['019', '018', '017', '016', '015', '014', '013', '012', '011',
+            '010', '09', '08', '07', '06', '05', '04', '03', '02', '01',
+            '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+    // Filter the list of cones and save them a list
+    let filteredCones = [];
     // Boolean: if true, the edit mode is turned on for the modal
     let editMode = false;
     // The glaze ID passed from the table needed for editing
@@ -92,7 +99,7 @@
     $: brandState = {
         filteredItems: filteredBrands,
         highlightedIndex,
-        selectItem: selectBrand
+        selectItem: _selectBrand
     }
 
     $: nameState = {
@@ -107,6 +114,12 @@
         selectItem: selectId
     }
 
+    $: coneState = {
+        filteredItems: filteredCones,
+        highlightedIndex,
+        selectItem: selectCone
+    }
+
     function openModal(){
         showAddModal = true;
     }
@@ -117,20 +130,18 @@
         const isOutsideBrandInput = !brandInput.contains(event.target);
         const isOutsideIdInput = !idInput.contains(event.target);
         const isOutsideNameInput = !nameInput.contains(event.target);
+        const isOutsideConeInput = !coneInput.contains(event.target);
         if (isOutsideBrandInput) {
-            if (isOutsideIdInput && isOutsideNameInput) {
-                closeBrandList();
-                closeIdsList();
-                closeNamesList();
-            } else if (isOutsideIdInput) {
-                closeBrandList();
-                closeIdsList();
-            } else {
-                closeNamesList();
-            }
-        } else {
+            closeBrandList();
+        }
+        if (isOutsideIdInput) {
             closeIdsList();
+        }
+        if (isOutsideNameInput) {
             closeNamesList();
+        }
+        if (isOutsideConeInput) {
+            closeConesList();
         }
     }
     
@@ -140,7 +151,7 @@
 
     function updateFilteredIds() {
         if (brand != '') {
-            filteredIds = dbIdsList.filter(idFromList => idFromList.toLowerCase().includes(id.toLowerCase()));
+            filteredIds = dbIdsList.filter(idFromList => idFromList.toLowerCase().includes(brand_id.toLowerCase()));
         } else {
             filteredIds = [];
         }
@@ -152,6 +163,10 @@
         } else {
             filteredNames = [];
         }
+    }
+
+    function updateFilteredCones() {
+        filteredCones = dbConesList.filter(coneFromList => coneFromList.toLowerCase().includes(cone.toLowerCase()));
     }
 
     function closeBrandList() {
@@ -166,6 +181,11 @@
 
     function closeIdsList() {
         filteredIds = [];
+        highlightedIndex = -1;
+    }
+
+    function closeConesList() {
+        filteredCones = [];
         highlightedIndex = -1;
     }
 
@@ -262,50 +282,6 @@
         }
     }
 
-    // Fetching the list of glazes after deleting, adding, updating
-    async function fetchGlazeList() {
-
-        const response = await fetch(`${API_URL}/api/glazes`);
-
-        if (!response.ok) {
-            const errorBody = await response.json();
-            console.log(`errorBody.message: ${errorBody.message}`);
-
-            throw error(response.status, {
-                message: errorBody.message
-            })
-        }
-
-        const glazes = await response.json();
-        return glazes;
-    }
-
-    // Fetch the list of brands on click on brand input
-    async function getBrandList() {
-        const response = await fetch(`${API_URL}/api/glaze_brands`);
-        if (response.ok) {
-            const brandList = await response.json();
-            return brandList;
-        }
-    }
-
-    async function selectBrand(brandItem) {
-        brand = brandItem;
-        closeBrandList();
-
-        encodedBrand = encodeURIComponent(brand);
-
-        const response_ids = await fetch(`${API_URL}/api/glaze_ids/${encodedBrand}`);
-        if (response_ids.ok) {
-            dbIdsList = await response_ids.json();
-        }
-
-        const response_names = await fetch(`${API_URL}/api/glaze_names/${encodedBrand}`);
-        if (response_names.ok) {
-            dbNamesList = await response_names.json();
-        }
-    }
-
     async function selectName(nameItem) {
         name = nameItem;
         closeNamesList();
@@ -334,7 +310,7 @@
         encodedBrand = encodeURIComponent(brand);
         encodedId = encodeURIComponent(brand_id);
 
-        const response = await fetch(`${API_URL}/api/glaze_from_id?brand=${encodedBrand}&brand_id=${encodeId}`);
+        const response = await fetch(`${API_URL}/api/glaze_from_id?brand=${encodedBrand}&brand_id=${encodedId}`);
 
         if (response.ok) {
             let data = await response.json();
@@ -346,7 +322,12 @@
             glaze_url = data.glaze_url;
         }
     }
-    
+
+    function selectCone(coneItem) {
+        cone = coneItem;
+        closeConesList();
+    }
+
     async function handleSubmit() {
         let response;
         if (!editMode){
@@ -373,7 +354,7 @@
             resetValuesForm();
             showAddModal = false;
             
-            data.glazes = await fetchGlazeList();
+            data.glazes = await _fetchGlazeList(API_URL);
 
         } else {
             console.log(response.errors);
@@ -429,20 +410,12 @@
         }
     }
 
-    async function deleteGlaze(){
-        const response = await fetch(`${API_URL}/api/delete_glaze/${glazeId}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
-        });
+    function selectItem(item, event) {
+        switch(event.target.name){
+            case 'brand':
+                _selectBrand(API_URL, item, brand, closeBrandList, dbIdsList, dbNamesList);
+                break;
 
-        if (!response.ok) {
-            const errorMessage = await response.json()
-            _schema = errorMessage.message;
-            console.log(`Error: ${_schema}`);
-        } else {
-            data.glazes = await fetchGlazeList();
-            showAddModal = false;
-            dbBrandList = await getBrandList();
         }
     }
 
@@ -474,14 +447,14 @@
     on:focus={handleClickOutsideInput}
     {editMode}
     deleteBtnLabel={'Delete glaze'}
-    handleDelete={deleteGlaze}
+    handleDelete={()=>_deleteGlaze(API_URL, glazeId, _schema, data, showAddModal, dbBrandList)}
 >
 
     <form on:submit|preventDefault method='POST'>
         <div class="container" bind:this={schemaGroup}>
             <div class="row">
                 <ErrorMessageInput errors={errors._schema}/>
-                <div class="form-group" bind:this={brandGroup}>
+                <div class="form-group col-12 col-md-6 p-2 p-md-2" bind:this={brandGroup}>
                     <LabelInput labelFor={brand} label={'Brand'}/>
                     <div bind:this={brandInput}>
                         {#if editMode}
@@ -489,7 +462,7 @@
                         {:else}
                             <InputWithSearch name={'brand'} placeholder={'e.g. Amaco'} bind:value={brand} 
                                 removeErrorMessage={removeErrorMessage} updateFilteredItems={updateFilteredBrands} errorKeys={['brand', '_schema']}
-                                state={brandState} filteredItems={filteredBrands} highlightedIndex={highlightedIndex} selectItem={selectBrand} handleKeydown={handleKeydown}
+                                state={brandState} filteredItems={filteredBrands} highlightedIndex={highlightedIndex} selectItem={_selectBrand} handleKeydown={handleKeydown}
                             />
                         {/if}
                     </div>
@@ -497,7 +470,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="form-group" bind:this={idGroup}>
+                <div class="form-group col-12 col-md-6 p-2 p-md-2" bind:this={idGroup}>
                     <LabelInput labelFor={brand_id} label={'ID'}/>
                     <div bind:this={idInput}>
                         {#if editMode}
@@ -511,7 +484,7 @@
                     </div>
                     <ErrorMessageInput errors={errors.brand_id}/>
                 </div>
-                <div class="form-group" bind:this={nameGroup}>
+                <div class="form-group col-12 col-md-6 p-2 p-md-2" bind:this={nameGroup}>
                     <LabelInput labelFor={name} label={'Name'}/>
                     <div bind:this={nameInput}>
                         {#if editMode}
@@ -527,7 +500,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="form-group" bind:this={colorGroup}>
+                <div class="form-group col-12 col-md-6 p-2 p-md-2" bind:this={colorGroup}>
                     <LabelInput labelFor={color} label={'Color'}/>
                     <InputSearch name={'color'} className={'form-control'} placeholder={'e.g. Yellow with spots'} bind:value={color} errorKey={'color'} removeErrorMessage={removeErrorMessage}/>
                     <ErrorMessageInput errors={errors.color}/>
@@ -548,12 +521,17 @@
             <div class="row">
                 <div class="form-group col-12 col-md-6 p-2 p-md-2" bind:this={coneGroup}>
                     <LabelInput labelFor={name} label={'Cone'}/>
-                    <InputNumber name={'cone'} className={'form-control'} placeholder={''} bind:value={name} errorKey={'cone'} removeErrorMessage={removeErrorMessage} addOn={'%'}/>
-                    <ErrorMessageInput errors={errors.name}/>
+                    <div bind:this={coneInput}>
+                    <InputWithSearch name={'cone'} placeholder={'e.g. 5/6'} bind:value={cone} 
+                                removeErrorMessage={removeErrorMessage} updateFilteredItems={updateFilteredCones} errorKeys={['cone']}
+                                state={coneState} filteredItems={filteredCones} highlightedIndex={highlightedIndex} selectItem={selectCone} handleKeydown={handleKeydown}
+                            />
+                    </div>
+                    <ErrorMessageInput errors={errors.cone}/>
                 </div>
             </div>
             <div class="row">
-                <div class="form-group" bind:this={urlGroup}>
+                <div class="form-group col-12 col-md-6 p-2 p-md-2" bind:this={urlGroup}>
                     <LabelInput labelFor={glaze_url} label={'URL'}/>
                     <InputSearch name={'glaze_url'} className={'form-control'} placeholder={'https://'} bind:value={glaze_url} errorKey={'glaze_url'} removeErrorMessage={removeErrorMessage}/>
                     <ErrorMessageInput errors={errors.glaze_url}/>
@@ -564,7 +542,7 @@
 
 </Modal>
 
-<TableGlaze data={data.glazes} handleOnClickEdit={openModal} on:edit={handleEditClick}/>
+<TableGlaze data={data.glazes} handleOnClickEdit={openModal} on:edit={handleEditClick} showPotColumn={true}/>
 
 
 
@@ -579,11 +557,6 @@
         flex: 1 1 200px; /* Flex-grow, flex-shrink, flex-basis */
         margin: 0;
         padding: 0;
-    }
-
-    .container{
-        padding-left: 2;
-        padding-right: 2;
     }
     .row{
         padding: 0;

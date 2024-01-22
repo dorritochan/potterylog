@@ -34,10 +34,10 @@
 >
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="modal-dialog scroll-container" role="document" on:click|stopPropagation>
-            <div class="modal-content p-2">
+            <div class="modal-content">
                 <!-- svelte-ignore a11y-autofocus -->
                 <div class="modal-header" autofocus>
-                    <h3 class="modal-title">
+                    <h3 class="modal-title pl-3 pt-3 ml-3">
                         { modalTitle }
                     </h3>
                     <button on:click={() => dialog.close()} type="button" class="btn btn-outline-secondary">

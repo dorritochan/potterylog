@@ -1,9 +1,9 @@
-import { API_URL } from "$lib/config";
+import { API_URL } from '$lib/config';
 import { error } from '@sveltejs/kit';
 
 export async function load({ fetch }) {
-    const response = await fetch(`${API_URL}/api/glazes`);
 
+    const response = await fetch(`${API_URL}/api/clays`);
     if (!response.ok) {
         const errorBody = await response.json();
         console.log(`errorBody.message: ${errorBody.message}`);
@@ -13,8 +13,8 @@ export async function load({ fetch }) {
         })
     }
 
-    const glazes = await response.json();
-    return { glazeList: glazes };
+    const clays = await response.json();
+    return { clays };
 }
 
 

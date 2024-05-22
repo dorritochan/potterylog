@@ -1,19 +1,29 @@
 <script>
 
-    import Footer from "./Footer.svelte";
-    import Header from "./Header.svelte";
+    import Footer from "$lib/components/layout/Footer.svelte";
+    import Header from "$lib/components/layout/Header.svelte";
 
 </script>
 
-<Header />
-<slot class="wrapper" />
-<Footer />
+<div class="wrapper-outer">
+    <Header />
+    <div class="wrapper-inner">
+        <slot/>
+    </div>
+    <Footer />
+</div>
 
 
 <style>
-    .wrapper{
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
+    .wrapper-outer{
+        position:relative; /* needed for footer positioning*/
+        
+        height:auto !important; /* real browsers */
+        height:100%; /* IE6: treaded as min-height*/
+
+        min-height:100%; /* real browsers */
+    }
+    .wrapper-inner{
+        padding:1em 1em 5em; /* bottom padding for footer */
     }
 </style>

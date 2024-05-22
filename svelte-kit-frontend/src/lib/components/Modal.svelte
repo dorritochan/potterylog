@@ -1,21 +1,31 @@
 <script>
     import { Button } from "sveltestrap";
     import { createEventDispatcher } from "svelte";
+    import { showModal, editMode } from "$lib/stores/glaze";
+
+    export let show;
+    $: $showModal = show;
 
     const dispatch = createEventDispatcher();
 
-    export let showAddModal; // boolean
     export let modalTitle = 'Modal title';
     export let submitText = 'Submit text';
 
-    export let editMode;
+    export let edit;
+    $: $editMode = edit;
+    
     export let deleteBtnLabel;
     export let handleDelete;
 
     export let dialog; // HTMLDialogElement
 
-    $: if (showAddModal && dialog) dialog.showModal();
-    $: if (!showAddModal && dialog) dialog.close();
+    $: if ($showModal && dialog) {
+        dialog.showModal();
+    }
+    $: if (!$showModal && dialog) {
+        dialog.close();
+    }
+        
 
     function onSubmitButtonClick(){
         dispatch('submit');
@@ -28,9 +38,9 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-<dialog
+<dialog 
     bind:this={dialog}
-    on:close={() => showAddModal = false}
+    on:close={() => show = false}
 >
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="modal-dialog scroll-container" role="document" on:click|stopPropagation>
@@ -100,28 +110,29 @@
         display: flex;
 	}
 	dialog[open] {
-		animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+		animation: fly-in 0.5s;
         display: flex;
 	}
-	@keyframes zoom {
+	@keyframes fly-in {
 		from {
-			transform: scale(0.1);
+			transform: translateY(10%);
+            opacity: 0;
 		}
 		to {
-			transform: scale(1);
+			transform: translateY(0%);
+            opacity: 1;
 		}
 	}
-    /* dialog.closing {
-        animation: zoomout 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    } */
-    @keyframes zoomout {
-		from {
-			transform: scale(1);
-		}
-		to {
-			transform: scale(0.1);
-		}
-	}
+    @keyframes fly-out {
+        from {
+            transform: translateY(0%);
+            opacity: 1;
+        }
+        to {
+            transform: translateY(10%);
+            opacity: 0;
+        }
+    }
 	dialog[open]::backdrop {
 		animation: fade 1s ease-out;
 	} 

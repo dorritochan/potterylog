@@ -2,13 +2,13 @@
     import { createEventDispatcher } from "svelte";
     let dispatch = createEventDispatcher();
 
-    export let data = [];
+    export let glazeList = [];
     export let handleOnClickEdit;
     function handleClickEdit(glazeIdEvent){
         handleOnClickEdit();
         dispatch('edit', glazeIdEvent);
     }
-    export let showPotColumn;
+    export let showPotColumn = false;
 </script>
 
 <div class="table-container">
@@ -30,7 +30,7 @@
             </tr>
         </thead>
         <tbody>
-            {#each data as glaze}
+            {#each glazeList as glaze}
             <tr>
                 {#if showPotColumn}
                 <td>

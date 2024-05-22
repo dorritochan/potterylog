@@ -2,7 +2,7 @@
     export let data;
     import { API_URL } from '$lib/config';
     import defaultImage from '$lib/images/default_mug.jpg';
-    import ButtonTransparent from './ButtonTransparent.svelte';
+    import ButtonTransparent from '$lib/components/ButtonTransparent.svelte';
     
     console.log(data.pots);
 
@@ -78,6 +78,9 @@
 
 </script>
 
+<svelte:head>
+    <title>Pottery log: Home</title>
+</svelte:head>
 
 <h1 class="m-3">Pots</h1>
 <div class="m-3">

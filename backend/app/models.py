@@ -122,8 +122,8 @@ class Glaze(db.Model):
     __tablename__ = 'glaze'
     id = db.Column(db.Integer, primary_key=True)
     brand = db.Column(db.String(140), index=True)
-    name = db.Column(db.String(50), unique=True)
-    brand_id = db.Column(db.String(50), unique=True)
+    name = db.Column(db.String(50))
+    brand_id = db.Column(db.String(50))
     color = db.Column(db.String(140))
     temp_min = db.Column(db.Integer) # in °C
     temp_max = db.Column(db.Integer) # in °C

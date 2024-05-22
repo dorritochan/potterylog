@@ -1,10 +1,10 @@
 <script>
     import { API_URL } from "$lib/config";
     import defaultCup from '$lib/images/default_mug.jpg';
-    import TableGlaze from '../../TableGlaze.svelte'
+    import TableGlaze from '$lib/components/TableGlaze.svelte'
 
     export let data;
-    let glaze = data.glaze;
+    let { glaze } = data;
 
     // console.log(data);
     console.log(glaze.glazed_pots);
@@ -26,7 +26,7 @@
 
 <h1 class="m-3 page-title">{ title }</h1>
 
-<TableGlaze data={[glaze]} handleOnClickEdit={openModal} on:edit={handleEditClick} showPotColumn={false}/>
+<TableGlaze glazes={[glaze]} handleOnClickEdit={openModal} on:edit={handleEditClick} showPotColumn={false}/>
 
 <h3 class="m-3 page-title">Pots used with this glaze</h3>
 <div class="container-fluid">

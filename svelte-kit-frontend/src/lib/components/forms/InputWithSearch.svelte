@@ -19,9 +19,6 @@
     function handleClick() {
         updateFilteredItems();
     }
-    function handleFocus() {
-        updateFilteredItems();
-    }
     function handleThisKeydown(event) {
         handleKeydown(event, state);
     }
@@ -32,8 +29,7 @@
         placeholder={placeholder}
         bind:value
         on:input={() => handleInput()}
-        on:click={() => handleClick()} 
-        on:focus={() => handleFocus()} 
+        on:focus={() => handleClick()} 
         on:keydown={(event) => handleThisKeydown(event)}
 />
 {#if filteredItems.length > 0}

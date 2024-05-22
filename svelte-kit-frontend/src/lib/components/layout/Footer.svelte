@@ -20,7 +20,7 @@
         background-color: transparent;
         border-top: 1px solid #dee2e6;
         text-align: center;
-        margin-top: auto;
+        padding-top: 2em;
         -webkit-backdrop-filter: blur(5px);
         backdrop-filter: blur(5px);
     }

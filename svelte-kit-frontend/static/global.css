@@ -8,7 +8,7 @@
 }
 
 html, body {
-	font-family: 'Quicksand', sans-serif;
+	font-family: "Dosis", sans-serif;
 	position: relative;
 	margin: 0; 
     padding: 0; 
@@ -18,17 +18,14 @@ html, body {
 }
 
 body {
-	margin: 0;
     display: flex;
     flex-direction: column; /* Stack children vertically */
     min-height: 100vh; /* Minimum height of viewport  */
-    background-image: url('./background.jpeg');
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    background: url('./background.jpeg') no-repeat center center fixed; /* Local image as background */
+    background-size: cover; /* Ensure the background covers the entire page */
+    margin: 0;
+    padding: 0;
+    color: #ffffff; /* Default text color to white for better readability against the background */
 }
 
 .page-title{
@@ -92,12 +89,63 @@ td {
     vertical-align: middle;
 }
 
-tbody, td, tfoot, th, thead, tr {
+
+table {
+    width: 80%;
+    margin: 40px auto;
+    border-collapse: separate;
+    border-spacing: 0 15px; /* Space between rows */
+    background-color: transparent; /* Transparent background for the table */
+}
+th, td {
+    padding: 12px;
+    text-align: left;
+    background-color: transparent; /* Transparent background for cells */
+}
+th {
+    font-size: 16px;
+    color: #ffffff; /* White for header text */
+    background-color: #9C5827; /* Dark teal for header background */
+}
+td {
+    color: #000000; /* Black text color for contrast */
+}
+.rounded-row {
+    background-color: #ffffff; /* Light gray for rows */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    border-radius: 10px; /* Rounded corners for rows */
+    overflow: hidden; /* Ensure rounded corners */
+}
+
+.rounded-row:hover {
+    background-color: #e7f3f6; 
+    color: #e9f4f9; /* White text on hover */
+}
+.rounded-row:hover td {
+    color: #9C5827; /* Ensure text color changes on hover */
+}
+tr td:first-child, tr th:first-child { border-top-left-radius: 10px; }
+tr td:last-child, tr th:last-child { border-top-right-radius: 10px; }
+
+tr td:first-child, tr th:first-child { border-bottom-left-radius: 10px; }
+tr td:last-child, tr th:last-child { border-bottom-right-radius: 10px; }
+
+a.link-table-item {
+    text-decoration: none;
+    cursor: pointer;
+    color: #9C5827;
+    margin: 5px 5px 5px 5px;
+}
+a.link-table-item:hover {
+    font-weight: bold;
+}
+
+/* tbody, td, tfoot, th, thead, tr {
     border: 0.1px rgba(255, 255, 255, 0.366) solid;
 }
 
 .table.table-striped td:nth-child(1), .table.table-striped th:nth-child(1) {
-    padding-left: 22px; /* Adjust this value to your preference */
+    padding-left: 22px; 
 }
 
 table {
@@ -115,7 +163,7 @@ table th, td {
 .table-container {
     padding: 20px;
     display: flex;
-    justify-content: center; /* Center horizontally */
+    justify-content: center;
     margin-top: 1em;
     margin-bottom: 1em;
 }
@@ -124,7 +172,7 @@ table tr:hover{
     -webkit-backdrop-filter: blur(15px);
     backdrop-filter: blur(15px);
     background-color: rgba(145, 49, 118, 0.467);
-}
+} */
 
 a.link-image-label {
     text-decoration: none;

@@ -87,7 +87,7 @@
     <ButtonTransparent handleOnClick={handleClickAddPot} buttonText={'&plus; Add a new pot'}/>
 </div>
 
-<table class="table table-striped table-hover-color table-hover">
+<table>
     <thead>
         <tr>
             <th on:click={sort("id")} class="sorting-column">
@@ -112,7 +112,7 @@
     </thead>
     <tbody>
         {#each pots as pot}
-            <tr>
+            <tr class="rounded-row">
                 <td>{ pot.id }</td>
                 <td>
                     <div class="container-fluid">
@@ -158,12 +158,6 @@
         height: 100%;
         object-fit: cover;
     }  
-    a.link-table-item {
-        text-decoration: none;
-        cursor: pointer;
-        color: #0d6efd;
-    }
-    a.link-table-item:hover {
-        font-weight: bold;
-    }
+
+
 </style>

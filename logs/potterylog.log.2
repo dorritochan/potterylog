@@ -1,83 +1,94 @@
-2023-10-23 14:43:19,390 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-23 14:43:23,906 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-23 14:56:20,768 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-23 14:56:28,441 ERROR: Exception on /viewcommissions [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+2023-12-07 15:51:24,911 ERROR: Exception on /api/pots [GET] [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
     rv = self.handle_user_exception(e)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
     rv = self.dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 716, in view_commissions
-    commissions = Commission.query.order_by(Commission.deadline.desc()).all()
-AttributeError: type object 'Commission' has no attribute 'deadline'
-2023-10-23 14:56:51,071 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-23 14:56:52,493 ERROR: Exception on /viewcommissions [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/controller.py", line 55, in get_pots
+    return jsonify(pots_schema.dump(pots))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 549, in dump
+    result = self._serialize(processed_obj, many=many)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 511, in _serialize
+    return [
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 512, in <listcomp>
+    self._serialize(d, many=False)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 517, in _serialize
+    value = field_obj.serialize(attr_name, obj, accessor=self.get_attribute)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 340, in serialize
+    return self._serialize(value, attr, obj, **kwargs)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 643, in _serialize
+    return schema.dump(nested_obj, many=many)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 549, in dump
+    result = self._serialize(processed_obj, many=many)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 511, in _serialize
+    return [
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 512, in <listcomp>
+    self._serialize(d, many=False)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 517, in _serialize
+    value = field_obj.serialize(attr_name, obj, accessor=self.get_attribute)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 340, in serialize
+    return self._serialize(value, attr, obj, **kwargs)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 643, in _serialize
+    return schema.dump(nested_obj, many=many)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 549, in dump
+    result = self._serialize(processed_obj, many=many)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 511, in _serialize
+    return [
+TypeError: 'Glaze' object is not iterable
+2023-12-07 16:33:54,668 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-07 16:33:58,213 ERROR: Exception on /api/pots [GET] [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
     rv = self.handle_user_exception(e)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
     rv = self.dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 716, in view_commissions
-    commissions = Commission.query.order_by(Commission.deadline.desc()).all()
-AttributeError: type object 'Commission' has no attribute 'deadline'
-2023-10-23 14:56:53,599 ERROR: Exception on /viewcommissions [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
-Traceback (most recent call last):
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 716, in view_commissions
-    commissions = Commission.query.order_by(Commission.deadline.desc()).all()
-AttributeError: type object 'Commission' has no attribute 'deadline'
-2023-10-23 14:57:51,974 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-23 14:57:56,155 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-23 14:57:59,040 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-23 14:58:01,016 ERROR: Exception on /viewcommissions [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
-Traceback (most recent call last):
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 721, in view_commissions
-    return render_template('viewcommissions.html', title='Commissions', form=form, commissions=commissions)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/templating.py", line 147, in render_template
-    return _render(app, template, context)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/templating.py", line 130, in _render
-    rv = template.render(context)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/jinja2/environment.py", line 1301, in render
-    self.environment.handle_exception()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/jinja2/environment.py", line 936, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/templates/viewcommissions.html", line 2, in top-level template code
-    {% include 'addcommision.html' %}
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/templating.py", line 62, in get_source
-    return self._get_source_fast(environment, template)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/templating.py", line 98, in _get_source_fast
-    raise TemplateNotFound(template)
-jinja2.exceptions.TemplateNotFound: addcommision.html
-2023-10-23 14:59:55,840 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-23 15:10:09,331 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/controller.py", line 55, in get_pots
+    return jsonify(pots_schema.dump(pots))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 549, in dump
+    result = self._serialize(processed_obj, many=many)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 511, in _serialize
+    return [
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 512, in <listcomp>
+    self._serialize(d, many=False)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 517, in _serialize
+    value = field_obj.serialize(attr_name, obj, accessor=self.get_attribute)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 340, in serialize
+    return self._serialize(value, attr, obj, **kwargs)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 643, in _serialize
+    return schema.dump(nested_obj, many=many)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 549, in dump
+    result = self._serialize(processed_obj, many=many)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 511, in _serialize
+    return [
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 512, in <listcomp>
+    self._serialize(d, many=False)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 517, in _serialize
+    value = field_obj.serialize(attr_name, obj, accessor=self.get_attribute)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 340, in serialize
+    return self._serialize(value, attr, obj, **kwargs)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 643, in _serialize
+    return schema.dump(nested_obj, many=many)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 549, in dump
+    result = self._serialize(processed_obj, many=many)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 517, in _serialize
+    value = field_obj.serialize(attr_name, obj, accessor=self.get_attribute)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 340, in serialize
+    return self._serialize(value, attr, obj, **kwargs)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 971, in _serialize
+    ret = self._format_num(value)  # type: _T
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/fields.py", line 948, in _format_num
+    return self.num_type(value)
+ValueError: invalid literal for int() with base 10: 'PC-31'
+2023-12-07 16:34:48,249 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]

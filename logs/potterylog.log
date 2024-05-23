@@ -1,50 +1,80 @@
-2023-10-25 23:12:40,159 ERROR: Exception on /viewcommissions [GET] [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py:1741]
+2023-12-07 16:37:49,388 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-07 16:49:00,261 ERROR: Exception on /api/pots [GET] [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py:1741]
 Traceback (most recent call last):
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
     response = self.full_dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
     rv = self.handle_user_exception(e)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
     rv = self.dispatch_request()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/controller.py", line 721, in view_commissions
-    return render_template('viewcommissions.html', title='Commissions', form=form, commissions=commissions)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/templating.py", line 147, in render_template
-    return _render(app, template, context)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/flask/templating.py", line 130, in _render
-    rv = template.render(context)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/jinja2/environment.py", line 1301, in render
-    self.environment.handle_exception()
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/jinja2/environment.py", line 936, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/templates/viewcommissions.html", line 2, in top-level template code
-    {% include 'addcommission.html' %}
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/venv/lib/python3.9/site-packages/jinja2/environment.py", line 936, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/templates/addcommission.html", line 53, in template
-    {{ form.done(class_="form-check-input" type_="checkbox") }}
-jinja2.exceptions.TemplateSyntaxError: expected token ',', got 'type_'
-2023-10-25 23:12:51,427 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-25 23:21:52,971 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-25 23:22:22,965 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-25 23:30:30,808 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-25 23:33:46,422 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-25 23:35:01,832 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-25 23:41:37,911 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-25 23:44:00,094 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-25 23:45:12,482 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-25 23:47:03,420 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-27 11:10:34,592 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-27 13:46:47,709 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-27 13:48:24,861 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-27 13:50:20,600 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-27 13:51:44,519 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-27 13:54:08,304 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-27 13:58:54,388 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-27 14:00:10,971 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-31 13:37:48,239 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-31 13:37:52,727 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
-2023-10-31 13:46:48,880 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT dojo/POTTERY/potterylog/app/__init__.py:41]
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/controller.py", line 53, in get_pots
+    pots_schema = PotSchema(many=True, only=('id', 'primary_image', 'throw_date', 'vessel_type', 'clay_type', 'used_glazes'))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow_sqlalchemy/load_instance_mixin.py", line 45, in __init__
+    super().__init__(*args, **kwargs)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 400, in __init__
+    self._init_fields()
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 979, in _init_fields
+    raise ValueError(message)
+ValueError: Invalid fields for <PotSchema(many=True)>: OrderedSet(['used_glazes']).
+2023-12-07 17:45:13,671 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-07 17:45:28,843 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-07 17:55:04,852 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-07 17:55:10,643 ERROR: Exception on /api/pots [GET] [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py:1741]
+Traceback (most recent call last):
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/controller.py", line 53, in get_pots
+    pots_schema = PotSchema(many=True, only=('id', 'primary_image', 'throw_date', 'vessel_type', 'clay_type', 'used_glazes'))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow_sqlalchemy/load_instance_mixin.py", line 45, in __init__
+    super().__init__(*args, **kwargs)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 400, in __init__
+    self._init_fields()
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 979, in _init_fields
+    raise ValueError(message)
+ValueError: Invalid fields for <PotSchema(many=True)>: OrderedSet(['used_glazes']).
+2023-12-07 17:55:45,636 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-07 17:55:47,916 ERROR: Exception on /api/pots [GET] [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py:1741]
+Traceback (most recent call last):
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/flask/app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/controller.py", line 53, in get_pots
+    pots_schema = PotSchema(many=True, only=('id', 'primary_image', 'throw_date', 'vessel_type', 'clay_type', 'used_glazes'))
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow_sqlalchemy/load_instance_mixin.py", line 45, in __init__
+    super().__init__(*args, **kwargs)
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 400, in __init__
+    self._init_fields()
+  File "/Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/venv/lib/python3.9/site-packages/marshmallow/schema.py", line 979, in _init_fields
+    raise ValueError(message)
+ValueError: Invalid fields for <PotSchema(many=True)>: OrderedSet(['used_glazes']).
+2023-12-07 17:56:12,567 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-07 18:00:32,639 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-07 19:13:31,859 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-07 19:15:29,778 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-11 12:07:25,804 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-11 12:08:17,203 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-11 12:17:53,832 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-11 12:32:50,650 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-11 12:33:17,000 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2023-12-11 16:15:16,068 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/backend/app/__init__.py:44]
+2024-05-23 21:23:19,788 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/app/__init__.py:41]
+2024-05-23 21:23:36,719 INFO: Potterylog startup [in /Users/dorritochan/Documents/IT_dojo/POTTERY/potterylog/app/__init__.py:41]

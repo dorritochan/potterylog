@@ -82,8 +82,8 @@
     <title>Pottery log: Home</title>
 </svelte:head>
 
-<h1 class="m-3">Pots</h1>
-<div class="m-3">
+<h1 class="m-3 page-title">Pots</h1>
+<div class="m-3 centered">
     <ButtonTransparent handleOnClick={handleClickAddPot} buttonText={'&plus; Add a new pot'}/>
 </div>
 
@@ -112,7 +112,7 @@
     </thead>
     <tbody>
         {#each pots as pot}
-            <tr class="rounded-row">
+            <tr>
                 <td>{ pot.id }</td>
                 <td>
                     <div class="container-fluid">

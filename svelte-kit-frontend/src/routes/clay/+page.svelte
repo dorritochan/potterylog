@@ -496,10 +496,7 @@
 
 
 <style>
-    .centered{
-        display: flex;
-        justify-content: center;
-    }
+    
     .form-group {
         position: relative;
         width: 100%;

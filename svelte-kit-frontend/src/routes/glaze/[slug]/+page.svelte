@@ -6,9 +6,6 @@
     export let data;
     let { glaze } = data;
 
-    // console.log(data);
-    console.log(glaze.glazed_pots);
-
     const title = `Glaze ${glaze.glaze_name}`;
 
     function openModal() {
@@ -26,7 +23,7 @@
 
 <h1 class="m-3 page-title">{ title }</h1>
 
-<TableGlaze glazes={[glaze]} handleOnClickEdit={openModal} on:edit={handleEditClick} showPotColumn={false}/>
+<TableGlaze glazeList={[glaze]} handleOnClickEdit={openModal} on:edit={handleEditClick} showPotColumn={false}/>
 
 <h3 class="m-3 page-title">Pots used with this glaze</h3>
 <div class="container-fluid">

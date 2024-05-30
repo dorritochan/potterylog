@@ -3,34 +3,46 @@
     import { createEventDispatcher } from "svelte";
     import { showModal, editMode } from "$lib/stores/glaze";
 
-    export let show;
-    $: $showModal = show;
-
-    const dispatch = createEventDispatcher();
-
+    // modalTitle - string, the title of the modal
+    // submitText - string, the text of the submit button
     export let modalTitle = 'Modal title';
     export let submitText = 'Submit text';
+    export let deleteBtnLabel = 'Delete';
 
+    // handleDelete - function, the function to call when the delete button is clicked
+    export let handleDelete;
+    
+    // show - boolean, whether to show the modal or not
+    // updates the store value
+    export let show;
+    $: $showModal = show;
+    
+    // edit - boolean, whether the modal is in edit mode or not
+    // updates the store value
     export let edit;
     $: $editMode = edit;
     
-    export let deleteBtnLabel;
-    export let handleDelete;
-
-    export let dialog; // HTMLDialogElement
-
+    // dialog - HTMLDialogElement, the dialog element
+    export let dialog;
+    
+    // show the modal when the show value changes
     $: if ($showModal && dialog) {
         dialog.showModal();
     }
     $: if (!$showModal && dialog) {
         dialog.close();
     }
-        
+    
+    // create an event dispatcher to dispatch custom events
+    // to the parent component of the modal
+    const dispatch = createEventDispatcher();
 
+    // function to handle the submit button click
     function onSubmitButtonClick(){
         dispatch('submit');
     }
 
+    // function to handle the reset button click
     function onResetButtonClick(){
         dispatch('resetValues');
     }

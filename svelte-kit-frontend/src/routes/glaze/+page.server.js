@@ -14,13 +14,7 @@ export async function load({ fetch }) {
     }
 
     const glazes = await response.json();
+    console.log('glazes:');
+    console.log(glazes);
     return { glazeList: glazes };
-}
-
-
-export const actions = {
-    default: async (event) => {
-        console.log('Logging the server code...');
-        console.log(event);
-    },
 }

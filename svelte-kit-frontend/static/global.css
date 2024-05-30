@@ -1,7 +1,7 @@
 :root {
-    --main-color: rgb(0, 128, 83);
+    --main-color: rgb(1, 137, 137);
 
-    --sec-color: rgb(180, 215, 202);
+    --sec-color: rgb(140, 195, 195);
 
     --ter-color: #9C5827;
 }
@@ -22,7 +22,8 @@ body {
     display: flex;
     flex-direction: column; /* Stack children vertically */
     min-height: 100vh; /* Minimum height of viewport  */
-    background: rgb(236, 246, 242) no-repeat center center fixed; /* Local image as background */
+    /*background: rgb(236, 246, 242) no-repeat center center fixed;  Local image as background */
+    background: url('./clay_background.jpg') no-repeat center center fixed;  /* Local image as background */
     background-size: cover; /* Ensure the background covers the entire page */
     margin: 0;
     padding: 0;
@@ -145,8 +146,9 @@ a {
     cursor: pointer;
     color: var(--main-color);
 }
-a:hover {
+a.text-hover-effect:hover {
     font-weight: bold;
+    font-size: smaller;
 }
 a.link-image-label {
     text-decoration: none;

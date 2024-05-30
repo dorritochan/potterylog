@@ -133,12 +133,12 @@
                 <td>{ pot.vessel_type }</td>
                 <td>
                     {#if pot.clay_type}
-                    <a href={`/clay/${pot.clay_type.id}`} class="link-table-item">{ pot.clay_type.clay_name }</a>
+                    <a href={`/clay/${pot.clay_type.id}`} class="text-hover-effect">{ pot.clay_type.clay_name }</a>
                     {/if}
                 </td>
                 <td>
                     {#each pot.used_glazes as glaze}
-                        <a href={`/glaze/${glaze.glaze.id}`} class="link-table-item">{ glaze.glaze.glaze_name }</a> <br>
+                        <a href={`/glaze/${glaze.glaze.id}`} class="text-hover-effect">{ glaze.glaze.glaze_name }</a> <br>
                     {/each}
                 </td>
             </tr>

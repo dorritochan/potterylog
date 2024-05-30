@@ -31,10 +31,10 @@
     <Collapse {isOpen} navbar expand="md" on:update={(event) => handleUpdate(event)}>
         <Nav navbar>
             <NavItem>
-                <NavLink href="/glaze">Glazes</NavLink>
+                <NavLink class="navitem" href="/glaze">Glazes</NavLink>
             </NavItem>
             <NavItem>
-                <NavLink href="/clay">Clays</NavLink>
+                <NavLink class="navitem" href="/clay">Clays</NavLink>
             </NavItem>
             <!--
             <NavItem>
@@ -61,6 +61,14 @@
     }
     .small-text {
         font-size: 15px;
+        color: white;
+    }
+    .navbar{
+        background-color: transparent;
+        text-align: center;
+    }
+    :global(.navitem){
+        color: white;
     }
 
 </style>

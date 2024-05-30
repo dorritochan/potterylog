@@ -15,14 +15,12 @@
         -webkit-backdrop-filter: blur(10px);
         backdrop-filter: blur(10px);
         border: 1px var(--main-color) solid;
-        color: var(--main-color);
+        color: white;
     }
     :global(.standard-btn.transparent):hover {
         background-color: var(--main-color);
         color: white;
         font-weight: bold;
     }
-    :global(.standard-btn.transparent):focus {
-        border: none;
-    }
+
 </style>

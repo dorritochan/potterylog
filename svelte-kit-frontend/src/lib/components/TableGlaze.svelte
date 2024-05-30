@@ -2,13 +2,21 @@
     import { createEventDispatcher } from "svelte";
     let dispatch = createEventDispatcher();
 
+    // glazeList - list of glazes to be displayed in the table
     export let glazeList = [];
+
+    // handleOnClickEdit - function to be called when the edit button is clicked
+    // the glaze id is passed as an argument
     export let handleOnClickEdit;
     function handleClickEdit(glazeIdEvent){
         handleOnClickEdit();
         dispatch('edit', glazeIdEvent);
     }
+
+    // showPotColumn - used for differentiating between the table with all the glazes and the table with the a single glaze's pots
+    // If false, the pots column will not be shown
     export let showPotColumn = false;
+    
 </script>
 
 <div class="table-container">

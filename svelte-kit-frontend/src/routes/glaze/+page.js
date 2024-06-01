@@ -70,6 +70,36 @@
         }
     }
 
+    export async function _fetchBrandGlazeIds(brand){
+
+        let encodedBrand = encodeURIComponent(brand);
+
+        const response = await fetch(`${API_URL}/api/glaze_ids/${encodedBrand}`);
+
+        if (!response.ok) {
+            const errorMessage = await response.json()
+            throw new Error(errorMessage.message);
+        } else {
+            const brandIdsList = await response.json();
+            return brandIdsList;
+        }
+    }
+
+    export async function _fetchBrandGlazeNames(brand){
+
+        let encodedBrand = encodeURIComponent(brand);
+
+        const response = await fetch(`${API_URL}/api/glaze_names/${encodedBrand}`);
+
+        if (!response.ok) {
+            const errorMessage = await response.json()
+            throw new Error(errorMessage.message);
+        } else {
+            const brandNamesList = await response.json();
+            return brandNamesList;
+        }
+    }
+
     export async function _fetchGlazeData(glazeId){
 
         const response = await fetch(`${API_URL}/api/glaze/${glazeId}`);
@@ -80,11 +110,46 @@
         }
     }
 
-    export async function _addGlaze(){
-        const response = await fetch(`${API_URL}/api/add_glaze`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(glazeData)
-        });
-        return response;
+    export async function _updateGlaze(glazeId, glazeData){
+        try {
+            const response = await fetch(`${API_URL}/api/update_glaze/${glazeId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(glazeData)
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.json()
+                throw new Error(`Error: ${errorMessage.message} (status: ${response.status})`);
+            }
+
+            return response;
+
+        } catch (error) {
+            console.error(`Failed to update glaze: ${error.message}`);
+            throw error;
+        }
+    }
+
+    export async function _addGlaze(glazeData) {
+        try {
+            const response = await fetch(`${API_URL}/api/add_glaze`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(glazeData)
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.json()
+                throw new Error(`Error: ${errorMessage.message} (status: ${response.status})`);
+            }
+
+            return response;
+
+        } catch (error) {
+            console.error(`Failed to add glaze: ${error.message}`);
+            throw error;
+        }
+
+        
     }

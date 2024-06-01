@@ -36,13 +36,14 @@
             <NavItem>
                 <NavLink class="navitem" href="/clay">Clays</NavLink>
             </NavItem>
+            <NavItem>
+                <NavLink class="navitem" href="/link">Links</NavLink>
+            </NavItem>
             <!--
             <NavItem>
                 <Navlink href="/kilns">Kilns</Navlink>
-            </NavItem>
-            <NavItem>
-                <Navlink href="/links">Links</Navlink>
-            </NavItem>
+            </NavItem> -->
+            <!--
             <NavItem>
                 <Navlink href="/glazerecipes">Glaze recipes</Navlink>
             </NavItem>
@@ -61,14 +62,15 @@
     }
     .small-text {
         font-size: 15px;
-        color: white;
+        color: var(--text-color);
     }
     .navbar{
         background-color: transparent;
         text-align: center;
+        min-height: 50px;
     }
     :global(.navitem){
-        color: white;
+        color: var(--text-color);
     }
 
 </style>

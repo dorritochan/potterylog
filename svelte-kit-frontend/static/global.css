@@ -1,7 +1,14 @@
 :root {
-    --main-color: rgb(1, 137, 137);
+    /* --main-color: rgb(1, 137, 137);
 
-    --sec-color: rgb(140, 195, 195);
+    --sec-color: rgb(140, 195, 195); */
+    --main-color: rgb(116, 118, 118);
+
+    --sec-color: rgb(221, 219, 219);
+
+    --text-color: rgb(57, 57, 57);
+
+    
 
     --ter-color: #9C5827;
 }
@@ -22,8 +29,7 @@ body {
     display: flex;
     flex-direction: column; /* Stack children vertically */
     min-height: 100vh; /* Minimum height of viewport  */
-    /*background: rgb(236, 246, 242) no-repeat center center fixed;  Local image as background */
-    background: url('./clay_background.jpg') no-repeat center center fixed;  /* Local image as background */
+    background: rgb(255, 255, 255) no-repeat center center fixed; 
     background-size: cover; /* Ensure the background covers the entire page */
     margin: 0;
     padding: 0;
@@ -33,7 +39,7 @@ body {
 /* page titles */
 
 .page-title{
-    color: white;
+    color: var(--text-color);
     display: flex;
     justify-content: center;
 }   

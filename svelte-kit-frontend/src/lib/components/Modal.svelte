@@ -2,6 +2,7 @@
     import { Button } from "sveltestrap";
     import { createEventDispatcher } from "svelte";
     import { showModal, editMode } from "$lib/stores/glaze";
+    import ButtonPrimary from "./ButtonPrimary.svelte";
 
     // modalTitle - string, the title of the modal
     // submitText - string, the text of the submit button
@@ -38,7 +39,7 @@
     const dispatch = createEventDispatcher();
 
     // function to handle the submit button click
-    function onSubmitButtonClick(){
+    function handleClick(){
         dispatch('submit');
     }
 
@@ -73,9 +74,11 @@
                 <br>
                 <div class="container">
                     <div class="row justify-content-between">
-                        <Button class="standard-btn primary col-12 col-md-4 p-2 p-md-2" type="submit" on:click={onSubmitButtonClick} color='primary'>
-                            { submitText }
-                        </Button>
+                        <div class="col-12 col-md-4 p-2 p-md-2">
+                            <ButtonPrimary buttonText={submitText} on:click={handleClick}>
+                                { submitText }
+                            </ButtonPrimary>
+                        </div>
                         <Button class="standard-btn col-12 col-md-4 p-2 p-md-2" type="secondary" outline on:click={onResetButtonClick} >
                             Reset values
                         </Button>
@@ -169,9 +172,6 @@
 
     dialog::-webkit-scrollbar-thumb:hover {
         background: #7caef880;
-    }
-    :global(.standard-btn.primary) {
-        box-shadow: 0px 6px 10px -5px #0d6efd;
     }
     :global(.standard-btn.secondary) {
         box-shadow: 0px 6px 10px -5px #666;

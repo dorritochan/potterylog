@@ -2,7 +2,7 @@ from typing import Any
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from marshmallow_sqlalchemy.fields import Nested
 from marshmallow import fields, validate, ValidationError, validates_schema
-from app.models import Clay, Pot, Glaze, PotGlaze
+from app.models import Clay, Pot, Glaze, PotGlaze, Link
 import re
 
 class CustomURLValidator:
@@ -191,3 +191,16 @@ class PotGlazeSchema(SQLAlchemyAutoSchema):
     pot = fields.Nested(PotSchema(only=('id', 'primary_image', 'pot_name')))
     number_of_layers = fields.Integer()
     display_order = fields.Integer()
+    
+    
+class LinkSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Link
+        load_instance = True  # Optional: deserialize to model instances
+        ordered = True
+    
+    # Define fields explicitly if needed
+    id = auto_field()
+    title = StringHandlingEmptystring(allow_none=False, required=True)
+    url = StringHandlingEmptystring(validate=CustomURLValidator(), allow_none=True)
+    description = StringHandlingEmptystring(allow_none=True)

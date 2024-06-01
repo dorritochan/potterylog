@@ -21,6 +21,7 @@
         border-top: 1px solid #dee2e6;
         text-align: center;
         padding-top: 2em;
+        min-height: 50px;
         -webkit-backdrop-filter: blur(5px);
         backdrop-filter: blur(5px);
     }

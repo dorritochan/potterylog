@@ -41,4 +41,7 @@ def create_app(config_class=Config):
     from .glaze.glaze import glaze as glaze_blueprint
     app.register_blueprint(glaze_blueprint)
     
+    from .link.link import link as link_blueprint
+    app.register_blueprint(link_blueprint)
+    
     return app

@@ -3,6 +3,8 @@
     import { API_URL } from '$lib/config';
     import defaultImage from '$lib/images/default_mug.jpg';
     import ButtonTransparent from '$lib/components/ButtonTransparent.svelte';
+    import Title from '$lib/components/Title.svelte';
+    import { goto } from '$app/navigation';
     
     console.log(data.pots);
 
@@ -72,20 +74,16 @@
 
     }
 
-    function handleClickAddPot(){
-
-    }
-
 </script>
 
 <svelte:head>
     <title>Pottery log: Home</title>
 </svelte:head>
 
-<h1 class="m-3 page-title">Pots</h1>
-<div class="m-3 centered">
-    <ButtonTransparent handleOnClick={handleClickAddPot} buttonText={'&plus; Add a new pot'}/>
-</div>
+<Title title={'Pots'}/>
+
+<ButtonTransparent on:click={() => goto('/pot')} buttonText={'&plus; Add a new pot'}/>
+
 
 <table>
     <thead>

@@ -21,16 +21,19 @@
     // Stores
     import { showModal, editMode, glazeId, glazeList } from '$lib/stores/glaze.js';
 
-    // Props
-
-
-
+    // State variables
+    // Reset the form values when the modal is closed
     let dialog;
     $: if (!$showModal && dialog) {
-        resetValuesForm();
+        resetAllValuesForm();
         $editMode = false;
         $glazeId = '';
     }
+
+    $: if ($editMode == false) {
+        dataFetched = false;
+    }
+
 
     // State variables for form inputs
     $: formData = {
@@ -112,14 +115,14 @@
         filteredItems: filteredNames,
         highlightedIndex,
         selectItem: selectName,
-        closeList: closeIdList
+        closeList: closeNameList
     }
 
     $: idState = {
         filteredItems: filteredIds,
         highlightedIndex,
         selectItem: selectId,
-        closeList: closeNameList
+        closeList: closeIdList
     }
 
     $: coneState = {
@@ -130,12 +133,18 @@
     }
 
 
-    // Reset the modal form values
+    // Reset the input values in the modal form
     function resetValuesForm() {
         for (let key in formData) {
-            if (!$editMode && (key === 'brand' || key === 'brand_id' || key === 'name')) {
+            if (!($editMode && (key === 'brand' || key === 'brand_id' || key === 'name'))) {
                 formData[key].value = '';
+                formData[key].error = '';
             }
+        }
+    }
+
+    function resetAllValuesForm() {
+        for (let key in formData) {
             formData[key].value = '';
             formData[key].error = '';
         }
@@ -158,7 +167,7 @@
             const relativeTop = targetRect.top - modalRect.top;
 
             // Scroll to the element
-            dialog.scrollTop = dialog.scrollTop + relativeTop;
+            dialog.scrollTop = dialog.scrollTop + relativeTop - 20;
 
         }
     }
@@ -168,7 +177,6 @@
     let dbBrandList = [];
     onMount(async () => {
         dbBrandList = await _fetchBrandList();
-        console.log(dbBrandList);
     });
 
     // Filter the brands on input and save them in a list
@@ -252,7 +260,7 @@
     // Filter the list of cones and save them a list
     let filteredCones = [];
     function updateFilteredCones() {
-        filteredCones = dbConesList.filter(coneFromList => coneFromList.toLowerCase().includes(formData.cone.value.toLowerCase()));
+        filteredCones = dbConesList.filter(coneFromList => coneFromList.includes(formData.cone.value));
     }
     function closeConeList() {
         [filteredCones, highlightedIndex] = _closeInputList(filteredCones, highlightedIndex);
@@ -264,27 +272,37 @@
 
 
     // Edit mode: Fetching the glaze information and setting the form data in edit mode
+    // dataFetched is a variable that prevents endless looping of the fetchGlazeData function
     let glazeData = {};
-    $: if ($editMode) {
+    let dataFetched = false;
+
+    $: if ($editMode && !dataFetched) {
         fetchGlazeData();
+        dataFetched = true;
+    }
+    async function fetchGlazeData(){
+        glazeData = await _fetchGlazeData($glazeId);
         for (let key in glazeData) {
             if (formData.hasOwnProperty(key)) {
                 formData[key].value = glazeData[key];
             }
         }
     }
-    async function fetchGlazeData(){
-        glazeData = await _fetchGlazeData($glazeId);
-    }
 
 
     async function handleSubmit() {
         
         let glazeFormData = {
-            brand: formData.brand.value, brand_id: formData.brand_id.value, name: formData.name.value,
-            color: formData.color.value, temp_min: formData.temp_min.value, temp_max: formData.temp_max.value,
-            cone: formData.cone.value, glaze_url: formData.glaze_url.value
+            brand: formData.brand.value, 
+            brand_id: formData.brand_id.value, 
+            name: formData.name.value,
+            color: formData.color.value, 
+            temp_min: formData.temp_min.value, 
+            temp_max: formData.temp_max.value,
+            cone: formData.cone.value, 
+            glaze_url: formData.glaze_url.value
         };
+
         try {
             let response;
 
@@ -293,9 +311,10 @@
             } else {
                 response = await _updateGlaze($glazeId, glazeFormData);
             }
-            const result = await response.json();
-            console.log(result.message);
 
+            console.log(response.message);
+
+            // Reset the form values, close the modal and update the glaze list
             resetValuesForm();
             $showModal = false;
             $glazeList = await _fetchGlazeList();
@@ -310,21 +329,32 @@
                 console.error('Server error occurred');
             }
             
-            // Set the respective errors in the errors dict
-            let errorMessages = error.message;
-
-            let firstError = '';
-            Object.keys(errorMessages).forEach(key => {
-                    if(formData.hasOwnProperty(key)) {
-                        formData[key].error = errorMessages[key];
-                        if (firstError == '') {
-                            firstError = formData[key].errorGroup;
-                        };
-                    }
-                });
-            console.log(firstError);
-            focusOnError(firstError);
+            handleError(error.message);
         }
+    }
+
+    // Handle the error messages on form submission
+    function handleError(error) {
+        const errorMessages = JSON.parse(error);
+        console.log('After parsing');
+        console.log(errorMessages);
+
+        let firstError = '';
+        Object.keys(errorMessages).forEach(key => {
+            console.log(key);
+            if (formData.hasOwnProperty(key)) {
+                formData[key].error = errorMessages[key];
+                if (firstError === '') {
+                    firstError = formData[key].errorGroup;
+                }
+            } else if (key === '_schema') {
+                formData.schema.error = errorMessages[key];
+                if (firstError === '') {
+                    firstError = formData.schema.errorGroup;
+                }
+            }
+        });
+        focusOnError(firstError);
     }
 
 
@@ -332,11 +362,13 @@
     async function handleDeleteGlaze() {
         try{
             await _deleteGlaze($glazeId);
-            glazeData = await _fetchGlazeList();
+            // Reset the form values, close the modal and update the glaze list
+            resetValuesForm();
             $showModal = false;
-            dbBrandList = await _fetchBrandList();
+            $glazeList = await _fetchGlazeList();
         } catch (error) {
             formData.schema.error = error.message;
+            focusOnError(formData.schema.errorGroup);
             console.log(`Error: ${formData.schema.error}`);
         }
     }
@@ -345,17 +377,15 @@
 
 
 <Modal 
-    bind:show={$showModal}
     bind:dialog 
     modalTitle="{$editMode ? 'Edit glaze' : 'Add a new glaze'}" 
-    submitText="{$editMode ? 'Update glaze' : 'Add glaze'}" 
-    on:submit={handleSubmit} 
-    on:resetValues={resetValuesForm} 
+    submitText="{$editMode ? 'Update glaze' : 'Add glaze'}"
+    deleteBtnLabel={'Delete glaze'}
+    on:clickSubmit={handleSubmit} 
+    on:clickReset={resetValuesForm} 
+    on:clickDelete={handleDeleteGlaze}
     on:click={handleClickOutsideInput} 
     on:focus={handleClickOutsideInput}
-    edit={$editMode}
-    deleteBtnLabel={'Delete glaze'}
-    handleDelete={handleDeleteGlaze}
 >
 
     <form on:submit|preventDefault method='POST'>
@@ -369,7 +399,7 @@
                         <InputDisabled name={'brand'} bind:value={formData.brand.value} className={'form-control'}/>
                         {:else}
                             <InputWithSearch name={'brand'} placeholder={'e.g. Amaco'} bind:value={formData.brand.value} 
-                                {removeErrorMessage} updateFilteredItems={updateFilteredBrands} errorKeys={['brand', '_schema']}
+                                {removeErrorMessage} updateFilteredItems={updateFilteredBrands} errorKeys={['brand', 'schema']}
                                 state={brandState} filteredItems={filteredBrands} {highlightedIndex} selectItem={selectBrand} {handleKeydown}
                             />
                         {/if}
@@ -385,7 +415,7 @@
                         <InputDisabled name={'brand_id'} bind:value={formData.brand_id.value} className={'form-control'}/>
                         {:else}
                             <InputWithSearch name={'brand_id'} placeholder={'e.g. C-1'} bind:value={formData.brand_id.value} 
-                                {removeErrorMessage} updateFilteredItems={updateFilteredIds} errorKeys={['brand_id', '_schema']}
+                                {removeErrorMessage} updateFilteredItems={updateFilteredIds} errorKeys={['brand_id', 'schema']}
                                 state={idState} filteredItems={filteredIds} {highlightedIndex} selectItem={selectId} {handleKeydown}
                             />
                         {/if}   
@@ -399,7 +429,7 @@
                         <InputDisabled name={'name'} bind:value={formData.name.value} className={'form-control'}/>
                         {:else}
                             <InputWithSearch name={'name'} placeholder={'e.g. Obsidian'} bind:value={formData.name.value} 
-                                {removeErrorMessage} updateFilteredItems={updateFilteredNames} errorKeys={['name', '_schema']}
+                                {removeErrorMessage} updateFilteredItems={updateFilteredNames} errorKeys={['name', 'schema']}
                                 state={nameState} filteredItems={filteredNames} {highlightedIndex} selectItem={selectName} {handleKeydown}
                             />
                         {/if}   

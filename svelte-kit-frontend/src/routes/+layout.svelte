@@ -6,9 +6,11 @@
 </script>
 
 <Header />
+
 <div class="main">
     <slot/>
 </div>
+
 <Footer />
 
 

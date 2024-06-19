@@ -10,27 +10,15 @@
     export let submitText = 'Submit text';
     export let deleteBtnLabel = 'Delete';
 
-    // handleDelete - function, the function to call when the delete button is clicked
-    export let handleDelete;
-    
-    // show - boolean, whether to show the modal or not
-    // updates the store value
-    export let show;
-    $: $showModal = show;
-    
-    // edit - boolean, whether the modal is in edit mode or not
-    // updates the store value
-    export let edit;
-    $: $editMode = edit;
-    
     // dialog - HTMLDialogElement, the dialog element
     export let dialog;
-    
-    // show the modal when the show value changes
+
+    // show the modal when the showModal is true and dialog is a valid HTML element
     $: if ($showModal && dialog) {
         dialog.showModal();
     }
     $: if (!$showModal && dialog) {
+        $editMode = false;
         dialog.close();
     }
     
@@ -39,13 +27,18 @@
     const dispatch = createEventDispatcher();
 
     // function to handle the submit button click
-    function handleClick(){
-        dispatch('submit');
+    function handleSubmitButtonClick(){
+        dispatch('clickSubmit');
     }
 
     // function to handle the reset button click
-    function onResetButtonClick(){
-        dispatch('resetValues');
+    function handleResetButtonClick(){
+        dispatch('clickReset');
+    }
+
+    // function to handle the delete button click
+    function handleDeleteButtonClick(){
+        dispatch('clickDelete');
     }
 
 </script>
@@ -53,7 +46,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 <dialog 
     bind:this={dialog}
-    on:close={() => show = false}
+    on:close={() => $showModal = false}
 >
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="modal-dialog scroll-container" role="document" on:click|stopPropagation>
@@ -75,17 +68,15 @@
                 <div class="container">
                     <div class="row justify-content-between">
                         <div class="col-12 col-md-4 p-2 p-md-2">
-                            <ButtonPrimary buttonText={submitText} on:click={handleClick}>
-                                { submitText }
-                            </ButtonPrimary>
+                            <ButtonPrimary buttonText={submitText} on:click={handleSubmitButtonClick} />
                         </div>
-                        <Button class="standard-btn col-12 col-md-4 p-2 p-md-2" type="secondary" outline on:click={onResetButtonClick} >
+                        <Button class="standard-btn col-12 col-md-4 p-2 p-md-2" type="secondary" outline on:click={handleResetButtonClick} >
                             Reset values
                         </Button>
                     </div>
-                    {#if editMode}
+                    {#if $editMode}
                     <div class="row justify-content-end mt-3 mb-3">
-                        <Button class="standard-btn col-12 col-md-4 p-2 p-md-2" outline color="danger" on:click={handleDelete}>
+                        <Button class="standard-btn col-12 col-md-4 p-2 p-md-2" outline color="danger" on:click={handleDeleteButtonClick}>
                             {deleteBtnLabel}
                         </Button>
                     </div>

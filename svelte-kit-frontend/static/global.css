@@ -2,9 +2,9 @@
     /* --main-color: rgb(1, 137, 137);
 
     --sec-color: rgb(140, 195, 195); */
-    --main-color: rgb(116, 118, 118);
+    --main-color: rgb(2, 74, 58);
 
-    --sec-color: rgb(221, 219, 219);
+    --sec-color: rgb(123, 175, 164);
 
     --text-color: rgb(57, 57, 57);
 
@@ -33,7 +33,6 @@ body {
     background-size: cover; /* Ensure the background covers the entire page */
     margin: 0;
     padding: 0;
-    color: #ffffff; /* Default text color to white for better readability against the background */
 }
 
 /* page titles */

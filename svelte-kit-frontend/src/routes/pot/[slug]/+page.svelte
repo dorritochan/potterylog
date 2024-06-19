@@ -1,2 +1,0 @@
-<p>Hello, this is a pot page.</p>
-

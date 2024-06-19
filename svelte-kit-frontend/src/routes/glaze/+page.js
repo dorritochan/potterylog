@@ -119,11 +119,11 @@
             });
 
             if (!response.ok) {
-                const errorMessage = await response.json()
-                throw new Error(`Error: ${errorMessage.message} (status: ${response.status})`);
+                const errorMessage = await response.json();
+                throw new Error(`${JSON.stringify(errorMessage.message)}`);
             }
 
-            return response;
+            return response.json();
 
         } catch (error) {
             console.error(`Failed to update glaze: ${error.message}`);
@@ -140,11 +140,11 @@
             });
 
             if (!response.ok) {
-                const errorMessage = await response.json()
-                throw new Error(`Error: ${errorMessage.message} (status: ${response.status})`);
+                const errorMessage = await response.json();
+                throw new Error(`${JSON.stringify(errorMessage.message)}`);
             }
 
-            return response;
+            return response.json();
 
         } catch (error) {
             console.error(`Failed to add glaze: ${error.message}`);

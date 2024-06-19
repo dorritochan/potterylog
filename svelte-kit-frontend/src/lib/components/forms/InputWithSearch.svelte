@@ -12,12 +12,14 @@
     export let highlightedIndex;
     export let selectItem;
     
-    function handleInput() {
-        updateFilteredItems();
-        errorKeys.forEach(removeErrorMessage);
-    }
     function handleClick() {
         updateFilteredItems();
+    }
+    function handleInput() {
+        handleClick();
+        
+        // Remove error messages when the user starts typing
+        errorKeys.forEach(removeErrorMessage);
     }
     function handleThisKeydown(event) {
         handleKeydown(event, state);
@@ -25,8 +27,8 @@
 </script>
 
 <input type="search" class="form-control input-search" autocomplete="off" 
-        name={name}
-        placeholder={placeholder}
+        {name}
+        {placeholder}
         bind:value
         on:input={() => handleInput()}
         on:focus={() => handleClick()} 

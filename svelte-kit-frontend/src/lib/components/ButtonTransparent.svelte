@@ -1,12 +1,13 @@
 <script>
     import { Button } from "sveltestrap";
     export let buttonText = '';
-    export let handleOnClick;
 </script>
 
-<Button class="standard-btn transparent" on:click={handleOnClick}>
-    {@html buttonText}
-</Button>
+<div name="addButton" class="m-3 centered">
+    <Button class="standard-btn transparent" on:click>
+        {@html buttonText}
+    </Button>
+</div>
 
 
 <style>

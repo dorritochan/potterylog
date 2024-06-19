@@ -5,11 +5,11 @@
     // linkList - array of objects, each object represents a link
     export let linkList = [];
 
-    // handleOnClickEdit - function to be called when the edit button is clicked
+    // handleClickEdit - function to be called when the edit button is clicked
     // the link id is passed as an argument
-    export let handleOnClickEdit;
+    export let openModal;
     function handleClickEdit(linkId){
-        handleOnClickEdit();
+        openModal();
         dispatch('edit', linkId);
     }
 

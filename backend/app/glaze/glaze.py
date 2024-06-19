@@ -124,6 +124,11 @@ def update_glaze(glaze_id):
     glaze_schema = GlazeSchema(session=db.session, context={'is_update':True})
     
     if old_glaze:
+        # Check if the new values are different from the current ones
+        fields = ['brand', 'name', 'brand_id', 'color', 'temp_min', 'temp_max', 'cone', 'glaze_url']
+        if all(getattr(old_glaze, field) == data.get(field) for field in fields):
+            return jsonify({'message': 'No changes were made.'}), 200
+        
         try:
             glaze_schema.load(data, instance=old_glaze, partial=True)
             db.session.commit()

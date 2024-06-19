@@ -4,7 +4,7 @@
     import TableLink from "$lib/components/TableLink.svelte";
 
     // Stores
-    import { showModal, editMode} from "$lib/stores/glaze.js";
+    import { showModal, editMode } from "$lib/stores/link.js";
 
     export let data;
     let linkList = data.linkList;
@@ -14,10 +14,10 @@
         $showModal = true;
     }
 
-    function handleOnClickEdit(linkId) {
+    let linkId;
+    function handleClickEdit(linkId) {
         $editMode = true;
-        openModal();
-        
+        linkId = linkId.detail;
         console.log("Edit button clicked for link ID:", linkId);
     }
 </script>
@@ -34,9 +34,9 @@
 </div>
 
 <div name="addButton" class="m-3 centered">
-    <ButtonTransparent handleOnClick={openModal} buttonText={'&plus; Add a new link'}/>
+    <ButtonTransparent on:click={openModal} buttonText={'&plus; Add a new link'}/>
 </div>
 
-<TableLink {handleOnClickEdit} {linkList}/>
+<TableLink on:edit={handleClickEdit} {openModal} {linkList}/>
 
 <ModalFormLink />
